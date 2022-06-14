@@ -6,8 +6,9 @@
 
 <mapper namespace="com.games.tap.mapper.UserMapper">
 
-    <select id="getAllUserInfo" parameterType="java.util.List">
-        SELECT * FROM user_info
-    </select>
 
+
+    <select id="getAllUserInfo" resultType="com.games.tap.domain.UserInfo">
+        select * from user_info
+    </select>
 </mapper>
