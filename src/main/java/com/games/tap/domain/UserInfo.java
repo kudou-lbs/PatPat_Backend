@@ -26,7 +26,7 @@ public class UserInfo {
     private Integer gender;
 
     @Column(name = "regis_time",columnDefinition = "varchar(25)")
-    private String registerTime;
+    private String regisTime;
 
     @Column(name = "fans_num",columnDefinition = "int(11)")
     private Integer fansNum;
