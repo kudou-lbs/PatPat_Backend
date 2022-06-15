@@ -13,7 +13,7 @@ build with maven
 ```shell
 cd folderRoot
 mvn install
-mvn spring-boor:run
+mvn spring-boot:run
 ```
 ### Interface url
 
