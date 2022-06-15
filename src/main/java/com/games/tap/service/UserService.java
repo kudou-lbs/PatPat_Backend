@@ -16,4 +16,12 @@ public class UserService {
     public List<UserInfo> getAllUserInfo(){
         return mUserMapper.getAllUserInfo();
     }
+
+    public List<UserInfo> getPicByName(String name) {
+        return mUserMapper.getPicByName(name);
+    }
+
+    public int insertPic(UserInfo userInfo) {
+        return mUserMapper.insertPic(userInfo);
+    }
 }

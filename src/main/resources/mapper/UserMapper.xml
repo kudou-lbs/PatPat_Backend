@@ -5,10 +5,16 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.games.tap.mapper.UserMapper">
-
-
-
     <select id="getAllUserInfo" resultType="com.games.tap.domain.UserInfo">
         select * from user_info
     </select>
+
+    <select id="getPicByName" resultType="com.games.tap.domain.UserInfo">
+        select uid,avatar,nickname from user_info where nickname=#{name}
+    </select>
+
+
+    <insert id="insertPic">
+        insert into user_info(avatar,nickname) values(#{avatar},#{nickname})
+    </insert>
 </mapper>

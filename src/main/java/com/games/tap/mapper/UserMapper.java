@@ -7,4 +7,7 @@ import java.util.List;
 public interface UserMapper {
 
     List<UserInfo> getAllUserInfo();
+
+    List<UserInfo> getPicByName(String name);
+    int insertPic(UserInfo userInfo);
 }
