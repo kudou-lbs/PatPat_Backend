@@ -4,6 +4,8 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Blob;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,8 +27,8 @@ public class UserInfo {
     @Column(name = "gender",columnDefinition = "int(1)")
     private Integer gender;
 
-    @Column(name = "regis_time",columnDefinition = "varchar(25)")
-    private String regisTime;
+    @Column(name = "register_time",columnDefinition = "varchar(25)")
+    private String registerTime;
 
     @Column(name = "fans_num",columnDefinition = "int(11)")
     private Integer fansNum;
@@ -34,4 +36,11 @@ public class UserInfo {
     @Column(name = "follow_num",columnDefinition = "int(11)")
     private Integer followNum;
 
+    //TODO implement background and avatar
+
+//    @OneToMany(mappedBy = "followedUId",cascade = CascadeType.REMOVE)
+//    List<Concern>concernList1= new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "followingUId",cascade = CascadeType.REMOVE)
+//    List<Concern>concernList2= new ArrayList<>();
 }

@@ -10,20 +10,19 @@ import javax.persistence.*;
 @Setter
 @ToString
 @Entity
-@Table(name = "user_login")
-public class UserLogin {
+@Table(name = "collection")
+public class Collection {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", columnDefinition = "bigint(20)")
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "uid", referencedColumnName = "uid")
+    @ManyToOne
+    @JoinColumn(name = "uid",referencedColumnName = "uid")
     private UserInfo uId;
 
-    @Column(name = "username", columnDefinition = "varchar(40)")
-    private String userName;
+    @ManyToOne
+    @JoinColumn(name = "pid",referencedColumnName = "pid")
+    private Post pId;
 
-    @Column(name = "password", columnDefinition = "varchar(30)")
-    private String password;
 }

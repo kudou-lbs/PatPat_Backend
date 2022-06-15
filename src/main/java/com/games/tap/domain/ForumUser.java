@@ -28,10 +28,10 @@ public class ForumUser {
 
     @ManyToOne
     @JoinColumn(name = "uid", referencedColumnName = "uid")
-    private UserInfo userInfo;
+    private UserInfo uId;
 
     @ManyToOne
     @JoinColumn(name = "cid", referencedColumnName = "cid")
-    private Community community;
+    private Community cId;
 
 }
