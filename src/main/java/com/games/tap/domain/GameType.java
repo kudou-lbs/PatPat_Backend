@@ -20,7 +20,6 @@ public class GameType {
     @Column(name = "type",columnDefinition = "int(3)")
     private TypeEnum type;
 
-    @ManyToOne
-    @JoinColumn(name = "gid",referencedColumnName = "gid")
-    private Game gId;
+    @Column(name = "gid", columnDefinition = "bigint(20)")
+    private Long gId;
 }

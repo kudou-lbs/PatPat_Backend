@@ -5,6 +5,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,11 +19,10 @@ public class Reply {
     @Column(name = "rid", columnDefinition = "bigint(20)")
     private Long rId;
 
-    @OneToOne
-    @JoinColumn(name = "uid",referencedColumnName = "uid")
-    private UserInfo uId;
+    @Column(name = "uid", columnDefinition = "bigint(20)")
+    private Long uId;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "pid",referencedColumnName = "pid")
     private Post pId;
 
@@ -45,4 +46,8 @@ public class Reply {
 
     @Column(name = "is_floor",columnDefinition = "int(1)")
     private Integer isFloor;
+
+    @OneToMany(mappedBy = "rId",cascade = CascadeType.ALL)
+    @ToString.Exclude
+    List<ReplyLike>replyLikeList=new ArrayList<>();
 }

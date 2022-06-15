@@ -21,8 +21,7 @@ public class Collection {
     @JoinColumn(name = "uid",referencedColumnName = "uid")
     private UserInfo uId;
 
-    @ManyToOne
-    @JoinColumn(name = "pid",referencedColumnName = "pid")
-    private Post pId;
+    @Column(name = "pid", columnDefinition = "bigint(20)")
+    private Long pId;
 
 }

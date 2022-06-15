@@ -30,8 +30,7 @@ public class ForumUser {
     @JoinColumn(name = "uid", referencedColumnName = "uid")
     private UserInfo uId;
 
-    @ManyToOne
-    @JoinColumn(name = "cid", referencedColumnName = "cid")
-    private Community cId;
+    @Column(name = "cid", columnDefinition = "bigint(20)")
+    private Long cId;
 
 }

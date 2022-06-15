@@ -17,9 +17,8 @@ public class ReplyLike {
     @Column(name = "id", columnDefinition = "bigint(20)")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "uid",referencedColumnName = "uid")
-    private UserInfo uId;
+    @Column(name = "uid",columnDefinition = "bigint(20)")
+    private Long uId;
 
     @ManyToOne
     @JoinColumn(name = "rid",referencedColumnName = "rid")

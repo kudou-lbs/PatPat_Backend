@@ -5,6 +5,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -28,4 +30,8 @@ public class Community {
 
     @Column(name = "post_num", columnDefinition = "int(11)")
     private Integer postNum;
+
+    @OneToMany(mappedBy = "cId",cascade = CascadeType.ALL)
+    @ToString.Exclude
+    List<Post>postList=new ArrayList<>();
 }

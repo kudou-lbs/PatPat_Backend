@@ -38,9 +38,22 @@ public class UserInfo {
 
     //TODO implement background and avatar
 
-//    @OneToMany(mappedBy = "followedUId",cascade = CascadeType.REMOVE)
-//    List<Concern>concernList1= new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "followingUId",cascade = CascadeType.REMOVE)
-//    List<Concern>concernList2= new ArrayList<>();
+    @OneToMany(mappedBy = "followedUId",cascade = CascadeType.ALL)
+    @ToString.Exclude
+    List<Concern>concernList1= new ArrayList<>();
+
+    @OneToMany(mappedBy = "followingUId",cascade = CascadeType.ALL)
+    @ToString.Exclude
+    List<Concern>concernList2= new ArrayList<>();
+
+    @OneToMany(mappedBy = "uId",cascade = CascadeType.ALL)
+    @ToString.Exclude
+    List<Collection>collectionList=new ArrayList<>();
+
+    @OneToMany(mappedBy = "uId",cascade = CascadeType.ALL)
+    @ToString.Exclude
+    List<ForumUser>forumUserList=new ArrayList<>();
+
+    @OneToOne(mappedBy = "uId",cascade = CascadeType.ALL)
+    UserLogin login;
 }
