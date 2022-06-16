@@ -12,9 +12,12 @@
     <select id="getPicByName" resultType="com.games.tap.domain.UserInfo">
         select uid,avatar,nickname from user_info where nickname=#{name}
     </select>
-
-
+    <cache readOnly="true"/>
     <insert id="insertPic">
         insert into user_info(avatar,nickname) values(#{avatar},#{nickname})
     </insert>
+
+    <select id="getUserById" resultType="com.games.tap.domain.UserInfo">
+        SELECT * FROM user_info WHERE uid=#{id}
+    </select>
 </mapper>

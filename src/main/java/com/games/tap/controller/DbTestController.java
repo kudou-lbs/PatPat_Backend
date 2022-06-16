@@ -3,7 +3,6 @@ package com.games.tap.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.games.tap.domain.UserInfo;
-import com.games.tap.mapper.UserMapper;
 import com.games.tap.service.UserService;
 import com.games.tap.util.Echo;
 
@@ -13,19 +12,17 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
 @Tag(name = "数据库操作测试")
+@RequestMapping("/test")
 @RestController
 public class DbTestController {
     @Autowired
@@ -35,10 +32,10 @@ public class DbTestController {
     @Operation(summary = "主页",description = "null")
     @RequestMapping(value = "/",method = RequestMethod.GET)
     public String hello(){
-        return "pages/root.html";
+        return "hello";
     }
 
-    @Operation(summary = "获取所有用户信息")
+    @Operation(summary = "获取所有用户信息" )
     @RequestMapping(value = "/UserInfo/getAll",method = RequestMethod.GET)
     @ResponseBody
     public List<UserInfo> getAllUserInfo(){
@@ -53,7 +50,7 @@ public class DbTestController {
     public String uploadImg(@RequestParam("fileName") MultipartFile file, @RequestParam("nickname") String nickName,HttpServletRequest request) throws IOException {
 
         String result;//上传结果信息
-        Map<String,Object> map=new HashMap<String, Object>();
+        Map<String,Object> map=new HashMap<>();
 
         if (file.getSize() / 1000 > 100){
             result="图片大小不能超过100KB";
@@ -61,10 +58,11 @@ public class DbTestController {
         else{
             //判断上传文件格式
             String fileType = file.getContentType();
-            if (fileType.equals("image/jpeg") || fileType.equals("image/png") || fileType.equals("image/jpeg")) {
+            if (Objects.equals(fileType, "image/png") || Objects.equals(fileType, "image/jpeg")) {
                 //获取文件名
                 String fileName = file.getOriginalFilename();
                 //获取文件后缀名
+                assert fileName != null;
                 int index = fileName.lastIndexOf(".");
                 String suffixName;
                 if(index > 0) {
@@ -137,8 +135,7 @@ public class DbTestController {
         UserInfo userInfo = new UserInfo();
         userInfo.setNickname(nickName);
         userInfo.setAvatar(path);
-        int row = userService.insertPic(userInfo);
-        return row;
+        return userService.insertPic(userInfo);
     }
 
     @Operation(summary = "获取图片路径")

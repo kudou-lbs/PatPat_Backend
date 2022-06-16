@@ -20,15 +20,15 @@ public class UserLogin {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "uid", referencedColumnName = "uid")
+    @JoinColumn(name = "uid", referencedColumnName = "uid",nullable = false)
     @Schema(description = "用户Id",required = true)
     private UserInfo uId;
 
-    @Column(name = "username", columnDefinition = "varchar(40)")
+    @Column(name = "username", columnDefinition = "varchar(40) ",nullable = false)
     @Schema(description = "账户名",required = true)
     private String userName;
 
-    @Column(name = "password", columnDefinition = "varchar(30)")
+    @Column(name = "password", columnDefinition = "varchar(30)",nullable = false)
     @Schema(description = "密码",required = true)
     private String password;
 }

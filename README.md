@@ -26,3 +26,6 @@ mvn spring-boot:run
 ---
 2022-06-15
 - Complete the database design
+
+2022-06-16
+- Integrate logging and token login authentication

@@ -13,7 +13,7 @@ public class UserService {
     @Resource
     public UserMapper mUserMapper;
 
-    public List<UserInfo> getAllUserInfo(){
+    public List<UserInfo> getAllUserInfo() {
         return mUserMapper.getAllUserInfo();
     }
 
@@ -23,5 +23,9 @@ public class UserService {
 
     public int insertPic(UserInfo userInfo) {
         return mUserMapper.insertPic(userInfo);
+    }
+
+    public UserInfo getUserById(Long id) {
+        return mUserMapper.getUserById(id);
     }
 }
