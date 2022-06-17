@@ -1,6 +1,7 @@
 package com.games.tap.controller;
 
 import com.games.tap.domain.UserInfo;
+import com.games.tap.domain.UserLogin;
 import com.games.tap.service.LoginService;
 import com.games.tap.service.UserService;
 import com.games.tap.util.JwtUtil;
@@ -36,15 +37,21 @@ public class UserController {
     }
 
     @Operation(summary = "通过id更改密码")
-    @RequestMapping(value = "UserLogin/update",method = RequestMethod.POST)
-    public int update(Integer id){
-        return loginService.update(id);
+    @RequestMapping(value = "/UserLogin/update")
+    public int update(Integer id,String password){
+        return loginService.update(id,password);
     }
 
     @Operation(summary = "通过id删除账号")
-    @RequestMapping(value = "UserLogin/deleteById",method = RequestMethod.DELETE)
-    public void deleteById(Integer id){
-        loginService.deleteById(id);
+    @RequestMapping(value = "/UserLogin/deleteById")
+    public int deleteById(Integer id){
+        return loginService.deleteById(id);
+    }
+
+    @Operation(summary = "通过id查找账号、密码")
+    @RequestMapping(value = "/UserLogin/getById")
+    public UserLogin getById(Integer id){
+        return loginService.getById(id);
     };
 
 }

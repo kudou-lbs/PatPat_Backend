@@ -22,27 +22,31 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-//        log.info("=======进入拦截器========");
+        log.info("=======进入拦截器========");
         // 如果不是映射到方法直接通过,可以访问资源.
         if (!(handler instanceof HandlerMethod)) {
+            log.info("我在11111111111111");
             return true;
         }
         log.info(request.getRequestURI());
         Method method = ((HandlerMethod) handler).getMethod();
         //检查是否有passtoken注释，有则跳过认证
         if (method.isAnnotationPresent(PassToken.class)) {
+            log.info("我在222222222222222222222222222");
             PassToken passToken = method.getAnnotation(PassToken.class);
             if (passToken.required()) {
                 return true;
             }
         }
         // 从 http 请求头中取出 token
+        log.info("我在3333333333333333333");
         String token = request.getHeader("token");
         if (null == token || "".equals(token.trim())) {
             log.warn("token为空");
             return false;//为空就返回错误
         }
         //1.判断 token 是否过期
+        log.info("我在44444444444444444444");
         if (JwtUtil.isValid(token)) {
             log.info("token验证成功");
         } else {//token过期就返回 token 无效.

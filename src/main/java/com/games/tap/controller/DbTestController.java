@@ -3,10 +3,12 @@ package com.games.tap.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.games.tap.domain.UserInfo;
+import com.games.tap.service.LoginService;
 import com.games.tap.service.UserService;
 import com.games.tap.util.Echo;
 
 
+import com.games.tap.util.PassToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,8 @@ import java.util.*;
 public class DbTestController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private LoginService loginService;
     private ObjectMapper mapper = new ObjectMapper();
 
     @Operation(summary = "主页",description = "null")
