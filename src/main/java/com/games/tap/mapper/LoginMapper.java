@@ -14,7 +14,7 @@ public interface LoginMapper {
     /**登录**/
     UserLogin login(String username, String password);
 
-    UserLogin getUserLoginsByUId(Long uId);
+    UserLogin getUserLoginByUId(Long uId);
 
     UserLogin getUserLoginByName(String userName);
 }

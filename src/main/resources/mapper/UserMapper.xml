@@ -13,8 +13,11 @@
         select uid,avatar,nickname from user_info where nickname=#{name}
     </select>
     <cache readOnly="true"/>
-    <insert id="insertPic">
-        insert into user_info(avatar,nickname) values(#{avatar},#{nickname})
+    <insert id="insertAvatar">
+        insert into user_info(avatar) values (#{avatar})
+    </insert>
+    <insert id="insertBackground">
+        insert into user_info(background) values (#{background})
     </insert>
 
     <select id="getUserById" resultType="com.games.tap.domain.UserInfo">

@@ -10,7 +10,8 @@ public interface UserMapper {
 
     List<UserInfo> getPicByName(String name);
 
-    int insertPic(UserInfo userInfo);
+    int insertAvatar(UserInfo userInfo);
+    int insertBackground(UserInfo userInfo);
 
     UserInfo getUserById(Long id);
 }

@@ -16,16 +16,6 @@ public class LoginService {
     @Resource
     private LoginMapper mLoginMapper;
 
-    public Map<String, Object> login(UserInfo user) {
-
-        UserInfo selectUser = new UserInfo();
-        //将userId存入token中
-        String token = JwtUtil.createToken(selectUser);
-        Map<String, Object> map = new HashMap<>();
-        map.put("user", selectUser);
-        map.put("token", token);
-        return map;
-    }
 
     public UserLogin getUserLoginByName(String name){
         return mLoginMapper.getUserLoginByName(name);

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" >
+    <head>
+        <meta charset="UTF-8">
+        <title>root</title>
+        <link type="text/css" rel="styleSheet"  href="main.css"/>
+        <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="main.js"></script>
+    </head>
+    <body>
+	<form action="/test/uploadImg" method="post">
+        <div id="top" class="center">
+            <p id="message"></p>
+        </div>
+        <div id="upload" class="center">
+            <h1>img upload</h1>
+            <label for="nickname">owner:</label><input type="text" name="nickname" id="nickname"/>
+            <input type="file" name="filename" id="filename" accept="image/png, image/jpeg, image/jpg" onchange="checkImg()"/>
+            <input type="button" id="submit" onclick="imgUpload()" value="submit"/>
+        </div>
+        <div id="load_img" class="center"></div>
+	</form>
+	
+	<form action="/test/getImgPath" method="get">
+        <div id="show_img" class="center">
+            <input type="button" id="show" onclick="showImg()" value="show img by owner">
+            <div id="owner_img"></div>
+        </div>
+	</form>
+		
+    </body>
+</html>
