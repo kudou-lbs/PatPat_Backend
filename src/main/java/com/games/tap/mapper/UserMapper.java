@@ -9,6 +9,7 @@ public interface UserMapper {
     List<UserInfo> getAllUserInfo();
 
     List<UserInfo> getPicByName(String name);
+
     int insertPic(UserInfo userInfo);
 
     UserInfo getUserById(Long id);

@@ -25,4 +25,12 @@ public class LoginService {
         map.put("token", token);
         return map;
     }
+
+    public int update(Integer id){
+        return mLoginMapper.update(id);
+    }
+
+    public void deleteById(Integer id){
+        mLoginMapper.deleteById(id);
+    };
 }
