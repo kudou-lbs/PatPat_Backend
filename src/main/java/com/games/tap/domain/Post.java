@@ -26,10 +26,9 @@ public class Post {
     @Schema(description = "用户Id")
     private Long uId;
 
-    @ManyToOne
-    @JoinColumn(name = "fid",referencedColumnName = "fid")
+    @Column(name = "fid",columnDefinition = "bigint(20)",nullable = false)
     @Schema(description = "论坛Id",required = true)
-    private Forum fId;
+    private Long fId;
 
     @Column(name = "title",columnDefinition = "varchar(100)")
     @Schema(description = "帖子标题")
@@ -58,15 +57,5 @@ public class Post {
     @Column(name = "reading_num",columnDefinition = "int(11) default 1")
     @Schema(description = "阅读数量")
     private Integer readingNum;
-
-    @OneToMany(mappedBy = "pId",cascade = CascadeType.ALL)
-    @ToString.Exclude
-    @Hidden
-    List<Reply>replyList=new ArrayList<>();
-
-    @OneToMany(mappedBy = "pId",cascade = CascadeType.ALL)
-    @ToString.Exclude
-    @Hidden
-    List<PostLike>postLikeList=new ArrayList<>();
 
 }

@@ -27,6 +27,10 @@ public class LoginService {
         return map;
     }
 
+    public UserLogin getUserLoginByName(String name){
+        return mLoginMapper.getUserLoginByName(name);
+    }
+
     public int update(Integer id,String password){
         return mLoginMapper.update(id,password);
     }

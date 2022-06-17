@@ -26,5 +26,14 @@
         select * from user_login where username=#{username} and password=#{password}
     </select>
 
+    <select id="getUserLoginByName" resultType="com.games.tap.domain.UserLogin">
+        SELECT * FROM user_login WHERE username=#{userName}
+    </select>
+
+    <select id="getUserLoginByUId" resultType="com.games.tap.domain.UserLogin">
+        SELECT * FROM user_login WHERE uid=#{uId}
+    </select>
+
+    <cache readOnly="true"/>
 
 </mapper>

@@ -31,10 +31,9 @@ public class ForumUser {
     @Schema(description = "论坛权限")
     private Integer identity;
 
-    @ManyToOne
-    @JoinColumn(name = "uid", referencedColumnName = "uid")
+    @Column(name = "uid", columnDefinition = "bigint(20)",nullable = false)
     @Schema(description = "用户Id",required = true)
-    private UserInfo uId;
+    private Long uId;
 
     @Column(name = "fid", columnDefinition = "bigint(20)")
     @Schema(description = "论坛Id")

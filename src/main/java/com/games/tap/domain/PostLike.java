@@ -23,9 +23,8 @@ public class PostLike {
     @Schema(description = "用户Id")
     private Long uId;
 
-    @ManyToOne
-    @JoinColumn(name = "pid",referencedColumnName = "pid")
+    @Column(name = "pid",columnDefinition = "bigint(20)",nullable = false)
     @Schema(description = "帖子Id",required = true)
-    private Post pId;
+    private Long pId;
 
 }

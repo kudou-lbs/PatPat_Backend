@@ -28,7 +28,7 @@ public class JwtInterceptor implements HandlerInterceptor {
             log.info("我在11111111111111");
             return true;
         }
-        log.info(request.getRequestURI());
+        log.debug("拦截"+request.getRequestURI());
         Method method = ((HandlerMethod) handler).getMethod();
         //检查是否有passtoken注释，有则跳过认证
         if (method.isAnnotationPresent(PassToken.class)) {
@@ -53,7 +53,7 @@ public class JwtInterceptor implements HandlerInterceptor {
             throw new RuntimeException("token 无效");
 //            return false; FIXME
         }
-        log.info("==============token:" + token);
+        log.info("token:" + token);
         Map<String, Object> map = JwtUtil.parseToken(token);
         Long userId = Long.parseLong(String.valueOf(map.get("userId")));
         //2.超过token刷新时间，刷新 token
@@ -62,6 +62,7 @@ public class JwtInterceptor implements HandlerInterceptor {
             response.setHeader("token", JwtUtil.createToken(user));
             log.info("token刷新成功");
         }
+        log.debug("处理完成");
         return true;
     }
 }

@@ -9,9 +9,11 @@ import com.games.tap.util.PassToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -27,11 +29,29 @@ public class UserController {
         // 先验证用户的账号密码,账号密码验证通过之后，生成Token
         log.warn(user.toString());
         return JwtUtil.createToken(user);
+
+    @Resource
+    LoginService mLoginService;
+    @Resource
+    UserService mUserService;
+
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    public String login(String username, String password) {
+        if (username.isEmpty() || password.isEmpty()) return "字段不能为空";
+        UserLogin userLogin = mLoginService.getUserLoginByName(username);
+        if (userLogin == null) return "账户名不存在";
+        UserInfo user;
+        if (password.equals(userLogin.getPassword())) {
+            user = mUserService.getUserById(userLogin.getUId());
+            // 先验证用户的账号密码,账号密码验证通过之后，生成Token
+            return JwtUtil.createToken(user);
+        }
+        return "登录失败";
     }
 
     @PostMapping("/testToken")
-    public String testToken(HttpServletRequest request){
-        String token = request.getHeader("token");
+    public String testToken(@RequestHeader("token") String token) {
+        if (token.isEmpty()) return "请求失败";
         JwtUtil.parseToken(token);
         return "请求成功";
     }

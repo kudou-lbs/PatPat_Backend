@@ -19,10 +19,9 @@ public class UserLogin {
     @Schema(description = "主键Id",accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "uid", referencedColumnName = "uid",nullable = false)
+    @Column(name = "uid", columnDefinition = "bigint(20)",nullable = false)
     @Schema(description = "用户Id",required = true)
-    private UserInfo uId;
+    private Long uId;
 
     @Column(name = "username", columnDefinition = "varchar(40) ",nullable = false)
     @Schema(description = "账户名",required = true)

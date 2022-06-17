@@ -19,13 +19,11 @@ public class Concern {
     @Schema(description = "主键Id",accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "following_uid",referencedColumnName = "uid")
+    @Column(name = "following_uid",columnDefinition = "bigint(20)",nullable = false)
     @Schema(description = "跟随者Id",required = true)
-    private UserInfo followingUId;
+    private Long followingUId;
 
-    @ManyToOne
-    @JoinColumn(name = "followed_uid",referencedColumnName = "uid")
+    @Column(name = "followed_uid",columnDefinition = "bigint(20)",nullable = false)
     @Schema(description = "被关注者Id",required = true)
-    private UserInfo followedUId;
+    private Long followedUId;
 }

@@ -23,9 +23,8 @@ public class ReplyLike {
     @Schema(description = "用户Id")
     private Long uId;
 
-    @ManyToOne
-    @JoinColumn(name = "rid",referencedColumnName = "rid")
+    @Column(name = "rid",columnDefinition = "bigint(20)",nullable = false)
     @Schema(description = "回复Id",required = true)
-    private Reply rId;
+    private Long rId;
 
 }

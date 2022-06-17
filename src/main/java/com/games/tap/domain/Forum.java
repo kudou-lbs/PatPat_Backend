@@ -30,16 +30,12 @@ public class Forum {
     @Schema(description = "论坛简介")
     private String intro;
 
-    @Column(name = "follower", columnDefinition = "int(11) default 0")
+    @Column(name = "follow_num", columnDefinition = "int(11) default 0")
     @Schema(description = "论坛用户数量")
-    private Integer follower;
+    private Integer followNum;
 
     @Column(name = "post_num", columnDefinition = "int(11) default 0")
     @Schema(description = "帖子数")
     private Integer postNum;
 
-    @OneToMany(mappedBy = "fId",cascade = CascadeType.ALL)
-    @ToString.Exclude
-    @Hidden
-    List<Post>postList=new ArrayList<>();
 }
