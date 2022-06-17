@@ -19,10 +19,9 @@ public class Collection {
     @Schema(description = "主键Id",accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "uid",referencedColumnName = "uid")
+    @Column(name = "uid",columnDefinition = "bigint(20)",nullable = false)
     @Schema(description = "用户Id",required = true)
-    private UserInfo uId;
+    private Long uId;
 
     @Column(name = "pid", columnDefinition = "bigint(20)")
     @Schema(description = "帖子Id")

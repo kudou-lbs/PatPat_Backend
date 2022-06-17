@@ -1,6 +1,7 @@
 package com.games.tap.service;
 
 import com.games.tap.domain.UserInfo;
+import com.games.tap.domain.UserLogin;
 import com.games.tap.mapper.LoginMapper;
 import com.games.tap.util.JwtUtil;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ public class LoginService {
     @Resource
     private LoginMapper mLoginMapper;
 
-    public Map<String, Object> login(UserInfo user) {
+    public Map<String, Object> login(UserLogin userLogin) {
 
         UserInfo selectUser = new UserInfo();
         //将userId存入token中
@@ -24,5 +25,9 @@ public class LoginService {
         map.put("user", selectUser);
         map.put("token", token);
         return map;
+    }
+
+    public UserLogin getUserLoginByName(String name){
+        return mLoginMapper.getUserLoginByName(name);
     }
 }

@@ -53,27 +53,4 @@ public class UserInfo {
     @Schema(description = "背景图路径")
     private String background;
 
-    @OneToMany(mappedBy = "followedUId",cascade = CascadeType.ALL)
-    @ToString.Exclude
-    @Hidden
-    List<Concern>concernList1= new ArrayList<>();
-
-    @OneToMany(mappedBy = "followingUId",cascade = CascadeType.ALL)
-    @ToString.Exclude
-    @Hidden
-    List<Concern>concernList2= new ArrayList<>();
-
-    @OneToMany(mappedBy = "uId",cascade = CascadeType.ALL)
-    @ToString.Exclude
-    @Hidden
-    List<Collection>collectionList=new ArrayList<>();
-
-    @OneToMany(mappedBy = "uId",cascade = CascadeType.ALL)
-    @ToString.Exclude
-    @Hidden
-    List<ForumUser>forumUserList=new ArrayList<>();
-
-    @OneToOne(mappedBy = "uId",cascade = CascadeType.ALL)
-    @Hidden
-    UserLogin login;
 }

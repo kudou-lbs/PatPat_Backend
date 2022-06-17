@@ -1,4 +1,11 @@
 package com.games.tap.mapper;
 
-public interface LoginMapper{
+import com.games.tap.domain.UserInfo;
+import com.games.tap.domain.UserLogin;
+
+
+public interface LoginMapper {
+    UserLogin getUserLoginsByUId(Long uId);
+
+    UserLogin getUserLoginByName(String userName);
 }

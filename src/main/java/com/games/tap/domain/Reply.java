@@ -30,10 +30,9 @@ public class Reply {
     @Schema(description = "论坛Id",required = true)
     private Long fId;
 
-    @ManyToOne
-    @JoinColumn(name = "pid",referencedColumnName = "pid")
+    @Column(name = "pid",columnDefinition = "bigint(20)",nullable = false)
     @Schema(description = "帖子Id",required = true)
-    private Post pId;
+    private Long pId;
 
     @Column(name = "content",columnDefinition = "varchar(500)")
     @Schema(description = "发布内容")
@@ -63,8 +62,4 @@ public class Reply {
     @Schema(description = "是否是子贴（否则为楼中楼回复）")
     private Integer isFloor;
 
-    @OneToMany(mappedBy = "rId",cascade = CascadeType.ALL)
-    @ToString.Exclude
-    @Hidden
-    List<ReplyLike>replyLikeList=new ArrayList<>();
 }
