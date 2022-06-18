@@ -29,3 +29,13 @@ mvn spring-boot:run
 
 2022-06-16
 - Integrate logging and token login authentication
+
+2022-06-17
+- Defines the unified return interface
+- Completed the login function
+- Improve the swagger-ui
+
+2022-06-18
+- Merge the code and optimize picture uploading function
+- rename `user_info` to `user`
+- Completed the registration function and user interface
