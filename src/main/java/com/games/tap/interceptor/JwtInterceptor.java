@@ -1,14 +1,14 @@
 package com.games.tap.interceptor;
 
-import com.games.tap.domain.UserInfo;
-import com.games.tap.service.UserService;
+import com.games.tap.domain.User;
+import com.games.tap.mapper.UserMapper;
 import com.games.tap.util.JwtUtil;
 import com.games.tap.util.PassToken;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
@@ -17,8 +17,8 @@ import java.util.Map;
 @Slf4j
 public class JwtInterceptor implements HandlerInterceptor {
 
-    @Autowired
-    private UserService mUserService;
+    @Resource
+    private UserMapper userMapper;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -54,7 +54,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         Long userId = Long.parseLong(String.valueOf(map.get("userId")));
         //2.超过token刷新时间，刷新 token
         if (JwtUtil.isNeedUpdate(token)) {
-            UserInfo user= mUserService.getUserById(userId);//可能有问题
+            User user= userMapper.getUserById(userId);//可能有问题
             response.setHeader("token", JwtUtil.createToken(user));
             log.info("token刷新成功");
         }

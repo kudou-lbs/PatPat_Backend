@@ -1,25 +1,29 @@
 package com.games.tap.mapper;
 
-import com.games.tap.domain.UserInfo;
+import com.games.tap.domain.User;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 public interface UserMapper {
 
-    List<UserInfo> getAllUser();
+    List<User> getAllUser();
 
-    List<UserInfo> getPicByUserName(String name);
+    User getUserById(Long id);
 
-    int insertAvatar(UserInfo userInfo);
-    int insertBackground(UserInfo userInfo);
+    User getUserByUserName(String name);
 
-    int insertUser(UserInfo user);
+    String getUserAvatarByUserName(String name);
 
-    UserInfo getUserById(Long id);
+    int updateUserAvatar(@Param("uId")Long uid,@Param("avatar")String avatar);
 
-    UserInfo getUserByUserName(String name);
+    int updatePassword(@Param("uId") Long uid, @Param("password")String password);
+
+    int updateBackground(@Param("uId") Long uid, @Param("background")String background);
+
+    int updateUser(User user);
+
+    int insertUser(User user);
 
     int deleteUserById(Long id);
-    /**改**/
-    int updateUser(UserInfo user);
 }

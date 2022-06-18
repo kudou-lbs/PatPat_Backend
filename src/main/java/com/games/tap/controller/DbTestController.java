@@ -1,23 +1,17 @@
 package com.games.tap.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.games.tap.domain.UserInfo;
-import com.games.tap.service.UserService;
-import com.games.tap.service.UploadImg;
+import com.games.tap.mapper.UserMapper;
+import com.games.tap.service.ImageService;
 
 
-import com.games.tap.util.PassToken;
+import com.games.tap.util.Echo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -25,11 +19,10 @@ import java.util.*;
 @RequestMapping("/test")
 @RestController
 public class DbTestController {
-    @Autowired
-    private UserService userService;
     @Resource
-    private UploadImg uploadImg;
-    private ObjectMapper mapper = new ObjectMapper();
+    private UserMapper userMapper;
+    @Resource
+    private ImageService imageService;
 
     @Operation(summary = "主页",description = "null")
     @RequestMapping(value = "/",method = RequestMethod.GET)
@@ -37,46 +30,15 @@ public class DbTestController {
         return "hello";
     }
 
-    @Operation(summary = "获取所有用户信息" )
-    @RequestMapping(value = "/user/getAll",method = RequestMethod.GET)
-    public List<UserInfo> getAllUser(){
-        return userService.getAllUser();
-    }
-
-    @Operation(summary = "上传图片")
+    @Operation(summary = "上传图片",description = "测试用")
     @RequestMapping(value = "/uploadImg",method = RequestMethod.GET)
-    @ResponseBody
     //文件上传
-    public String uploadImg(@RequestParam("fileName") MultipartFile file, @RequestParam("nickname") String nickName,HttpServletRequest request) throws IOException {
-        UserInfo userInfo = new UserInfo();
-        userInfo.setNickname(nickName);
-
-        return uploadImg.uploadAvatar(file);
-    }
-
-    @Operation(summary = "获取图片路径")
-    @RequestMapping(value = "/getImgPath",method = RequestMethod.GET)
-    @ResponseBody
-    public String getImgPathByOwner(@RequestParam("username")String username){
-        List<UserInfo> imgs= userService.getPicByUserName(username);
-        HashMap<String, List> map = new HashMap<>();
-        ArrayList<String> paths = new ArrayList<>();
-        if(imgs!=null && !imgs.isEmpty()){
-            for(UserInfo i:imgs){
-                paths.add(i.getAvatar());
-            }
+    public Echo uploadImg(@RequestParam("fileName") MultipartFile file) throws IOException {
+        Map<String,String>map=imageService.uploadImage(file);
+        if(map.containsKey("path")){
+            return Echo.success(map.get("path"));
         }
-        map.put("paths", paths);
-
-        String result;
-        try {
-            result = mapper.writeValueAsString(map);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return e.toString();
-        }
-
-        return result;
+        return Echo.fail(map.get("result"));
     }
 
 

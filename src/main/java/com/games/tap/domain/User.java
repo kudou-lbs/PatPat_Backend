@@ -9,8 +9,8 @@ import javax.persistence.*;
 @Setter
 @ToString
 @Entity
-@Table(name = "user_info",uniqueConstraints = {@UniqueConstraint(columnNames = {"uid"})})
-public class UserInfo {
+@Table(name = "user",uniqueConstraints = {@UniqueConstraint(columnNames = {"uid"})})
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "uid", columnDefinition = "bigint(20)")
@@ -57,19 +57,19 @@ public class UserInfo {
     @Schema(description = "密码",required = true)
     private String password;
 
-    public UserInfo(){}
-    public UserInfo(String userName,String password,String nickname, Integer gender) {
+    public User(){}
+    public User(String userName, String password, String nickname, Integer gender) {
         this.username=userName;
         this.password=password;
         this.nickname=nickname;
         this.gender=gender;
     }
-    public UserInfo(String userName,String password,String nickname) {
+    public User(String userName, String password, String nickname) {
         this.username=userName;
         this.password=password;
         this.nickname=nickname;
     }
-    public UserInfo(String userName,String password){
+    public User(String userName, String password){
         this.username=userName;
         this.password=password;
     }

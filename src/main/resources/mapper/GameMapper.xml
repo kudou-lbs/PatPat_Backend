@@ -9,4 +9,5 @@
     <insert id="insertPic">
         insert into game(picture) values (#{picture})
     </insert>
+    <cache/>
 </mapper>
