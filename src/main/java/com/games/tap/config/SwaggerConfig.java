@@ -1,37 +1,36 @@
 package com.games.tap.config;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.media.StringSchema;
+import io.swagger.v3.oas.models.parameters.HeaderParameter;
+import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.Contact;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
 
 @Configuration
 public class SwaggerConfig {
+
     @Bean
-    public Docket docket() {
-        return new Docket(DocumentationType.OAS_30)
-                .apiInfo(apiInfo())
-                // 是否开启swagger
-                .enable(true)
-                .select()
-                // 过滤条件，扫描指定路径下的文件
-                .apis(RequestHandlerSelectors.basePackage("com.games.tap.controller"))
-                // 指定路径处理，PathSelectors.any()代表不过滤任何路径
-                .paths(PathSelectors.any())
-                .build();
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .components(new Components().addParameters("JWT", new HeaderParameter()
+                        .name("token").description("用户登录认证").schema(new StringSchema()).required(false)))
+                .info(new Info()
+                        .title("Patpat接口测试")
+                        .version("v0.1")
+                        .description("测试接口文档    —— 致高贵的客户端和前端爷")
+                        .contact(new Contact().name("admin").url("https://gitee.com/lin_po_sheng/patpat-backend")));
     }
 
-    private ApiInfo apiInfo() {
-        return new ApiInfoBuilder()
-                .title("Patpat接口测试")
-                .description("测试接口文档    —— 致高贵的客户端和前端爷")
-                .contact(new Contact("admin", "#", "327404055@qq.com"))
-                .version("v0.1")
-                .build();
+    /**
+     * 添加全局的请求头参数
+     */
+    @Bean
+    public OpenApiCustomiser customerGlobalHeaderOpenApiCustomizer() {
+        return openApi -> openApi.getPaths().values().stream().flatMap(pathItem -> pathItem.readOperations().stream())
+                .forEach(operation -> operation.addParametersItem(new HeaderParameter().$ref("#/components/parameters/JWT")));
     }
 }

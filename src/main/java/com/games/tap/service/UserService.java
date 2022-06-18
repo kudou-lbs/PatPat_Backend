@@ -1,43 +1,50 @@
 package com.games.tap.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.games.tap.domain.UserInfo;
 import com.games.tap.mapper.UserMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 @Service
 public class UserService {
     @Resource
-    public UserMapper mUserMapper;
+    public UserMapper userMapper;
 
-    public List<UserInfo> getAllUserInfo() {
-        return mUserMapper.getAllUserInfo();
+    public List<UserInfo> getAllUser() {
+        return userMapper.getAllUser();
     }
 
-    public List<UserInfo> getPicByName(String name) {
-        return mUserMapper.getPicByName(name);
+    public List<UserInfo> getPicByUserName(String name) {
+        return userMapper.getPicByUserName(name);
     }
 
     public int insertAvatar(UserInfo userInfo) {
-        return mUserMapper.insertAvatar(userInfo);
+        return userMapper.insertAvatar(userInfo);
     }
 
-    public int insertBackground(UserInfo userInfo){return mUserMapper.insertBackground(userInfo);}
+    public int insertBackground(UserInfo userInfo) {
+        return userMapper.insertBackground(userInfo);
+    }
+
+    public int insertUser(UserInfo user){
+        return userMapper.insertUser(user);
+    }
 
     public UserInfo getUserById(Long id) {
-        return mUserMapper.getUserById(id);
+        return userMapper.getUserById(id);
     }
 
+    public UserInfo getUserByUserName(String username){
+        return userMapper.getUserByUserName(username);
+    }
+
+    public int updateUser(UserInfo user){
+        return userMapper.updateUser(user);
+    }
+
+    public int deleteUserById(Long id){
+        return userMapper.deleteUserById(id);
+    }
 }

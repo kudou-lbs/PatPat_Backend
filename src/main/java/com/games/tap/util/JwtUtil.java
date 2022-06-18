@@ -31,8 +31,9 @@ public class JwtUtil {
         String token="";
         try{
             token= JWT.create()
+                    .withSubject(user.toString())
                     .withClaim("uid", user.getUId()) // 将 user id 保存到 token 里面
-                    .withClaim("nickname", user.getNickname())
+                    .withClaim("username", user.getUsername())
                     .withExpiresAt(date) //十分钟后token过期
                     .sign(Algorithm.HMAC256(JWT_SECRET_KEY));
         }catch (Exception e){
@@ -106,8 +107,8 @@ public class JwtUtil {
         //获取JWT中的数据,注意数据类型一定要与添加进去的数据类型一致,否则取不到数据
         Map<String, Object> map = new HashMap<>();
         map.put("userId", decodedJwt.getClaim("uid").asLong());
-        map.put("username", decodedJwt.getClaim("nickname").asString());
-//        map.put("expire", decodedJwt.getExpiresAt());
+        map.put("username", decodedJwt.getClaim("username").asString());
+        map.put("expire", decodedJwt.getExpiresAt());
         return map;
     }
 }

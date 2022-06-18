@@ -35,6 +35,10 @@ public class Game {
     @Schema(description = "游戏官方地址")
     private String url;
 
+    @Column(name = "intro",columnDefinition = "varchar(300)")
+    @Schema(description = "游戏介绍")
+    private String intro;
+
     @Column(name = "picture",columnDefinition = "varchar(200)")
     @Schema(description = "游戏图标路径")
     private String picture;

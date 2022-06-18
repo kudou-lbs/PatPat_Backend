@@ -5,12 +5,12 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.games.tap.mapper.UserMapper">
-    <select id="getAllUserInfo" resultType="com.games.tap.domain.UserInfo">
+    <select id="getAllUser" resultType="com.games.tap.domain.UserInfo">
         select * from user_info
     </select>
 
-    <select id="getPicByName" resultType="com.games.tap.domain.UserInfo">
-        select uid,avatar,nickname from user_info where nickname=#{name}
+    <select id="getPicByUserName" resultType="com.games.tap.domain.UserInfo">
+        select uid,avatar,nickname from user_info where username=#{name}
     </select>
     <cache readOnly="true"/>
     <insert id="insertAvatar">
@@ -20,7 +20,24 @@
         insert into user_info(background) values (#{background})
     </insert>
 
+    <insert id="insertUser" parameterType="com.games.tap.domain.UserInfo" useGeneratedKeys="true" keyProperty="uId">
+        INSERT INTO user_info (username, password, nickname, gender, register_time)
+        VALUES (#{username}, #{password}, #{nickname}, #{gender}, #{registerTime});
+    </insert>
+
+    <update id="update">
+        update user_info set password=#{password} where uid=#{uId}
+    </update>
+
+    <delete id="deleteById">
+        delete from user_info where id=#{id}
+    </delete>
+
     <select id="getUserById" resultType="com.games.tap.domain.UserInfo">
         SELECT * FROM user_info WHERE uid=#{id}
+    </select>
+
+    <select id="getUserByUserName" resultType="com.games.tap.domain.UserInfo">
+        SELECT * FROM user_info WHERE username=#{name}
     </select>
 </mapper>

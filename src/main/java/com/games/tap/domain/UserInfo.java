@@ -1,13 +1,9 @@
 package com.games.tap.domain;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import javax.persistence.*;
-import java.sql.Blob;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter
@@ -29,8 +25,8 @@ public class UserInfo {
     @Schema(description = "自我介绍")
     private String intro;
 
-    @Column(name = "gender",columnDefinition = "int(1)")
-    @Schema(description = "性别")
+    @Column(name = "gender",columnDefinition = "int(1) default 0")
+    @Schema(description = "性别:保密 0、男 1、女 2")
     private Integer gender;
 
     @Column(name = "register_time",columnDefinition = "varchar(25)")
@@ -53,4 +49,28 @@ public class UserInfo {
     @Schema(description = "背景图路径")
     private String background;
 
+    @Column(name = "username", columnDefinition = "varchar(40) ",nullable = false)
+    @Schema(description = "账户名",required = true)
+    private String username;
+
+    @Column(name = "password", columnDefinition = "varchar(100)",nullable = false)
+    @Schema(description = "密码",required = true)
+    private String password;
+
+    public UserInfo(){}
+    public UserInfo(String userName,String password,String nickname, Integer gender) {
+        this.username=userName;
+        this.password=password;
+        this.nickname=nickname;
+        this.gender=gender;
+    }
+    public UserInfo(String userName,String password,String nickname) {
+        this.username=userName;
+        this.password=password;
+        this.nickname=nickname;
+    }
+    public UserInfo(String userName,String password){
+        this.username=userName;
+        this.password=password;
+    }
 }

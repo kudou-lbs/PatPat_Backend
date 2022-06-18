@@ -22,12 +22,11 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        //log.info("=======进入拦截器========");
+//        log.info("=======进入拦截器========");
         // 如果不是映射到方法直接通过,可以访问资源.
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
-        log.debug("拦截"+request.getRequestURI());
         Method method = ((HandlerMethod) handler).getMethod();
         //检查是否有passtoken注释，有则跳过认证
         if (method.isAnnotationPresent(PassToken.class)) {
@@ -36,6 +35,7 @@ public class JwtInterceptor implements HandlerInterceptor {
                 return true;
             }
         }
+        log.info("拦截"+request.getRequestURI());
         // 从 http 请求头中取出 token
         String token = request.getHeader("token");
         if (null == token || "".equals(token.trim())) {
@@ -58,7 +58,7 @@ public class JwtInterceptor implements HandlerInterceptor {
             response.setHeader("token", JwtUtil.createToken(user));
             log.info("token刷新成功");
         }
-        log.debug("处理完成");
+        log.info("处理完成");
         return true;
     }
 }

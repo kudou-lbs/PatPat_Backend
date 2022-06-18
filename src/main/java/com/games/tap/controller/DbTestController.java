@@ -3,7 +3,6 @@ package com.games.tap.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.games.tap.domain.UserInfo;
-import com.games.tap.service.LoginService;
 import com.games.tap.service.UserService;
 import com.games.tap.service.UploadImg;
 
@@ -18,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -27,8 +27,6 @@ import java.util.*;
 public class DbTestController {
     @Autowired
     private UserService userService;
-    @Autowired
-    private LoginService loginService;
     @Resource
     private UploadImg uploadImg;
     private ObjectMapper mapper = new ObjectMapper();
@@ -40,34 +38,27 @@ public class DbTestController {
     }
 
     @Operation(summary = "获取所有用户信息" )
-    @RequestMapping(value = "/UserInfo/getAll",method = RequestMethod.GET)
-    @ResponseBody
-    public List<UserInfo> getAllUserInfo(){
-        return userService.getAllUserInfo();
+    @RequestMapping(value = "/user/getAll",method = RequestMethod.GET)
+    public List<UserInfo> getAllUser(){
+        return userService.getAllUser();
     }
 
-
-    @PassToken
     @Operation(summary = "上传图片")
-    @RequestMapping("/uploadImg")
+    @RequestMapping(value = "/uploadImg",method = RequestMethod.GET)
     @ResponseBody
     //文件上传
     public String uploadImg(@RequestParam("fileName") MultipartFile file, @RequestParam("nickname") String nickName,HttpServletRequest request) throws IOException {
         UserInfo userInfo = new UserInfo();
         userInfo.setNickname(nickName);
-        
+
         return uploadImg.uploadAvatar(file);
     }
 
-
-
-
-    @PassToken
     @Operation(summary = "获取图片路径")
-    @RequestMapping("/getImgPath")
+    @RequestMapping(value = "/getImgPath",method = RequestMethod.GET)
     @ResponseBody
-    public String getImgPathByOwner(@RequestParam("nickname")String nickname){
-        List<UserInfo> imgs= userService.getPicByName(nickname);
+    public String getImgPathByOwner(@RequestParam("username")String username){
+        List<UserInfo> imgs= userService.getPicByUserName(username);
         HashMap<String, List> map = new HashMap<>();
         ArrayList<String> paths = new ArrayList<>();
         if(imgs!=null && !imgs.isEmpty()){

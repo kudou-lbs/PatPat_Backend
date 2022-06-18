@@ -19,7 +19,7 @@ mvn spring-boot:run
 
 ---
 ***For the noble client and front-end***
-`http://localhost:8080/swagger-ui/`
+`http://localhost:8080/api-docs`
 
 ## Change Log
 
