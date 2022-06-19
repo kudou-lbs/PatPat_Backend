@@ -49,7 +49,7 @@ public class User {
     @Schema(description = "背景图路径")
     private String background;
 
-    @Column(name = "username", columnDefinition = "varchar(40) ",nullable = false)
+    @Column(name = "username", columnDefinition = "varchar(40) ",nullable = false,unique = true)
     @Schema(description = "账户名",required = true)
     private String username;
 

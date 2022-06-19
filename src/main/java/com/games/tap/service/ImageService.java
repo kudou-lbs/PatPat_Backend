@@ -77,14 +77,6 @@ public class ImageService {
         }
         return true;
     }
-
-//
-//    private int saveBack(String path){
-//        //将图片信息存入数据库
-//        User userInfo = new User();
-//        userInfo.setBackground(path);
-//        return userService.insertBackground(userInfo);
-//    }
 //
 //    private int saveGamePic(String path){
 //        //将图片信息存入数据库

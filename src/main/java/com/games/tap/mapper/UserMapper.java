@@ -13,7 +13,11 @@ public interface UserMapper {
 
     User getUserByUserName(String name);
 
-    String getUserAvatarByUserName(String name);
+    String getUserAvatarById(String id);
+
+    String getBackgroundById(String id);
+
+    String getPasswordById(Long id);
 
     int updateUserAvatar(@Param("uId")Long uid,@Param("avatar")String avatar);
 

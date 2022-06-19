@@ -3,6 +3,7 @@ package com.games.tap.controller;
 import com.games.tap.domain.User;
 import com.games.tap.mapper.UserMapper;
 import com.games.tap.service.ImageService;
+import com.games.tap.service.UserService;
 import com.games.tap.util.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -26,6 +28,8 @@ public class UserController {
 
     @Resource
     UserMapper userMapper;
+    @Resource
+    UserService userService;
     @Resource
     PasswordEncoder encoder;
     @Resource
@@ -64,14 +68,8 @@ public class UserController {
     })
     public Echo register(@RequestBody User user) {
         // 合法性校验
-        if(user.getUsername()==null||user.getUsername().equals(""))
-            return Echo.fail("账户名不能为空");
-        if(user.getPassword()==null||user.getPassword().equals(""))
-            return Echo.fail("密码不能为空");
-        if(!ToolUtil.checkPassword(user.getPassword()))
-            return Echo.fail("密码格式错误");
-        if(userMapper.getUserByUserName(user.getUsername())!=null)
-            return Echo.define(RetCode.USER_HAS_EXISTED);
+        Echo echo=userService.checkUser(user);
+        if(echo!=null)return echo;
         if(user.getNickname()==null||user.getNickname().equals("")){
             String name="用户"+Long.toHexString(SnowFlake.nextId()).replace("0","");
             user.setNickname(name);
@@ -87,7 +85,7 @@ public class UserController {
         else return Echo.fail("注册失败");
     }
 
-
+    @Operation(summary = "登录校验",description = "携带参数为header中的token，登录获取，过期需要重新登录")
     @PostMapping("/testToken")
     public String testToken(HttpServletRequest request) {
         String token = request.getHeader("token");
@@ -104,16 +102,23 @@ public class UserController {
         return Echo.success(list);
     }
 
-    @Operation(summary = "更改用户信息",description = "传入用户的完整信息进行更改")
-    @RequestMapping(value = "/user",method = RequestMethod.PUT)
-    public Echo updateUser(@RequestBody User user){
+    @Operation(summary = "更改用户信息",description = "传入用户的完整信息,对单个用户进行更改")
+    @RequestMapping(value = "/user/{id}",method = RequestMethod.PUT)
+    public Echo updateUser(@PathVariable("id")Long id,@RequestBody User user){
+        if(!Objects.equals(id, user.getUId()))return Echo.fail("请求id不一致，id不可更改");
+        Echo echo=userService.checkUser(user);
+        if(echo!=null)return echo;
+        String pwd=userMapper.getPasswordById(id);
+        if(!encoder.matches(user.getPassword(),pwd)&&!user.getPassword().equals(pwd)){
+            user.setPassword(encoder.encode(user.getPassword()));
+        }
         if(userMapper.updateUser(user)!=0)return Echo.success();
         else return Echo.fail();
     }
 
-    @Operation(summary = "删除用户",description = "通过id删除")
+    @Operation(summary = "删除用户",description = "通过id删除，该方法应加入权限验证")
     @RequestMapping(value = "/user/{id}",method = RequestMethod.DELETE)
-    public Echo deleteById(@PathVariable("id")Long id){
+    public Echo deleteById(@PathVariable("id")Long id){// FIXME 用户只能注销自己的用户，管理员才有任意操作的权限
         if(userMapper.deleteUserById(id)!=0)return Echo.success();
         else return Echo.fail();
     }
@@ -127,22 +132,45 @@ public class UserController {
     }
 
     @Operation(summary = "获取用户头像",description = "目前返回的是路径")
-    @RequestMapping(value = "/user/{username}/avatar",method = RequestMethod.GET)
-    public Echo getImgPathByOwner(@PathVariable("username")String username){
-        String path= userMapper.getUserAvatarByUserName(username);
+    @RequestMapping(value = "/user/{id}/avatar",method = RequestMethod.GET)
+    public Echo getAvatarPathById(@PathVariable("id")String id){
+        String path= userMapper.getUserAvatarById(id);
         if(path==null||path.equals(""))return Echo.fail();
         return Echo.success(path);
     }
 
-    @Operation(summary = "上传用户头像")
+    @Operation(summary = "上传用户头像",description = "用户只能上传自己的头像")
     @RequestMapping(value = "/user/{id}/avatar",method = RequestMethod.POST)
     //文件上传
-    public Echo uploadImg(@RequestParam("filename") MultipartFile file, @PathVariable("id") Long id) throws IOException {
+    public Echo uploadAvatar(@RequestParam("filename") MultipartFile file, @PathVariable("id") Long id) throws IOException {
         if(userMapper.getUserById(id)==null)return Echo.fail("用户不存在");
         Map<String,String>map=imageService.uploadImage(file);
         if(map.containsKey("path")){
-            userMapper.updateUserAvatar(id,map.get("path"));
-            return Echo.success();
+            if(userMapper.updateUserAvatar(id,map.get("path"))!=0)
+                return Echo.success();
+            else return Echo.fail("数据库操作失败");
+        }
+        return Echo.fail(map.get("result"));
+    }
+
+    @Operation(summary = "获取用户空间背景",description = "目前返回的是路径")
+    @RequestMapping(value = "/user/{id}/background",method = RequestMethod.GET)
+    public Echo getImgPathByOwner(@PathVariable("id")String id){
+        String path= userMapper.getBackgroundById(id);
+        if(path==null||path.equals(""))return Echo.fail();
+        return Echo.success(path);
+    }
+
+    @Operation(summary = "上传用户背景图",description = "用户只能上传自己的背景")
+    @RequestMapping(value = "/user/{id}/background",method = RequestMethod.POST)
+    //文件上传
+    public Echo uploadBack(@RequestParam("filename") MultipartFile file, @PathVariable("id") Long id) throws IOException {
+        if(userMapper.getUserById(id)==null)return Echo.fail("用户不存在");
+        Map<String,String>map=imageService.uploadImage(file);
+        if(map.containsKey("path")){
+            if(userMapper.updateBackground(id,map.get("path"))!=0)
+                return Echo.success();
+            else return Echo.fail("数据库操作失败");
         }
         return Echo.fail(map.get("result"));
     }

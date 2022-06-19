@@ -4,6 +4,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.games.tap.domain.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
@@ -18,7 +20,7 @@ public class JwtUtil {
 
     private static final String JWT_SECRET_KEY = "qat1qat2qat3tap2tap1tap";
     private static final long EXPIRE_TIME = 10 * 60 * 1000;
-
+    private static final ObjectMapper om=new ObjectMapper();
     /**
      * 注册token
      *
@@ -28,7 +30,7 @@ public class JwtUtil {
         String token="";
         try{
             token= JWT.create()
-                    .withSubject(user.toString())
+                    .withSubject(om.writeValueAsString(user))
                     .withClaim("uid", user.getUId()) // 将 user id 保存到 token 里面
                     .withClaim("username", user.getUsername())
                     .withExpiresAt(date) //十分钟后token过期
@@ -91,21 +93,41 @@ public class JwtUtil {
     }
 
     /**
-     * 检查Token所有Claims
+     * 验证JWT,必须先验证合法性
      *
      * @param token Token
-     * @return Claims
+     * @return DecodedJWT
      */
-    public static Map<String, Object> parseToken(String token) {
-
-        //验证JWT
-        DecodedJWT decodedJwt = JWT.require(Algorithm.HMAC256(JWT_SECRET_KEY))
+    public static DecodedJWT parseToken(String token) {
+        return JWT.require(Algorithm.HMAC256(JWT_SECRET_KEY))
                 .build().verify(token);
+    }
+
+    public static User parseUser(String token){
+        try {
+            return om.readValue(parseToken(token).getSubject(),User.class);//可能会有问题
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Long parseUserId(String token){
+        return parseToken(token).getClaim("uid").asLong();
+    }
+
+    public static Map<String,Object> parseAllInfo(String token){
+        DecodedJWT decodedJWT=parseToken(token);
         //获取JWT中的数据,注意数据类型一定要与添加进去的数据类型一致,否则取不到数据
         Map<String, Object> map = new HashMap<>();
-        map.put("userId", decodedJwt.getClaim("uid").asLong());
-        map.put("username", decodedJwt.getClaim("username").asString());
-        map.put("expire", decodedJwt.getExpiresAt());
+        try {
+            map.put("user",om.readValue(decodedJWT.getSubject(),User.class));
+            map.put("userId", decodedJWT.getClaim("uid").asLong());
+            map.put("username", decodedJWT.getClaim("username").asString());
+            map.put("expire", decodedJWT.getExpiresAt());
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
         return map;
     }
 }

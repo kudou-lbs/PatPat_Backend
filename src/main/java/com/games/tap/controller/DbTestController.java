@@ -15,7 +15,7 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.*;
 
-@Tag(name = "数据库操作测试")
+@Tag(name = "test")
 @RequestMapping("/test")
 @RestController
 public class DbTestController {

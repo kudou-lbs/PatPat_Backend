@@ -9,10 +9,24 @@
         select * from user
     </select>
 
-    <select id="getUserAvatarByUserName" resultType="java.lang.String">
-        select avatar from user where username=#{name}
+    <select id="getUserAvatarById" resultType="java.lang.String">
+        select avatar from user where uid=#{uId}
     </select>
 
+    <select id="getPasswordById" resultType="Long">
+        select password from user where uid=#{uId}
+    </select>
+
+    <select id="getUserById" resultType="com.games.tap.domain.User">
+        SELECT * FROM user WHERE uid=#{id}
+    </select>
+
+    <select id="getUserByUserName" resultType="com.games.tap.domain.User">
+        SELECT * FROM user WHERE username=#{name}
+    </select>
+    <select id="getBackgroundById" resultType="java.lang.String">
+        select background from user where uid=#{uId}
+    </select>
     <cache readOnly="true"/>
     <update id="updateUserAvatar">
         UPDATE user SET avatar= #{avatar} WHERE uid=#{uId}
@@ -30,18 +44,10 @@
 
     <insert id="insertUser" parameterType="com.games.tap.domain.User" useGeneratedKeys="true" keyProperty="uId">
         INSERT INTO user (username, password, nickname, gender, register_time)
-        VALUES (#{username}, #{password}, #{nickname}, #{gender}, #{registerTime});
+        VALUES (#{username}, #{password}, #{nickname}, #{gender}, #{registerTime})
     </insert>
 
     <delete id="deleteUserById">
         delete from user where id=#{id}
     </delete>
-
-    <select id="getUserById" resultType="com.games.tap.domain.User">
-        SELECT * FROM user WHERE uid=#{id}
-    </select>
-
-    <select id="getUserByUserName" resultType="com.games.tap.domain.User">
-        SELECT * FROM user WHERE username=#{name}
-    </select>
 </mapper>

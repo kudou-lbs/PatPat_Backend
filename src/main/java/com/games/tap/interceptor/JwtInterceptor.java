@@ -28,7 +28,7 @@ public class JwtInterceptor implements HandlerInterceptor {
             return true;
         }
         Method method = ((HandlerMethod) handler).getMethod();
-        //检查是否有passtoken注释，有则跳过认证
+        //检查是否有passToken注释，有则跳过认证
         if (method.isAnnotationPresent(PassToken.class)) {
             PassToken passToken = method.getAnnotation(PassToken.class);
             if (passToken.required()) {
@@ -46,17 +46,19 @@ public class JwtInterceptor implements HandlerInterceptor {
         if (JwtUtil.isValid(token)) {
             log.info("token验证成功");
         } else {//token过期就返回 token 无效.
-            throw new RuntimeException("token 无效");
-//            return false; FIXME
+            log.info("token 无效");
+            return false;
         }
         log.info("token:" + token);
-        Map<String, Object> map = JwtUtil.parseToken(token);
-        Long userId = Long.parseLong(String.valueOf(map.get("userId")));
+        Long userId = JwtUtil.parseUserId(token);
         //2.超过token刷新时间，刷新 token
         if (JwtUtil.isNeedUpdate(token)) {
-            User user= userMapper.getUserById(userId);//可能有问题
-            response.setHeader("token", JwtUtil.createToken(user));
-            log.info("token刷新成功");
+            User user= userMapper.getUserById(userId);
+            if(user!=null){
+                response.setHeader("token", JwtUtil.createToken(user));
+                log.info("token刷新成功");
+            }else
+                log.info("token刷新失败");
         }
         log.info("处理完成");
         return true;
