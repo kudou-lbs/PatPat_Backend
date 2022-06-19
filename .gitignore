@@ -2,6 +2,7 @@ HELP.md
 target/
 lib/
 logs/
+data/
 **/static/
 **/logback-spring.xml
 !.mvn/wrapper/maven-wrapper.jar

@@ -13,9 +13,9 @@ public interface UserMapper {
 
     User getUserByUserName(String name);
 
-    String getUserAvatarById(String id);
+    String getUserAvatarById(Long id);
 
-    String getBackgroundById(String id);
+    String getBackgroundById(Long id);
 
     String getPasswordById(Long id);
 

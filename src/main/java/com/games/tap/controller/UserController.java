@@ -70,6 +70,8 @@ public class UserController {
         // 合法性校验
         Echo echo=userService.checkUser(user);
         if(echo!=null)return echo;
+        if(userMapper.getUserByUserName(user.getUsername())!=null)
+            return Echo.define(RetCode.USER_HAS_EXISTED);
         if(user.getNickname()==null||user.getNickname().equals("")){
             String name="用户"+Long.toHexString(SnowFlake.nextId()).replace("0","");
             user.setNickname(name);
@@ -108,10 +110,7 @@ public class UserController {
         if(!Objects.equals(id, user.getUId()))return Echo.fail("请求id不一致，id不可更改");
         Echo echo=userService.checkUser(user);
         if(echo!=null)return echo;
-        String pwd=userMapper.getPasswordById(id);
-        if(!encoder.matches(user.getPassword(),pwd)&&!user.getPassword().equals(pwd)){
-            user.setPassword(encoder.encode(user.getPassword()));
-        }
+        user.setPassword(encoder.encode(user.getPassword()));
         if(userMapper.updateUser(user)!=0)return Echo.success();
         else return Echo.fail();
     }
@@ -133,7 +132,7 @@ public class UserController {
 
     @Operation(summary = "获取用户头像",description = "目前返回的是路径")
     @RequestMapping(value = "/user/{id}/avatar",method = RequestMethod.GET)
-    public Echo getAvatarPathById(@PathVariable("id")String id){
+    public Echo getAvatarPathById(@PathVariable("id")Long id){
         String path= userMapper.getUserAvatarById(id);
         if(path==null||path.equals(""))return Echo.fail();
         return Echo.success(path);
@@ -142,7 +141,7 @@ public class UserController {
     @Operation(summary = "上传用户头像",description = "用户只能上传自己的头像")
     @RequestMapping(value = "/user/{id}/avatar",method = RequestMethod.POST)
     //文件上传
-    public Echo uploadAvatar(@RequestParam("filename") MultipartFile file, @PathVariable("id") Long id) throws IOException {
+    public Echo uploadAvatar(@RequestParam("filename") MultipartFile file, @PathVariable("id") Long id){
         if(userMapper.getUserById(id)==null)return Echo.fail("用户不存在");
         Map<String,String>map=imageService.uploadImage(file);
         if(map.containsKey("path")){
@@ -155,7 +154,7 @@ public class UserController {
 
     @Operation(summary = "获取用户空间背景",description = "目前返回的是路径")
     @RequestMapping(value = "/user/{id}/background",method = RequestMethod.GET)
-    public Echo getImgPathByOwner(@PathVariable("id")String id){
+    public Echo getImgPathByOwner(@PathVariable("id")Long id){
         String path= userMapper.getBackgroundById(id);
         if(path==null||path.equals(""))return Echo.fail();
         return Echo.success(path);
@@ -164,7 +163,7 @@ public class UserController {
     @Operation(summary = "上传用户背景图",description = "用户只能上传自己的背景")
     @RequestMapping(value = "/user/{id}/background",method = RequestMethod.POST)
     //文件上传
-    public Echo uploadBack(@RequestParam("filename") MultipartFile file, @PathVariable("id") Long id) throws IOException {
+    public Echo uploadBack(@RequestParam("filename") MultipartFile file, @PathVariable("id") Long id){
         if(userMapper.getUserById(id)==null)return Echo.fail("用户不存在");
         Map<String,String>map=imageService.uploadImage(file);
         if(map.containsKey("path")){

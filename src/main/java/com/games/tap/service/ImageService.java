@@ -1,5 +1,6 @@
 package com.games.tap.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,10 @@ import java.util.UUID;
 @Service
 public class ImageService {
 
-    public Map<String,String> uploadImage(MultipartFile file) throws IOException {
+    @Value("${web.upload-path}")
+    private String uploadPath;
+
+    public Map<String,String> uploadImage(MultipartFile file){
         String result= "";//上传结果信息
         Map<String,String> map=new HashMap<>();
         if (file.getSize() > 1024*1024*2){
@@ -40,11 +44,11 @@ public class ImageService {
                 fileName = UUID.randomUUID()+suffixName;
                 //获取项目路径
                 Resource resource = new ClassPathResource("");
-                String projectPath = resource.getFile().getAbsolutePath()+ "\\static\\img";
+                String projectPath = uploadPath+"/image";
                 System.out.println(projectPath);
                 if (upload(projectPath, file, fileName)) {
                     //文件存放的相对路径(一般存放在数据库用于img标签的src)
-                    String relativePath="img/"+fileName;
+                    String relativePath="/image/"+fileName;
                     map.put("path",relativePath);
                 } else{
                     result="图片上传失败";
@@ -60,7 +64,7 @@ public class ImageService {
 
     private boolean upload(String realPath, MultipartFile file, String fileName){
         // 将img文件存入本地
-        String path = realPath + "\\" + fileName;
+        String path = realPath + "/" + fileName;
         System.out.println(path);
         File dest = new File(path);
         //判断文件父目录是否存在

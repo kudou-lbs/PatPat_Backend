@@ -7,17 +7,19 @@ import com.games.tap.service.ImageService;
 import com.games.tap.util.Echo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.*;
 
 @Tag(name = "test")
 @RequestMapping("/test")
-@RestController
+@Controller
 public class DbTestController {
     @Resource
     private UserMapper userMapper;
@@ -30,17 +32,9 @@ public class DbTestController {
         return "hello";
     }
 
-    @Operation(summary = "上传图片",description = "测试用")
-    @RequestMapping(value = "/uploadImg",method = RequestMethod.GET)
-    //文件上传
-    public Echo uploadImg(@RequestParam("fileName") MultipartFile file) throws IOException {
-        Map<String,String>map=imageService.uploadImage(file);
-        if(map.containsKey("path")){
-            return Echo.success(map.get("path"));
-        }
-        return Echo.fail(map.get("result"));
+    @Operation(summary = "展示用户头像")
+    @RequestMapping(value = "/showImage",method = RequestMethod.GET)
+    public String getAvatarPathById(Long id){
+        return userMapper.getUserAvatarById(id);
     }
-
-
-
 }

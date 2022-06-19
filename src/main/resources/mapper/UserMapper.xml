@@ -13,8 +13,8 @@
         select avatar from user where uid=#{uId}
     </select>
 
-    <select id="getPasswordById" resultType="Long">
-        select password from user where uid=#{uId}
+    <select id="getPasswordById" resultType="java.lang.String">
+        select password from user where uid=#{id}
     </select>
 
     <select id="getUserById" resultType="com.games.tap.domain.User">

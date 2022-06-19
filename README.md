@@ -39,3 +39,7 @@ mvn spring-boot:run
 - Merge the code and optimize picture uploading function
 - rename `user_info` to `user`
 - Completed the registration function and user interface
+
+2022-06-19
+- Implemented and tested some user interfaces
+- update the settings of image upload

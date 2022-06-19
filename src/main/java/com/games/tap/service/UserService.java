@@ -31,8 +31,6 @@ public class UserService {
             return Echo.fail("密码不能为空");
         if(!checkPassword(user.getPassword()))
             return Echo.fail("密码格式错误");
-        if(userMapper.getUserByUserName(user.getUsername())!=null)
-            return Echo.define(RetCode.USER_HAS_EXISTED);
         return null;
     }
     public boolean checkPassword(String password) {
