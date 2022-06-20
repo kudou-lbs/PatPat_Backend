@@ -50,6 +50,10 @@ public class Post {
     @Schema(description = "点赞数量")
     private Integer likeNum;
 
+    @Column(name = "picture",columnDefinition = "varchar(200)")
+    @Schema(description = "帖子图片路径")
+    private String picture;
+
     @Column(name = "reply_num",columnDefinition = "int(11) default 0")
     @Schema(description = "回复数量")
     private Integer replyNum;

@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Setter
@@ -40,7 +41,14 @@ public class Game {
     private String intro;
 
     @Column(name = "picture",columnDefinition = "varchar(200)")
-    @Schema(description = "游戏图标路径")
+    @Schema(description = "游戏背景路径")
     private String picture;
+
+    @Column(name = "icon",columnDefinition = "varchar(200)")
+    @Schema(description = "游戏图标路径")
+    private String icon;
+
+    @Transient
+    private List<String>typeList;
 
 }

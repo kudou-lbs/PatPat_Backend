@@ -4,7 +4,6 @@ import com.games.tap.domain.User;
 import com.games.tap.mapper.UserMapper;
 import com.games.tap.util.Echo;
 import com.games.tap.util.JwtUtil;
-import com.games.tap.util.RetCode;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

@@ -28,6 +28,7 @@ public class DbTestController {
 
     @Operation(summary = "主页",description = "null")
     @RequestMapping(value = "/",method = RequestMethod.GET)
+    @ResponseBody
     public String hello(){
         return "hello";
     }

@@ -9,6 +9,11 @@
         select * from user
     </select>
 
+    <select id="getUserList" resultType="com.games.tap.vo.UserInfo">
+        SELECT uid,nickname,avatar,intro,fans_num
+        FROM user ORDER BY fans_num LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
     <select id="getUserAvatarById" resultType="java.lang.String">
         select avatar from user where uid=#{uId}
     </select>
@@ -24,10 +29,13 @@
     <select id="getUserByUserName" resultType="com.games.tap.domain.User">
         SELECT * FROM user WHERE username=#{name}
     </select>
+    <select id="getIdByUserName" resultType="java.lang.Long">
+        SELECT uid FROM user WHERE username=#{name}
+    </select>
     <select id="getBackgroundById" resultType="java.lang.String">
         select background from user where uid=#{uId}
     </select>
-    <cache readOnly="true"/>
+<!--    <cache readOnly="true"/>-->
     <update id="updateUserAvatar">
         UPDATE user SET avatar= #{avatar} WHERE uid=#{uId}
     </update>
