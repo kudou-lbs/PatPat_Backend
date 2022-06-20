@@ -22,7 +22,7 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-//        log.info("=======进入拦截器========");
+//       log.info("=======进入拦截器========");
         // 如果不是映射到方法直接通过,可以访问资源.
         if (!(handler instanceof HandlerMethod)) {
             return true;

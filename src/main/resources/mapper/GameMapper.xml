@@ -5,9 +5,14 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.games.tap.mapper.GameMapper">
+    <select id="getAllGame" resultType="com.games.tap.domain.Game">
+        SELECT table_type.gid as gid,game.hot,game.name,
+               game.picture,game.score,game.url,game.intro,table_type.type as type
+        FROM game right outer join
+        (SELECT game_type.gid,GROUP_CONCAT(game_type.type SEPARATOR ',') type
+        FROM game_type
+        GROUP BY game_type.gid)as table_type
+        on game.gid=table_type.gid
+    </select>
 
-    <insert id="insertPic">
-        insert into game(picture) values (#{picture})
-    </insert>
-    <cache/>
 </mapper>

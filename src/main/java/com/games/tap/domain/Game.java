@@ -43,4 +43,7 @@ public class Game {
     @Schema(description = "游戏图标路径")
     private String picture;
 
+    @Transient
+    private String type;
+
 }

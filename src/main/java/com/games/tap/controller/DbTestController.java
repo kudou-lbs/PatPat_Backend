@@ -1,11 +1,15 @@
 package com.games.tap.controller;
 
+import com.games.tap.domain.Game;
 import com.games.tap.mapper.UserMapper;
+import com.games.tap.service.GameService;
 import com.games.tap.service.ImageService;
 
 
 import com.games.tap.util.Echo;
+import com.games.tap.util.PassToken;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -23,11 +27,11 @@ import java.util.*;
 public class DbTestController {
     @Resource
     private UserMapper userMapper;
-    @Resource
-    private ImageService imageService;
 
+    @PassToken
     @Operation(summary = "主页",description = "null")
     @RequestMapping(value = "/",method = RequestMethod.GET)
+    @ResponseBody
     public String hello(){
         return "hello";
     }
