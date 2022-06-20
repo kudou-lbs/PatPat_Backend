@@ -62,4 +62,7 @@ public class Reply {
     @Schema(description = "是否是子贴（否则为楼中楼回复）")
     private Integer isFloor;
 
+    @Transient
+    private String replyToUserName;
+
 }

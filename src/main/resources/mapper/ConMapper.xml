@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.games.tap.mapper.ConMapper">
+
+    <select id="getFanList" resultType="com.games.tap.vo.UserInfo">
+        SELECT uid,nickname,avatar,intro,fans_num FROM concern LEFT JOIN user
+        ON user.uid=concern.following_uid WHERE followed_uid=#{uId}
+    </select>
+
+    <select id="getFollowList" resultType="com.games.tap.vo.UserInfo">
+        SELECT uid,nickname,avatar,intro,fans_num FROM concern LEFT JOIN user
+        ON user.uid=concern.followed_uid WHERE following_uid=#{uId}
+    </select>
+
+    <select id="getPartFanList" resultType="com.games.tap.vo.UserInfo">
+        SELECT uid,nickname,avatar,intro,fans_num FROM concern LEFT JOIN user
+        ON user.uid=concern.following_uid WHERE followed_uid=#{id} LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="getPartFollowList" resultType="com.games.tap.vo.UserInfo">
+        SELECT uid,nickname,avatar,intro,fans_num FROM concern LEFT JOIN user
+        ON user.uid=concern.followed_uid WHERE following_uid=#{id} LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="isFollow" resultType="com.games.tap.domain.Concern">
+        SELECT * FROM concern WHERE following_uid=#{following} and followed_uid=#{followed}
+    </select>
+
+    <insert id="follow" useGeneratedKeys="true">
+        INSERT INTO concern(followed_uid, following_uid) VALUES (#{followed},#{following});
+        UPDATE user SET fans_num=fans_num+1 WHERE uid=#{followed};
+        UPDATE user SET follow_num=user.follow_num+1 WHERE uid=#{following};
+    </insert>
+
+    <delete id="unfollow">
+        UPDATE user SET fans_num=fans_num-1 WHERE uid=#{followed};
+        UPDATE user SET follow_num=user.follow_num-1 WHERE uid=#{following};
+        DELETE FROM concern WHERE following_uid=#{following} and followed_uid=#{followed};
+    </delete>
+
+</mapper>
