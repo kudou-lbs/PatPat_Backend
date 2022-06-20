@@ -43,3 +43,6 @@ mvn spring-boot:run
 2022-06-19
 - Implemented and tested some user interfaces
 - update the settings of image upload
+
+2022-06-20
+- Completed the user follow interface
