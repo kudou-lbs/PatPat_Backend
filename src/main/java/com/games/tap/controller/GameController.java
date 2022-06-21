@@ -2,6 +2,7 @@ package com.games.tap.controller;
 
 import com.games.tap.domain.Game;
 import com.games.tap.service.GameService;
+import com.games.tap.util.Echo;
 import com.games.tap.util.PassToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,6 +23,16 @@ public class GameController {
     @RequestMapping(value = "/Game/getAllGame")
     public List<Game> getAllGame(){
         return gameService.getAllGame();
+    }
+
+    @PassToken
+    @Operation(summary = "插入游戏信息")
+    @RequestMapping(value = "/Game/insert")
+    public Echo insertGame(Game game, int[] types){
+        gameService.insertGame(game);
+        Long gid= gameService.getGidByGame(game);
+        gameService.insertType(gid,types);
+        return Echo.success();
     }
 
 
