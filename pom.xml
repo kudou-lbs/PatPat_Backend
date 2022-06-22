@@ -84,6 +84,7 @@
 			<artifactId>spring-security-crypto</artifactId>
 			<version>5.7.1</version>
 		</dependency>
+
 	</dependencies>
 
 	<build>

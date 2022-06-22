@@ -5,14 +5,117 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.games.tap.mapper.GameMapper">
+    <insert id="insertGame">
+        insert into game(gid,hot, name, score, url, intro,picture,icon) VALUES
+            (#{gId},#{hot},#{name},#{score},#{url},#{intro},#{picture},#{icon})
+    </insert>
+
+    <insert id="insertType">
+        insert into game_type(gid, type) VALUES
+        <foreach collection="types" item="type" separator=",">
+            (#{gId},
+            #{type})
+        </foreach>
+    </insert>
+
+    <delete id="deleteType">
+        delete from game_type where gid=#{gId} and type in
+        <foreach collection="types" item="type" separator="," open="(" close=")">
+            #{type}
+        </foreach>
+    </delete>
+
+    <update id="updateGame">
+        update game
+        <set>
+            <if test="hot != null">
+                hot=#{hot},
+            </if>
+            <if test="name != null and name !=''">
+                name=#{name},
+            </if>
+            <if test="score != null">
+                score=#{score},
+            </if>
+            <if test="url != null and url !=''">
+                url=#{url},
+            </if>
+            <if test="intro != null and intro !=''">
+                intro=#{intro},
+            </if>
+            <if test="picture != null and picture !=''">
+                picture=#{picture},
+            </if>
+            <if test="icon != null and icon !=''">
+                icon=#{icon},
+            </if>
+        </set>
+        where gid=#{gId}
+    </update>
+
+    <delete id="deleteGameById">
+        delete from game where gid=#{gId};
+        delete from game_type where gid=#{gId};
+    </delete>
+
+    <select id="getGidByGame" resultType="java.lang.Long">
+        SELECT gid from game
+        <where>
+            <if test="hot != null">
+                and hot=#{hot}
+            </if>
+            <if test="name != null and name !=''">
+                and name=#{name}
+            </if>
+            <if test="score != null">
+                and score=#{score}
+            </if>
+            <if test="url != null and url !=''">
+                and url=#{url}
+            </if>
+            <if test="intro != null and intro !=''">
+                and intro=#{intro}
+            </if>
+            <if test="picture != null and picture !=''">
+                and picture=#{picture}
+            </if>
+            <if test="icon != null and icon !=''">
+                and icon=#{icon}
+            </if>
+        </where>
+    </select>
+
+
     <select id="getAllGame" resultType="com.games.tap.domain.Game">
         SELECT table_type.gid as gid,game.hot,game.name,
-               game.picture,game.score,game.url,game.intro,table_type.type as type
+               game.picture,game.score,game.url,game.intro,game.icon,table_type.type as types
         FROM game right outer join
-        (SELECT game_type.gid,GROUP_CONCAT(game_type.type SEPARATOR ',') type
-        FROM game_type
-        GROUP BY game_type.gid)as table_type
-        on game.gid=table_type.gid
+             (SELECT game_type.gid,GROUP_CONCAT(game_type.type SEPARATOR ',') type
+              FROM game_type
+              GROUP BY game_type.gid)as table_type
+             on game.gid=table_type.gid
+    </select>
+
+    <select id="OrderByHot" resultType="com.games.tap.domain.Game">
+        SELECT table_type.gid as gid,game.hot,game.name,
+               game.picture,game.score,game.url,game.intro,game.icon,table_type.type as types
+        FROM game right outer join
+             (SELECT game_type.gid,GROUP_CONCAT(game_type.type SEPARATOR ',') type
+              FROM game_type
+              GROUP BY game_type.gid)as table_type
+             on game.gid=table_type.gid
+            order by hot desc
+    </select>
+
+    <select id="getById" resultType="com.games.tap.domain.Game">
+        SELECT table_type.gid as gid,game.hot,game.name,
+               game.picture,game.score,game.url,game.intro,game.icon,table_type.type as types
+        FROM game right outer join
+             (SELECT game_type.gid,GROUP_CONCAT(game_type.type SEPARATOR ',') type
+              FROM game_type
+              GROUP BY game_type.gid)as table_type
+             on game.gid=table_type.gid
+            where game.gid=#{gId}
     </select>
 
 </mapper>

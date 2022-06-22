@@ -19,9 +19,9 @@ public class GameType {
     @Schema(description = "主键Id",accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 
-    @Column(name = "type",columnDefinition = "int(3)")
+    @Column(name = "type",columnDefinition = "varchar(10)")
     @Schema(description = "游戏类型")
-    private TypeEnum type;
+    private String type;
 
     @Column(name = "gid", columnDefinition = "bigint(20)")
     @Schema(description = "游戏Id",required = true)
