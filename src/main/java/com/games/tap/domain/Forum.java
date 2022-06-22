@@ -15,6 +15,7 @@ import java.util.List;
 @ToString
 @Entity
 @Table(name = "forum")
+@Schema(description = "论坛信息")
 public class Forum {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -46,3 +46,6 @@ mvn spring-boot:run
 
 2022-06-20
 - Completed the user follow interface
+
+2022-06-22
+- Completed the forum interface and game interface

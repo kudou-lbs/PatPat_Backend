@@ -6,6 +6,7 @@ import com.games.tap.util.Echo;
 import com.games.tap.util.PassToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,28 +22,28 @@ public class GameController {
 
     @PassToken
     @Operation(summary = "返回所有游戏信息")
-    @RequestMapping(value = "/Game/getAllGame",method = RequestMethod.GET)
+    @RequestMapping(value = "/games",method = RequestMethod.GET)
     public List<Game> getAllGame(){
         return gameService.getAllGame();
     }
 
     @PassToken
     @Operation(summary = "热度排行榜")
-    @RequestMapping(value = "/Game/OrderByHot",method = RequestMethod.GET)
+    @RequestMapping(value = "/game/rank",method = RequestMethod.GET)
     public List<Game> OrderByHot(){
         return gameService.OrderByHot();
     }
 
     @PassToken
     @Operation(summary = "根据id返回游戏信息")
-    @RequestMapping(value = "/Game/getGameById",method = RequestMethod.GET)
+    @RequestMapping(value = "/game",method = RequestMethod.GET)
     public List<Game> getById(Long gId){
         return gameService.getById(gId);
     }
 
     @PassToken
     @Operation(summary = "插入单条游戏信息")
-    @RequestMapping(value = "/Game/insert",method = RequestMethod.POST)
+    @RequestMapping(value = "/game",method = RequestMethod.POST)
     public Echo insertGame(Game game){
         gameService.insertGame(game);
         Long gId=game.getGId();
@@ -57,7 +58,7 @@ public class GameController {
 
     @PassToken
     @Operation(summary = "批量插入游戏信息")
-    @RequestMapping(value = "/Game/insertM",method = RequestMethod.POST)
+    @RequestMapping(value = "/games",method = RequestMethod.POST)
     public Echo insertMGame(@RequestBody List<Game> games){
         for (Game game : games) {
             gameService.insertGame(game);
@@ -74,7 +75,7 @@ public class GameController {
 
     @PassToken
     @Operation(summary = "根据id删除游戏信息")
-    @RequestMapping(value = "/Game/deleteById",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/game",method = RequestMethod.DELETE)
     public Echo deleteById(Long gId){
         gameService.deleteGameById(gId);
         return Echo.success();
@@ -82,7 +83,7 @@ public class GameController {
 
     @PassToken
     @Operation(summary = "根据id修改游戏信息(除标签)")
-    @RequestMapping(value = "/Game/updateGame",method = RequestMethod.PUT)
+    @RequestMapping(value = "/game",method = RequestMethod.PUT)
     public Echo updateGame(Game game){
         gameService.updateGame(game);
         return Echo.success();
@@ -90,7 +91,7 @@ public class GameController {
 
     @PassToken
     @Operation(summary = "添加某个游戏（id）的部分标签（int[] types）")
-    @RequestMapping(value = "/Game/addType",method = RequestMethod.POST)
+    @RequestMapping(value = "/game/type",method = RequestMethod.POST)
     public Echo insertType(Long gId,String[] types){
         gameService.insertType(gId,types);
         return Echo.success();
@@ -98,7 +99,7 @@ public class GameController {
 
     @PassToken
     @Operation(summary = "删除某个游戏（id）的部分标签（int[] types）")
-    @RequestMapping(value = "/Game/deleteType",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/game/type",method = RequestMethod.DELETE)
     public Echo deleteType(Long gId, String[] types){
         gameService.deleteType(gId,types);
         return Echo.success();

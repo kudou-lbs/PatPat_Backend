@@ -12,6 +12,7 @@ import javax.persistence.*;
 @ToString
 @Entity
 @Table(name = "concern")
+@Schema(description = "用户间相互关注的信息")
 public class Concern {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

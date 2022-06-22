@@ -10,6 +10,7 @@ import javax.persistence.*;
 @ToString
 @Entity
 @Table(name = "user",uniqueConstraints = {@UniqueConstraint(columnNames = {"uid"})})
+@Schema(description = "用户信息")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
