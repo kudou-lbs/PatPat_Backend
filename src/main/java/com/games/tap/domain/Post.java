@@ -62,4 +62,11 @@ public class Post {
     @Schema(description = "阅读数量")
     private Integer readingNum;
 
+    public Post(){}
+
+    public Post(Long uid,Long fid,String title){
+        this.uId=uid;
+        this.fId=fid;
+        this.title=title;
+    }
 }

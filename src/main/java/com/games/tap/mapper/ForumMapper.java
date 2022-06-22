@@ -1,6 +1,7 @@
 package com.games.tap.mapper;
 
 import com.games.tap.domain.Forum;
+import com.games.tap.domain.Post;
 import com.games.tap.vo.ForumInfo;
 import org.apache.ibatis.annotations.Param;
 
@@ -13,6 +14,9 @@ public interface ForumMapper {
     List<ForumInfo> getForumList(@Param("offset")Long offset, @Param("pageSize")Long pageSize);
 
     List<ForumInfo> getForumListWithUserId(@Param("uid")Long id,@Param("offset")Long offset, @Param("pageSize")Long pageSize);
+
+    List<Post> getForumPostList(@Param("fid")Long id,@Param("offset")Long offset,
+                                @Param("pageSize")Long pageSize,@Param("rank")int rank);
 
     Forum getForumByName(String name);
 

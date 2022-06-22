@@ -20,10 +20,10 @@ import javax.annotation.Resource;
 class TapApplicationTests {
 	@Resource
 	UserMapper userMapper;
-
+	
 	@Test
 	void contextLoads() {
-		log.info(String.valueOf(TypeEnum.MMO));
+
 	}
 
 }

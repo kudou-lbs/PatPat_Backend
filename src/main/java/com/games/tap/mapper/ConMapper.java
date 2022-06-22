@@ -8,13 +8,9 @@ import java.util.List;
 
 public interface ConMapper {
 
-    List<UserInfo> getPartFanList(@Param("id")Long id,@Param("offset")Long offset, @Param("pageSize")Long pageSize);
+    List<UserInfo> getFanList(Long id,@Param("offset")Long offset, @Param("pageSize")Long pageSize);
 
-    List<UserInfo> getPartFollowList(@Param("id")Long id,@Param("offset")Long offset, @Param("pageSize")Long pageSize);
-
-    List<UserInfo> getFanList(Long id);
-
-    List<UserInfo> getFollowList(Long id);
+    List<UserInfo> getFollowList(@Param("id")Long id,@Param("offset")Long offset, @Param("pageSize")Long pageSize);
 
     int follow(@Param("following")Long following,@Param("followed")Long followed);
     // FIXME:这两个写了多个SQL语句，可能有问题

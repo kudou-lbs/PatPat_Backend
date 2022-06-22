@@ -10,16 +10,30 @@
         SELECT * FROM forum;
     </select>
 
+    <select id="getForumPostList" resultType="com.games.tap.domain.Post">
+        # TODO
+    </select>
+
     <select id="getForumList" resultType="com.games.tap.vo.ForumInfo">
         SELECT fid,name,icon,follow_num,false AS is_like FROM forum ORDER BY follow_num DESC
-        LIMIT #{pageSize} OFFSET #{offset}
+        <if test="pageSize!=null ">
+            LIMIT #{pageSize}
+        </if>
+        <if test="offset!=null ">
+            OFFSET #{offset}
+        </if>
     </select>
 
     <select id="getForumListWithUserId" resultType="com.games.tap.vo.ForumInfo">
         SELECT forum.fid,name,icon,follow_num,IFNULL(is_like,false) AS is_like FROM forum LEFT JOIN
             (SELECT fid,is_like FROM forum_user WHERE uid=#{uid})AS user_forum
         ON forum.fid=user_forum.fid ORDER BY follow_num DESC
-        LIMIT #{pageSize} OFFSET #{offset}
+        <if test="pageSize!=null ">
+            LIMIT #{pageSize}
+        </if>
+        <if test="offset!=null ">
+            OFFSET #{offset}
+        </if>
     </select>
 
     <select id="getForumById" resultType="com.games.tap.domain.Forum">
@@ -39,7 +53,9 @@
     </update>
 
     <delete id="deleteForumById">
-        DELETE FROM forum WHERE fid=#{id}
+        DELETE FROM reply WHERE fid=#{id};
+        DELETE FROM post WHERE fid=#{id};
+        DELETE FROM forum WHERE fid=#{id};
     </delete>
 
 </mapper>
