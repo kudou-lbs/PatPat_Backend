@@ -19,13 +19,13 @@ public class Game {
     @Schema(description = "主键Id",accessMode = Schema.AccessMode.READ_ONLY)
     private Long gId;
 
-    @Column(name = "name",columnDefinition = "varchar(50)")
+    @Column(name = "name",columnDefinition = "varchar(50)",nullable = false,unique = true)
     @Schema(description = "游戏名",required = true)
     private String name;
 
-    @Column(name = "score",columnDefinition = "int(4)")
+    @Column(name = "score",columnDefinition = "float")
     @Schema(description = "游戏评分")
-    private Integer score;
+    private float score;
 
     @Column(name = "hot",columnDefinition = "int(11)")
     @Schema(description = "游戏热度")
@@ -48,6 +48,6 @@ public class Game {
     private String icon;
 
     @Transient
-    private String type;
+    private String types;
 
 }
