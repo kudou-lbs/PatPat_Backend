@@ -17,7 +17,7 @@ public interface ConMapper {
     List<UserInfo> getFollowList(Long id);
 
     int follow(@Param("following")Long following,@Param("followed")Long followed);
-
+    // FIXME:这两个写了多个SQL语句，可能有问题
     int unfollow(@Param("following")Long following,@Param("followed")Long followed);
 
     Concern isFollow(@Param("following")Long following,@Param("followed")Long followed);

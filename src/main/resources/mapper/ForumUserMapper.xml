@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.games.tap.mapper.ForumUserMapper">
+
+    <select id="getForumUser" resultType="com.games.tap.domain.ForumUser">
+        SELECT * FROM forum_user WHERE fid=#{fid} AND uid=#{uid};
+    </select>
+
+    <select id="getLikeForumUser" resultType="com.games.tap.domain.ForumUser">
+        SELECT * FROM forum_user WHERE fid=#{id} AND is_like=true;
+    </select>
+
+    <select id="getLikeForum" resultType="com.games.tap.vo.LikeForum">
+        SELECT user_forum.fid, name, icon, level, title AS last_title
+        FROM ((SELECT fid, level FROM forum_user WHERE uid = #{id} AND is_like=true) AS user_forum
+            LEFT JOIN forum ON user_forum.fid = forum.fid)
+                 LEFT JOIN (SELECT fid, title
+                             FROM post
+                             WHERE (fid, last_date) IN (SELECT fid, MAX(last_date) FROM post GROUP BY fid))
+            AS forum_post ON user_forum.fid = forum_post.fid
+        ORDER BY follow_num DESC;
+    </select>
+
+    <select id="isLike" resultType="java.lang.Boolean">
+        SELECT is_like FROM forum_user WHERE fid=#{fid} AND uid=#{uid}
+    </select>
+
+    <insert id="insertForumUser" parameterType="com.games.tap.domain.ForumUser" useGeneratedKeys="true" keyProperty="fId">
+        INSERT INTO forum_user (fid, uid, is_like, identity) VALUES (#{fId},#{uId},#{isLike},#{identity})
+    </insert>
+
+    <update id="likeForum">
+        UPDATE forum_user SET is_like=true WHERE fid=#{fid} AND uid=#{uid};
+        UPDATE forum SET follow_num=follow_num+1 WHERE fid=#{fid};
+    </update>
+
+    <update id="unlikeForum">
+        UPDATE forum_user SET is_like=false WHERE fid=#{fid} AND uid=#{uid};
+        UPDATE forum SET follow_num=follow_num-1 WHERE fid=#{fid};
+    </update>
+
+    <update id="updateIdentity" >
+        UPDATE forum_user SET identity=#{identity} WHERE fid=#{fid} AND uid=#{uid}
+    </update>
+
+    <delete id="deleteForumUser">
+        DELETE FROM forum_user WHERE fid=#{fid} AND uid=#{uid}
+    </delete>
+
+</mapper>

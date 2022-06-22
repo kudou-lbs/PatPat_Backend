@@ -5,13 +5,14 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.games.tap.mapper.UserMapper">
+
     <select id="getAllUser" resultType="com.games.tap.domain.User">
         select * from user
     </select>
 
     <select id="getUserList" resultType="com.games.tap.vo.UserInfo">
         SELECT uid,nickname,avatar,intro,fans_num
-        FROM user ORDER BY fans_num LIMIT #{pageSize} OFFSET #{offset}
+        FROM user ORDER BY fans_num DESC LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
     <select id="getUserAvatarById" resultType="java.lang.String">
@@ -20,6 +21,10 @@
 
     <select id="getPasswordById" resultType="java.lang.String">
         select password from user where uid=#{id}
+    </select>
+
+    <select id="getNicknameById" resultType="java.lang.String">
+        SELECT nickname FROM user WHERE uid=#{id}
     </select>
 
     <select id="getUserById" resultType="com.games.tap.domain.User">
@@ -51,8 +56,8 @@
     </update>
 
     <insert id="insertUser" parameterType="com.games.tap.domain.User" useGeneratedKeys="true" keyProperty="uId">
-        INSERT INTO user (username, password, nickname, gender, register_time)
-        VALUES (#{username}, #{password}, #{nickname}, #{gender}, #{registerTime})
+        INSERT INTO user (username, password, nickname, gender,intro, register_time)
+        VALUES (#{username}, #{password}, #{nickname}, #{gender}, #{intro},#{registerTime})
     </insert>
 
     <delete id="deleteUserById">

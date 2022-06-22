@@ -58,7 +58,7 @@ public class Reply {
     @Schema(description = "被回复者的用户Id")
     private Long replyToUid;
 
-    @Column(name = "is_floor",columnDefinition = "int(1)")
+    @Column(name = "is_floor",columnDefinition = "tinyint(1)")
     @Schema(description = "是否是子贴（否则为楼中楼回复）")
     private Integer isFloor;
 

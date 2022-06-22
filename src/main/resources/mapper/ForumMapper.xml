@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.games.tap.mapper.ForumMapper">
+
+    <select id="getAllForum" resultType="com.games.tap.domain.Forum">
+        SELECT * FROM forum;
+    </select>
+
+    <select id="getForumList" resultType="com.games.tap.vo.ForumInfo">
+        SELECT fid,name,icon,follow_num,false AS is_like FROM forum ORDER BY follow_num DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="getForumListWithUserId" resultType="com.games.tap.vo.ForumInfo">
+        SELECT forum.fid,name,icon,follow_num,IFNULL(is_like,false) AS is_like FROM forum LEFT JOIN
+            (SELECT fid,is_like FROM forum_user WHERE uid=#{uid})AS user_forum
+        ON forum.fid=user_forum.fid ORDER BY follow_num DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="getForumById" resultType="com.games.tap.domain.Forum">
+        SELECT * FROM forum WHERE fid=#{id}
+    </select>
+
+    <select id="getForumByName" resultType="com.games.tap.domain.Forum">
+        SELECT * FROM forum WHERE name=#{name}
+    </select>
+
+    <insert id="insertForum" parameterType="com.games.tap.domain.Forum" useGeneratedKeys="true" keyProperty="fId">
+        INSERT INTO forum (intro, name, icon) VALUES (#{intro},#{name},#{icon})
+    </insert>
+
+    <update id="updateForum" parameterType="com.games.tap.domain.Forum">
+        UPDATE forum SET intro=#{intro},name=#{name},icon=#{icon} WHERE fid=#{fId}
+    </update>
+
+    <delete id="deleteForumById">
+        DELETE FROM forum WHERE fid=#{id}
+    </delete>
+
+</mapper>

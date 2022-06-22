@@ -2,9 +2,12 @@ package com.games.tap.interceptor;
 
 import com.games.tap.domain.User;
 import com.games.tap.mapper.UserMapper;
+import com.games.tap.util.Echo;
 import com.games.tap.util.JwtUtil;
 import com.games.tap.util.PassToken;
+import com.games.tap.util.RetCode;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -40,6 +43,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         String token = request.getHeader("token");
         if (null == token || "".equals(token.trim())) {
             log.warn("token为空");
+            JwtUtil.failMessage(response);
             return false;//为空就返回错误
         }
         //1.判断 token 是否过期
@@ -47,6 +51,7 @@ public class JwtInterceptor implements HandlerInterceptor {
             log.info("token验证成功");
         } else {//token过期就返回 token 无效.
             log.info("token 无效");
+            JwtUtil.failMessage(response);
             return false;
         }
         log.info("token:" + token);

@@ -73,11 +73,12 @@ public class UserController {
         if (echo != null) return echo;
         if (userMapper.getUserByUserName(user.getUsername()) != null)
             return Echo.define(RetCode.USER_HAS_EXISTED);
+        //  初始化设置
         if (user.getNickname() == null || user.getNickname().equals("")) {
             String name = "用户" + Long.toHexString(SnowFlake.nextId()).replace("0", "");
             user.setNickname(name);
         }
-        //  初始化设置
+        if (user.getIntro() == null || user.getIntro().equals("")) user.setIntro("签名是一种态度，我想我可以更酷");
         user.setPassword(encoder.encode(user.getPassword()));
         if (user.getGender() == null) user.setGender(0);
         user.setRegisterTime(DateUtil.getCurrentTime());
@@ -96,24 +97,28 @@ public class UserController {
         return "请求成功";
     }
 
+    @PassToken
     @Operation(summary = "获取用户信息列表", description = "通过起始位置，数量获取列表，不带参数为返回全部信息，带参数时offset可选，pageSize必带")//TODO：加入权限验证
-    @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public Echo getUserList(String offset,String pageSize) {
-        if(offset==null&&pageSize==null){
-             List<User> list = userMapper.getAllUser();
-             if (list == null || list.isEmpty()) return Echo.fail();
+    @RequestMapping(value = "/user", method = RequestMethod.GET)
+    public Echo getUserList(String offset, String pageSize) {
+        if (offset == null && pageSize == null) {
+            List<User> list = userMapper.getAllUser();
+            if (list == null || list.isEmpty()) return Echo.fail();
             return Echo.success(list);
-        }else {
-            List<UserInfo>list;
-            if(offset==null){
-                if(!StringUtils.isNumeric(pageSize))return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-                if(Long.parseLong(pageSize)<=0)return Echo.define(RetCode.PARAM_IS_INVALID);
-                list=userMapper.getUserList(0L,Long.parseLong(pageSize));
-            }else{
-                if(!StringUtils.isNumeric(pageSize)||!StringUtils.isNumeric(offset))
+        } else if (pageSize == null) {
+            return Echo.fail("pageSize不能为空");
+        } else {
+            List<UserInfo> list;
+            if (offset == null) {
+                if (!StringUtils.isNumeric(pageSize)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+                if (Long.parseLong(pageSize) <= 0) return Echo.define(RetCode.PARAM_IS_INVALID);
+                list = userMapper.getUserList(0L, Long.parseLong(pageSize));
+            } else {
+                if (!StringUtils.isNumeric(pageSize) || !StringUtils.isNumeric(offset))
                     return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-                if(Long.parseLong(pageSize)<=0||Long.parseLong(offset)<0)return Echo.define(RetCode.PARAM_IS_INVALID);
-                list=userMapper.getUserList(Long.parseLong(offset),Long.parseLong(pageSize));
+                if (Long.parseLong(pageSize) <= 0 || Long.parseLong(offset) < 0)
+                    return Echo.define(RetCode.PARAM_IS_INVALID);
+                list = userMapper.getUserList(Long.parseLong(offset), Long.parseLong(pageSize));
             }
             if (list == null || list.isEmpty()) return Echo.fail();
             return Echo.success(list);
@@ -123,39 +128,53 @@ public class UserController {
     @Operation(summary = "更改用户信息", description = "传入用户的完整信息,对单个用户进行更改")
     @RequestMapping(value = "/user/{id}", method = RequestMethod.PUT)
     public Echo updateUser(@PathVariable("id") String id, @RequestBody User user) {
-        if(!StringUtils.isNumeric(id))return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long uid=Long.parseLong(id);
+        if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+        Long uid = Long.parseLong(id);
         if (!Objects.equals(uid, user.getUId())) return Echo.fail("请求id不一致，id不可更改");
         Echo echo = userService.checkUser(user);
         if (echo != null) return echo;
+        User saveUser = userMapper.getUserById(uid);
         Long did = userMapper.getIdByUserName(user.getUsername());
         if (did != null && !did.equals(uid)) return Echo.fail("用户名已存在");
-        user.setPassword(encoder.encode(user.getPassword()));
-        if (userMapper.updateUser(user) != 0) return Echo.success();
+        else if (did == null) saveUser.setUsername(user.getUsername());
+        if (user.getIntro() != null) saveUser.setIntro(user.getIntro());
+        if (user.getNickname() != null) saveUser.setNickname(user.getNickname());
+        if (user.getGender() != null && user.getGender() >= 0 && user.getGender() < 3)
+            saveUser.setGender(user.getGender());
+        if (!Objects.equals(saveUser.getRegisterTime(), user.getRegisterTime()))
+            return Echo.fail("注册时间不可更改");
+        if (!Objects.equals(saveUser.getFansNum(), user.getFansNum())
+                || !Objects.equals(saveUser.getFollowNum(), user.getFollowNum()))
+            return Echo.fail("关注和粉丝数不可显式修改");
+        if (!encoder.matches(user.getPassword(), saveUser.getPassword()))
+            saveUser.setPassword(encoder.encode(user.getPassword()));
+        if (userMapper.updateUser(saveUser) != 0) return Echo.success();
         else return Echo.fail();
     }
 
-    @Operation(summary = "删除用户", description = "通过id删除，该方法应加入权限验证")
+    @Operation(summary = "删除用户", description = "通过id删除，该方法应加入权限验证")//TODO 用户删除相应表也应该删除
     @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE)
     public Echo deleteById(@PathVariable("id") String id) {// FIXME 用户只能注销自己的用户，管理员才有任意操作的权限
-        if(!StringUtils.isNumeric(id))return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+        if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         if (userMapper.deleteUserById(Long.parseLong(id)) != 0) return Echo.success();
         else return Echo.fail();
     }
 
+    @PassToken
     @Operation(summary = "通过id查找用户")
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
     public Echo getUserById(@PathVariable("id") String id) {
-        if(!StringUtils.isNumeric(id))return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+        if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         User user = userMapper.getUserById(Long.parseLong(id));
         if (user == null) return Echo.fail();
         return Echo.success(user);
     }
 
+    @PassToken
     @Operation(summary = "获取用户头像", description = "目前返回的是路径")
     @RequestMapping(value = "/user/{id}/avatar", method = RequestMethod.GET)
     public Echo getAvatarPathById(@PathVariable("id") String id) {
-        if(!StringUtils.isNumeric(id))return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+        if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         String path = userMapper.getUserAvatarById(Long.parseLong(id));
         if (path == null || path.equals("")) return Echo.fail();
         return Echo.success(path);
@@ -164,9 +183,9 @@ public class UserController {
     @Operation(summary = "上传用户头像", description = "用户只能上传自己的头像")
     @RequestMapping(value = "/user/{id}/avatar", method = RequestMethod.POST)
     //文件上传
-    public Echo uploadAvatar(@RequestParam("filename") MultipartFile file, @PathVariable("id") String id,HttpServletRequest request) {
-        if(!StringUtils.isNumeric(id))return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long uid=Long.parseLong(id);
+    public Echo uploadAvatar(@RequestParam("filename") MultipartFile file, @PathVariable("id") String id, HttpServletRequest request) {
+        if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+        Long uid = Long.parseLong(id);
         if (!Objects.equals(uid, userService.getIdByToken(request.getHeader("token"))))// TODO 最后改成 @RequestHeader的格式
             return Echo.define(RetCode.PERMISSION_NO_ACCESS);
         if (userMapper.getUserById(uid) == null) return Echo.fail("用户不存在");
@@ -179,11 +198,12 @@ public class UserController {
         return Echo.fail(map.get("result"));
     }
 
+    @PassToken
     @Operation(summary = "获取用户空间背景", description = "目前返回的是路径")
     @RequestMapping(value = "/user/{id}/background", method = RequestMethod.GET)
     public Echo getImgPathByOwner(@PathVariable("id") String id) {
-        if(!StringUtils.isNumeric(id))return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long uid=Long.parseLong(id);
+        if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+        Long uid = Long.parseLong(id);
         String path = userMapper.getBackgroundById(uid);
         if (path == null || path.equals("")) return Echo.fail();
         return Echo.success(path);
@@ -193,8 +213,8 @@ public class UserController {
     @RequestMapping(value = "/user/{id}/background", method = RequestMethod.POST)
     //文件上传
     public Echo uploadBack(@RequestParam("filename") MultipartFile file, @PathVariable("id") String id, HttpServletRequest request) {
-        if(!StringUtils.isNumeric(id))return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long uid=Long.parseLong(id);
+        if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+        Long uid = Long.parseLong(id);
         if (!Objects.equals(uid, userService.getIdByToken(request.getHeader("token"))))
             return Echo.define(RetCode.PERMISSION_NO_ACCESS);
         if (userMapper.getUserById(uid) == null) return Echo.fail("用户不存在");
@@ -207,47 +227,53 @@ public class UserController {
         return Echo.fail(map.get("result"));
     }
 
-    @Operation(summary = "粉丝列表",description = "获取关注该用户的粉丝列表")
-    @RequestMapping(value = "/fan/{id}",method = RequestMethod.GET)
-    public Echo getFanList(@PathVariable String id){
-        if(!StringUtils.isNumeric(id))return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        List<UserInfo>list= conMapper.getFanList(Long.parseLong(id));
+    @Operation(summary = "粉丝列表", description = "获取关注该用户的粉丝列表")
+    @RequestMapping(value = "/fan/{id}", method = RequestMethod.GET)
+    public Echo getFanList(@PathVariable String id) {
+        if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+        List<UserInfo> list = conMapper.getFanList(Long.parseLong(id));
         if (list == null || list.isEmpty()) return Echo.fail("数据为空");
         return Echo.success(list);
     }
 
-    @Operation(summary = "关注列表",description = "获取该用户关注的用户列表")
-    @RequestMapping(value = "/follow/{id}",method = RequestMethod.GET)
-    public Echo getFollowList(@PathVariable String id){
-        if(!StringUtils.isNumeric(id))return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        List<UserInfo>list= conMapper.getFollowList(Long.parseLong(id));
+    @PassToken
+    @Operation(summary = "关注列表", description = "获取该用户关注的用户列表")
+    @RequestMapping(value = "/follow/{id}", method = RequestMethod.GET)
+    public Echo getFollowList(@PathVariable String id) {
+        if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+        List<UserInfo> list = conMapper.getFollowList(Long.parseLong(id));
         if (list == null || list.isEmpty()) return Echo.fail("数据为空");
         return Echo.success(list);
     }
 
-    @Operation(summary = "关注用户",description = "关注其他用户")
-    @RequestMapping(value = "/concern",method = RequestMethod.POST)
-    public Echo follow(String followedId,String followingId){
-        if(!StringUtils.isNumeric(followedId)||!StringUtils.isNumeric(followingId))
+    @PassToken
+    @Operation(summary = "关注用户", description = "关注其他用户")
+    @RequestMapping(value = "/concern", method = RequestMethod.POST)
+    public Echo follow(String followedId, String followingId, HttpServletRequest request) {
+        if (!StringUtils.isNumeric(followedId) || !StringUtils.isNumeric(followingId))
             return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long ingId=Long.parseLong(followingId),edId=Long.parseLong(followedId);
-        if(conMapper.isFollow(ingId,edId)!=null)return Echo.fail("已经关注过了");
-        if(conMapper.follow(ingId,edId)>0){
+        Long ingId = Long.parseLong(followingId), edId = Long.parseLong(followedId);
+        if (!Objects.equals(ingId, userService.getIdByToken(request.getHeader("token"))))
+            return Echo.define(RetCode.PERMISSION_NO_ACCESS);
+        if (conMapper.isFollow(ingId, edId) != null) return Echo.fail("已经关注过了");
+        if (conMapper.follow(ingId, edId) > 0) {
             return Echo.success();
-        }else
+        } else
             return Echo.fail("关注失败");
     }
 
-    @Operation(summary = "取消关注",description = "取消关注其他用户")
-    @RequestMapping(value = "/concern",method = RequestMethod.DELETE)
-    public Echo unfollow(String followedId,String followingId){
-        if(!StringUtils.isNumeric(followedId)||!StringUtils.isNumeric(followingId))
+    @Operation(summary = "取消关注", description = "取消关注其他用户")
+    @RequestMapping(value = "/concern", method = RequestMethod.DELETE)
+    public Echo unfollow(String followedId, String followingId, HttpServletRequest request) {
+        if (!StringUtils.isNumeric(followedId) || !StringUtils.isNumeric(followingId))
             return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long ingId=Long.parseLong(followingId),edId=Long.parseLong(followedId);
-        if(conMapper.isFollow(ingId,edId)==null)return Echo.fail("还没有关注");
-        if(conMapper.unfollow(ingId,edId)>0){
+        Long ingId = Long.parseLong(followingId), edId = Long.parseLong(followedId);
+        if (!Objects.equals(ingId, userService.getIdByToken(request.getHeader("token"))))
+            return Echo.define(RetCode.PERMISSION_NO_ACCESS);
+        if (conMapper.isFollow(ingId, edId) == null) return Echo.fail("还没有关注");
+        if (conMapper.unfollow(ingId, edId) > 0) {
             return Echo.success();
-        }else
+        } else
             return Echo.fail("取关失败");
     }
 }

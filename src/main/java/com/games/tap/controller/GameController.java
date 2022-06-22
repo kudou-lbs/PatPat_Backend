@@ -6,6 +6,7 @@ import com.games.tap.util.PassToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -19,7 +20,7 @@ public class GameController {
 
     @PassToken
     @Operation(summary = "返回所有游戏信息")
-    @RequestMapping(value = "/Game/getAllGame")
+    @RequestMapping(value = "/Game/getAllGame",method = RequestMethod.GET)
     public List<Game> getAllGame(){
         return gameService.getAllGame();
     }
