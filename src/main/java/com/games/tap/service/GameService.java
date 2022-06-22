@@ -16,28 +16,40 @@ public class GameService {
         return gameMapper.getAllGame();
     }
 
+    public List<Game> getGameList(Long offset,Long pageSize){
+        return gameMapper.getGameList(offset,pageSize);
+    }
+
     public List<Game> OrderByHot(){
         return gameMapper.OrderByHot();
+    }
+
+    public List<Game> getOrderList(Long offset,Long pageSize){
+        return gameMapper.getOrderList(offset,pageSize);
     }
 
     public List<Game> getById(Long gId){
         return gameMapper.getById(gId);
     }
 
+    public Integer isExisted(Long gId){
+        return gameMapper.isExisted(gId);
+    }
+
+    public Integer isTypeExited(Long gId,String type){
+        return gameMapper.isTypeExited(gId,type);
+    }
+
     public int insertGame(Game game){
         return gameMapper.insertGame(game);
     }
 
-    public int insertType(Long gId,@Param("types") String[] types){
+    public int insertType(Long gId,String[] types){
         return gameMapper.insertType(gId,types);
     }
 
-    public int deleteType(Long gId,@Param("types") String[] types){
+    public int deleteType(Long gId,String[] types){
         return gameMapper.deleteType(gId,types);
-    }
-
-    public Long getGidByGame(Game game){
-        return gameMapper.getGidByGame(game);
     }
 
     public int deleteGameById(Long gId){

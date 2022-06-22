@@ -58,33 +58,6 @@
         delete from game_type where gid=#{gId};
     </delete>
 
-    <select id="getGidByGame" resultType="java.lang.Long">
-        SELECT gid from game
-        <where>
-            <if test="hot != null">
-                and hot=#{hot}
-            </if>
-            <if test="name != null and name !=''">
-                and name=#{name}
-            </if>
-            <if test="score != null">
-                and score=#{score}
-            </if>
-            <if test="url != null and url !=''">
-                and url=#{url}
-            </if>
-            <if test="intro != null and intro !=''">
-                and intro=#{intro}
-            </if>
-            <if test="picture != null and picture !=''">
-                and picture=#{picture}
-            </if>
-            <if test="icon != null and icon !=''">
-                and icon=#{icon}
-            </if>
-        </where>
-    </select>
-
 
     <select id="getAllGame" resultType="com.games.tap.domain.Game">
         SELECT table_type.gid as gid,game.hot,game.name,
@@ -94,6 +67,18 @@
               FROM game_type
               GROUP BY game_type.gid)as table_type
              on game.gid=table_type.gid
+    </select>
+
+
+    <select id="getGameList" resultType="com.games.tap.domain.Game">
+        SELECT table_type.gid as gid,game.hot,game.name,
+               game.picture,game.score,game.url,game.intro,game.icon,table_type.type as types
+        FROM game right outer join
+             (SELECT game_type.gid,GROUP_CONCAT(game_type.type SEPARATOR ',') type
+              FROM game_type
+              GROUP BY game_type.gid)as table_type
+             on game.gid=table_type.gid
+        LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
     <select id="OrderByHot" resultType="com.games.tap.domain.Game">
@@ -107,6 +92,19 @@
             order by hot desc
     </select>
 
+
+    <select id="getOrderList" resultType="com.games.tap.domain.Game">
+        SELECT table_type.gid as gid,game.hot,game.name,
+               game.picture,game.score,game.url,game.intro,game.icon,table_type.type as types
+        FROM game right outer join
+             (SELECT game_type.gid,GROUP_CONCAT(game_type.type SEPARATOR ',') type
+              FROM game_type
+              GROUP BY game_type.gid)as table_type
+             on game.gid=table_type.gid
+        order by hot desc
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
     <select id="getById" resultType="com.games.tap.domain.Game">
         SELECT table_type.gid as gid,game.hot,game.name,
                game.picture,game.score,game.url,game.intro,game.icon,table_type.type as types
@@ -118,4 +116,10 @@
             where game.gid=#{gId}
     </select>
 
+    <select id="isExisted" resultType="java.lang.Integer">
+        select * from game where gid=#{gId}
+    </select>
+    <select id="isTypeExited" resultType="java.lang.Integer">
+        select * from game_type where gid=#{gId} and type=#{type}
+    </select>
 </mapper>
