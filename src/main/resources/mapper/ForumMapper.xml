@@ -24,7 +24,7 @@
             LEFT JOIN user u ON fpost.uid = u.uid
             LEFT JOIN forum_user fu ON fpost.fid = fu.fid AND fpost.uid = fu.uid
         <if test="uid!=null ">
-            LEFT JOIN post_like pl ON fu.uid = pl.uid AND pl.uid = #{uid}
+            LEFT JOIN post_like pl ON fpost.pid = pl.pid AND pl.uid = #{uid}
         </if>
         ORDER BY
         <choose>
@@ -80,9 +80,9 @@
     </update>
 
     <delete id="deleteForumById">
-        DELETE FROM reply WHERE fid=#{id};
-        DELETE FROM post WHERE fid=#{id};
         DELETE FROM forum WHERE fid=#{id};
+        DELETE FROM post WHERE fid=#{id};
+        DELETE FROM reply WHERE fid=#{id};
     </delete>
 
 </mapper>

@@ -39,9 +39,9 @@
     </insert>
 
     <delete id="unfollow">
+        DELETE FROM concern WHERE following_uid=#{following} and followed_uid=#{followed};
         UPDATE user SET fans_num=fans_num-1 WHERE uid=#{followed};
         UPDATE user SET follow_num=user.follow_num-1 WHERE uid=#{following};
-        DELETE FROM concern WHERE following_uid=#{following} and followed_uid=#{followed};
     </delete>
 
 </mapper>

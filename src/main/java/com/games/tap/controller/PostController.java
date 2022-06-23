@@ -7,7 +7,9 @@ import com.games.tap.mapper.UserMapper;
 import com.games.tap.service.ImageService;
 import com.games.tap.util.DateUtil;
 import com.games.tap.util.Echo;
+import com.games.tap.util.PassToken;
 import com.games.tap.util.RetCode;
+import com.games.tap.vo.PostInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.StringUtils;
@@ -58,14 +60,33 @@ public class PostController {
         return Echo.fail();
     }
 
+    @PassToken
+    @Operation(summary = "获得详细帖子信息",description = "通过pid获取帖子,登录时需要传入uid判断是否喜欢")
+    @RequestMapping(value = "/post",method = RequestMethod.GET)
+    public Echo getPost(String pid,String uid){
+        if(pid==null||pid.equals(""))return Echo.define(RetCode.PARAM_IS_EMPTY);
+        if (!StringUtils.isNumeric(pid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+        Long fId=Long.parseLong(pid),uId=null;
+        if(postMapper.getPostByPId(fId)==null)return Echo.fail("帖子不存在");
+        if(uid!=null&&!uid.equals("")){
+            if (!StringUtils.isNumeric(pid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+            uId=Long.parseLong(uid);
+            if(userMapper.getUserById(uId)==null)return Echo.define(RetCode.USER_NOT_EXIST);
+        }
+        PostInfo postInfo=postMapper.getPostInfo(fId,uId);
+        if(postInfo==null)return Echo.fail();
+        return Echo.success(postInfo);
+    }
+
+    @PassToken
     @Operation(summary = "帖子阅读量加1",description = "通过id增加帖子阅读量，当用户点击帖子时调用")
     @RequestMapping(value = "/post/read",method = RequestMethod.POST)
-    public Echo readPost(String id){
-        if(id==null||id.equals(""))return Echo.define(RetCode.PARAM_IS_EMPTY);
-        if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long pid=Long.parseLong(id);
-        if(postMapper.getPostByPId(pid)==null)return Echo.fail("帖子不存在");
-        if(postMapper.updateReadingNum(pid)!=0)return Echo.success();
+    public Echo readPost(String pid){
+        if(pid==null||pid.equals(""))return Echo.define(RetCode.PARAM_IS_EMPTY);
+        if (!StringUtils.isNumeric(pid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+        Long id=Long.parseLong(pid);
+        if(postMapper.getPostByPId(id)==null)return Echo.fail("帖子不存在");
+        if(postMapper.updateReadingNum(id)!=0)return Echo.success();
         return Echo.fail();
     }
 
