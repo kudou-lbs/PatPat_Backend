@@ -21,6 +21,7 @@ public interface GameMapper {
     int insertGame(Game game);
     int insertType(Long gId, String[] types);
     int deleteType(Long gId, String[] types);
+    int deleteTypeById(Long gId);
 
     int deleteGameById(Long gId);
 

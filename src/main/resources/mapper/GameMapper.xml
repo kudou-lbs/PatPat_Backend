@@ -57,6 +57,9 @@
         delete from game where gid=#{gId};
         delete from game_type where gid=#{gId};
     </delete>
+    <delete id="deleteTypeById">
+        delete from game_type where gid=#{gId};
+    </delete>
 
 
     <select id="getAllGame" resultType="com.games.tap.domain.Game">

@@ -41,4 +41,15 @@ public interface UserMapper {
     int insertUser(User user);
 
     int deleteUserById(Long id);
+
+    Integer postCollection(Long uid,Long pid);
+
+    Integer postCancelCollection(Long uid,Long pid);
+
+    Integer isCollectionExited(Long uid,Long pid);
+
+    Integer addCollectionNum(Long pid);
+    Integer subCollectionNum(Long pid);
+
+    List<UserPostInfo> getUserCollectList(@Param("uid")Long uid, @Param("offset")Long offset, @Param("pageSize")Long pageSize);
 }

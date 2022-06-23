@@ -60,6 +60,10 @@ public class GameService {
         return gameMapper.deleteType(gId,types);
     }
 
+    public int deleteTypeById(Long gId){
+        return gameMapper.deleteTypeById(gId);
+    }
+
     public int deleteGameById(Long gId){
         return gameMapper.deleteGameById(gId);
     }

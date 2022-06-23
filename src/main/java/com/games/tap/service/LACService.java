@@ -2,6 +2,7 @@ package com.games.tap.service;
 
 import com.games.tap.domain.PostLike;
 import com.games.tap.mapper.PostLikeMapper;
+import com.games.tap.vo.UserPostInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
@@ -19,27 +20,23 @@ public class LACService {
         return postLikeMapper.postLike(uid, pid);
     }
 
-    public Integer postIsLiked(Long uid,Long pid){
-        return postLikeMapper.postIsLiked(uid,pid);
-    }
-
     public Integer postCancelLike(Long uid,Long pid){
         return postLikeMapper.postCancelLike(uid,pid);
     }
 
-    public Integer deletePostLikeByPid(Long pid){
-        return postLikeMapper.deletePostLikeByPid(pid);
+    public List<UserPostInfo> getUserPostList(Long uid, Long offset, Long pageSize){
+        return postLikeMapper.getUserPostList(uid,offset,pageSize);
     }
 
-    public List<Long> getPidByUid(Long uid){
-        return postLikeMapper.getPidByUid(uid);
+    public Integer addLikeNum(Long pid){
+        return postLikeMapper.addLikeNum(pid);
     }
 
-    public List<Long> getPidList(Long uid, Long offset, Long pageSize){
-        return postLikeMapper.getPidList(uid, offset, pageSize);
+    public Integer subLikeNum(Long pid){
+        return postLikeMapper.subLikeNum(pid);
     }
 
-    public Integer getPostLikes(Long pid){
-        return postLikeMapper.getPostLikes(pid);
+    public Integer isExited(Long uid,Long pid){
+        return postLikeMapper.isExited(uid,pid);
     }
 }

@@ -5,15 +5,20 @@ import com.games.tap.mapper.UserMapper;
 import com.games.tap.util.Echo;
 import com.games.tap.util.JwtUtil;
 import com.games.tap.util.RetCode;
+import com.games.tap.vo.UserPostInfo;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
 public class UserService {
+    @Resource
+    UserMapper userMapper;
 
     public User getUserByToken(String token) {
         return JwtUtil.parseUser(token);
@@ -53,5 +58,29 @@ public class UserService {
         Pattern Password_Pattern = Pattern.compile(regEx1);
         Matcher matcher = Password_Pattern.matcher(password);
         return matcher.matches();
+    }
+
+    public Integer postCollection(Long uid,Long pid){
+        return userMapper.postCollection(uid,pid);
+    }
+
+    public Integer postCancelCollection(Long uid,Long pid){
+        return userMapper.postCancelCollection(uid, pid);
+    }
+
+    public Integer isCollectionExited(Long uid,Long pid){
+        return userMapper.isCollectionExited(uid, pid);
+    }
+
+    public Integer addCollectionNum(Long pid){
+        return userMapper.addCollectionNum(pid);
+    }
+
+    public Integer subCollectionNum(Long pid){
+        return userMapper.subCollectionNum(pid);
+    }
+
+    public List<UserPostInfo> getUserCollectList(Long uid, Long offset, Long pageSize){
+        return userMapper.getUserCollectList(uid, offset, pageSize);
     }
 }

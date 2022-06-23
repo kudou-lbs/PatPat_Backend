@@ -5,6 +5,7 @@ import com.games.tap.service.LACService;
 import com.games.tap.util.Echo;
 import com.games.tap.util.PassToken;
 import com.games.tap.util.RetCode;
+import com.games.tap.vo.UserPostInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import com.games.tap.domain.Post;
 import com.games.tap.mapper.ForumMapper;
@@ -124,15 +125,17 @@ public class PostController {
         Long pId=Long.parseLong(pid);
         if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
         if (postMapper.getPostByPId(pId) == null) return Echo.fail("帖子不存在");
+        if (lacService.isExited(uId,pId) != null) return Echo.fail("已经点赞");
 
         Integer like= lacService.postLike(uId,pId);
+        lacService.addLikeNum(pId);
         if (like == 0) return Echo.fail("点赞失败");
         return Echo.success("点赞成功");
     }
 
     @PassToken
     @Operation(summary = "取消帖子点赞")
-    @RequestMapping(value = "/post/cancel",method = RequestMethod.POST)
+    @RequestMapping(value = "/post/cancel",method = RequestMethod.DELETE)
     public Echo postCancelLike(String uid,String pid){
         if (!StringUtils.isNumeric(uid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         if (!StringUtils.isNumeric(pid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
@@ -140,8 +143,10 @@ public class PostController {
         Long pId=Long.parseLong(pid);
         if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
         if (postMapper.getPostByPId(pId) == null) return Echo.fail("帖子不存在");
+        if (lacService.isExited(uId,pId) == null) return Echo.fail("还没有点赞");
 
         Integer like= lacService.postCancelLike(uId,pId);
+        lacService.subLikeNum(pId);
         if (like == 0) return Echo.fail("取消点赞失败");
         return Echo.success("取消点赞成功");
     }
@@ -155,15 +160,9 @@ public class PostController {
         if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
 
         if (offset == null && pageSize == null) {
-            List<Long> pIds=lacService.getPidByUid(uId);
-            if (pIds.size()==0) return Echo.fail("该用户没有点赞帖子");
-            List<Post> posts=new ArrayList<>();
-            for (Long id : pIds) {
-                Post post=postMapper.getPostByPId(id);
-                posts.add(post);
-            }
-            if (posts == null || posts.isEmpty()) return Echo.fail();
-            return Echo.success(posts);
+            List<UserPostInfo> postInfos=lacService.getUserPostList(uId,null,null);
+            if (postInfos == null || postInfos.isEmpty()) return Echo.fail();
+            return Echo.success(postInfos);
         } else if (pageSize == null) {
             return Echo.fail("pageSize不能为空");
         }else {
@@ -176,41 +175,10 @@ public class PostController {
                 if (Long.parseLong(offset) < 0) return Echo.define(RetCode.PARAM_IS_INVALID);
                 start=Long.parseLong(offset);
             }
-            List<Long> pIds=lacService.getPidList(uId,start,size);
-            if (pIds.size()==0) return Echo.fail("该用户没有点赞帖子");
-            List<Post> posts=new ArrayList<>();
-            for (Long id : pIds) {
-                Post post=postMapper.getPostByPId(id);
-                posts.add(post);
-            }
-            if (posts == null || posts.isEmpty()) return Echo.fail();
-            return Echo.success(posts);
+            List<UserPostInfo> postInfos=lacService.getUserPostList(uId,start,size);
+            if (postInfos == null || postInfos.isEmpty()) return Echo.fail();
+            return Echo.success(postInfos);
         }
     }
 
-    @PassToken
-    @Operation(summary = "获取帖子的点赞数")
-    @RequestMapping(value = "/post/getlikes",method = RequestMethod.GET)
-    public Echo getPostLikes(String pid){
-        if (!StringUtils.isNumeric(pid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long pId=Long.parseLong(pid);
-        Integer count=lacService.getPostLikes(pId);
-        return Echo.success(count);
-    }
-
-    @PassToken
-    @Operation(summary = "判断是否点赞")
-    @RequestMapping(value = "/post/islike",method = RequestMethod.GET)
-    public Echo postIsLiked(String uid,String pid){
-        if (!StringUtils.isNumeric(uid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        if (!StringUtils.isNumeric(pid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long uId=Long.parseLong(uid);
-        Long pId=Long.parseLong(pid);
-        if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
-        if (postMapper.getPostByPId(pId) == null) return Echo.fail("帖子不存在");
-
-        Integer like= lacService.postIsLiked(uId,pId);
-        if (like == 0) return Echo.fail("该帖子没被点赞");
-        return Echo.success("该帖子被该用户点赞");
-    }
 }

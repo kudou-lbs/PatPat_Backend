@@ -9,24 +9,42 @@
     <insert id="postLike">
         insert into post_like(pid, uid) VALUES (#{pid},#{uid})
     </insert>
+
+    <update id="addLikeNum">
+        UPDATE post SET like_num=post.like_num+1 WHERE pid=#{pid}
+    </update>
+
+    <update id="subLikeNum">
+        UPDATE post SET like_num=post.like_num-1 WHERE post.like_num>=0 and pid=#{pid}
+    </update>
+
     <delete id="postCancelLike">
         delete from post_like where uid=#{uid} and pid=#{pid}
     </delete>
-    <delete id="deletePostLikeByPid">
-        delete from post_like where pid=#{pid}
-    </delete>
-    <select id="getPidByUid" resultType="java.lang.Long">
-        select pid from post_like where uid=#{uid}
-    </select>
-    <select id="getPidList" resultType="java.lang.Long">
-        select pid from post_like where uid=#{uid}
-        LIMIT #{pageSize} OFFSET #{offset}
-    </select>
+
     <select id="getPostLikes" resultType="java.lang.Integer">
         select count(*) from post_like where pid=#{pid}
     </select>
-    <select id="postIsLiked" resultType="java.lang.Integer">
-        select * from post_like where pid=#{pid} and uid=#{uid}
+
+    <select id="getUserPostList" resultType="com.games.tap.vo.UserPostInfo">
+        SELECT post.*,f.name AS forum_name,avatar,level,IFNULL(username,'用户已注销') AS username,
+        (IF(pl.id IS null, false, true)) AS is_like
+        FROM (SELECT * FROM post_like WHERE uid=#{uid}) pl
+        LEFT JOIN post ON post.pid = pl.pid AND pl.uid = #{uid}
+        LEFT JOIN user u ON pl.uid = u.uid
+        LEFT JOIN forum_user fu ON post.fid = fu.fid AND pl.uid = fu.uid
+        LEFT JOIN forum f ON post.fid = f.fid
+        ORDER BY last_date DESC
+        <if test="pageSize!=null ">
+            LIMIT #{pageSize}
+        </if>
+        <if test="offset!=null ">
+            OFFSET #{offset}
+        </if>
+    </select>
+
+    <select id="isExited" resultType="java.lang.Integer">
+        select * from post_like where uid=#{uid} and pid=#{pid}
     </select>
 
 </mapper>

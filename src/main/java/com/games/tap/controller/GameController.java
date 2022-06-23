@@ -129,8 +129,14 @@ public class GameController {
     @Operation(summary = "插入单条游戏信息")
     @RequestMapping(value = "/game",method = RequestMethod.POST)
     public Echo insertGame(Game game){
-        if(gameService.isExisted(game.getGId()) != null)
-            return Echo.define(RetCode.USER_HAS_EXISTED);
+        if(gameService.isExisted(game.getGId()) != null){
+            gameService.updateGame(game);
+            if (game.getTypes()!=null&&game.getTypes()!=""){
+                String[] type = game.getTypes().split("  ");
+                gameService.deleteTypeById(game.getGId());
+                gameService.insertType(game.getGId(),type);
+            }
+        }
         gameService.insertGame(game);
         Long gId=game.getGId();
         String[] types=game.getTypes().split("  ");
@@ -157,6 +163,13 @@ public class GameController {
 //                types[i] = Integer.parseInt(str[i]);
 //            }
                 gameService.insertType(gId, types);
+            }else{
+                gameService.updateGame(game);
+                if (game.getTypes()!=null&&game.getTypes()!=""){
+                    String[] type = game.getTypes().split("  ");
+                    gameService.deleteTypeById(game.getGId());
+                    gameService.insertType(game.getGId(),type);
+                }
             }
         }
         return Echo.success();
@@ -177,6 +190,11 @@ public class GameController {
     public Echo updateGame(Game game){
         if(gameService.isExisted(game.getGId()) == null) return Echo.fail("该游戏不存在");
         gameService.updateGame(game);
+        if (game.getTypes()!=null&&game.getTypes()!=""){
+            String[] type = game.getTypes().split("  ");
+            gameService.deleteTypeById(game.getGId());
+            gameService.insertType(game.getGId(),type);
+        }
         return Echo.success();
     }
 

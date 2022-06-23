@@ -25,6 +25,7 @@
         SELECT fpost.*,f.name AS forum_name,avatar,level,IFNULL(username,'用户已注销') AS username,
         (IF(pl.id IS null, false, true)) AS is_like
         FROM (SELECT * FROM post WHERE uid=#{uid}) fpost
+
         LEFT JOIN user u ON fpost.uid = u.uid
         LEFT JOIN forum_user fu ON fpost.fid = fu.fid AND fpost.uid = fu.uid
         LEFT JOIN forum f ON fpost.fid = f.fid
@@ -69,7 +70,8 @@
     <select id="getBackgroundById" resultType="java.lang.String">
         select background from user where uid=#{uId}
     </select>
-<!--    <cache readOnly="true"/>-->
+
+    <!--    <cache readOnly="true"/>-->
     <update id="updateUserAvatar">
         UPDATE user SET avatar= #{avatar} WHERE uid=#{uId}
     </update>
@@ -94,4 +96,41 @@
         DELETE FROM collection WHERE uid=#{id};
         DELETE FROM forum_user WHERE uid=#{id};
     </delete>
+
+    <insert id="postCollection">
+        insert into collection(pid, uid) VALUES (#{pid},#{uid})
+    </insert>
+
+    <delete id="postCancelCollection">
+        delete from collection where uid=#{uid} and pid=#{pid}
+    </delete>
+
+    <select id="isCollectionExited" resultType="java.lang.Integer">
+        select * from collection where uid=#{uid} and pid=#{pid}
+    </select>
+
+    <update id="addCollectionNum">
+        UPDATE post SET collect_num=post.collect_num+1 WHERE pid=#{pid}
+    </update>
+
+    <update id="subCollectionNum">
+        UPDATE post SET collect_num=post.collect_num-1 WHERE post.collect_num>=0 and pid=#{pid}
+    </update>
+
+    <select id="getUserCollectList" resultType="com.games.tap.vo.UserPostInfo">
+        SELECT post.*,f.name AS forum_name,avatar,level,IFNULL(username,'用户已注销') AS username,
+        (IF(pl.id IS null, false, true)) AS is_like
+        FROM (SELECT * FROM collection WHERE uid=#{uid}) pl
+        LEFT JOIN post ON post.pid = pl.pid AND pl.uid = #{uid}
+        LEFT JOIN user u ON pl.uid = u.uid
+        LEFT JOIN forum_user fu ON post.fid = fu.fid AND pl.uid = fu.uid
+        LEFT JOIN forum f ON post.fid = f.fid
+        ORDER BY last_date DESC
+        <if test="pageSize!=null ">
+            LIMIT #{pageSize}
+        </if>
+        <if test="offset!=null ">
+            OFFSET #{offset}
+        </if>
+    </select>
 </mapper>
