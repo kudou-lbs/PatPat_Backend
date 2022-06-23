@@ -7,6 +7,7 @@ import com.games.tap.service.ImageService;
 import com.games.tap.service.UserService;
 import com.games.tap.util.*;
 import com.games.tap.vo.UserInfo;
+import com.games.tap.vo.UserPostInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -218,15 +219,38 @@ public class UserController {
         return Echo.fail(map.get("result"));
     }
 
+    @PassToken
+    @Operation(summary = "获取用户发布的帖子列表",description = "通过uid查找用户的帖子,order定义排序，0 回复时间排序，1 发布时间排序，2 回复数量排序，默认0")
+    @RequestMapping(value = "user/post",method = RequestMethod.GET)
+    public Echo getUserPostList(String uid,String offset,String pageSize,String order){
+        if(uid==null||uid.equals(""))return Echo.define(RetCode.PARAM_IS_EMPTY);
+        Echo echo = UserService.checkList(uid, offset, pageSize);
+        if (echo != null) return echo;
+        Long start = null, size = null,id=Long.parseLong(uid);
+        if(userMapper.getUserById(id)==null)return Echo.define(RetCode.USER_NOT_EXIST);
+        int rank=0;
+        if (order != null) {
+            if (!StringUtils.isNumeric(order)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+            rank=Integer.parseInt(order);
+            if (rank<0||rank>2) return Echo.define(RetCode.PARAM_IS_INVALID);
+        }
+        if (offset != null) start = Long.parseLong(offset);
+        if (pageSize != null) size = Long.parseLong(pageSize);
+        List<UserPostInfo> list= userMapper.getUserPostList(id,start,size,rank);
+        if (list == null || list.isEmpty()) return Echo.fail("数据为空");
+        return Echo.success(list);
+    }
+
     @Operation(summary = "粉丝列表", description = "获取关注该用户的粉丝列表")
     @RequestMapping(value = "/fan/{id}", method = RequestMethod.GET)
     public Echo getFanList(@PathVariable String id, String offset, String pageSize) {
         Echo echo = UserService.checkList(id, offset, pageSize);
         if (echo != null) return echo;
-        Long start = null, size = null;
+        Long start = null, size = null,uid=Long.parseLong(id);
+        if(userMapper.getUserById(uid)==null)return Echo.define(RetCode.USER_NOT_EXIST);
         if (offset != null) start = Long.parseLong(offset);
         if (pageSize != null) size = Long.parseLong(pageSize);
-        List<UserInfo> list = conMapper.getFanList(Long.parseLong(id), start, size);
+        List<UserInfo> list = conMapper.getFanList(uid, start, size);
         if (list == null || list.isEmpty()) return Echo.fail("数据为空");
         return Echo.success(list);
     }
@@ -237,10 +261,11 @@ public class UserController {
     public Echo getFollowList(@PathVariable String id, String offset, String pageSize) {
         Echo echo = UserService.checkList(id, offset, pageSize);
         if (echo != null) return echo;
-        Long start = null, size = null;
+        Long start = null, size = null,uid=Long.parseLong(id);
+        if(userMapper.getUserById(uid)==null)return Echo.define(RetCode.USER_NOT_EXIST);
         if (offset != null) start = Long.parseLong(offset);
         if (pageSize != null) size = Long.parseLong(pageSize);
-        List<UserInfo> list = conMapper.getFollowList(Long.parseLong(id), start, size);
+        List<UserInfo> list = conMapper.getFollowList(uid, start, size);
         if (list == null || list.isEmpty()) return Echo.fail("数据为空");
         return Echo.success(list);
     }

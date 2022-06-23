@@ -1,6 +1,7 @@
 package com.games.tap.mapper;
 
 import com.games.tap.domain.Post;
+import com.games.tap.vo.PostInfo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -9,7 +10,7 @@ public interface PostMapper {
 
     Post getPostByPId(Long pid);
 
-    List<Post> getUserPostList(@Param("uid")Long uid,@Param("offset")Long offset, @Param("pageSize")Long pageSize);
+    PostInfo getPostInfo(@Param("pid")Long pid,@Param("uid")Long uid);
 
     int updateReadingNum(Long pid);
 

@@ -10,8 +10,22 @@
         SELECT * FROM post WHERE pid=#{pid}
     </select>
 
-    <select id="getUserPostList" resultType="com.games.tap.domain.Post">
-
+    <select id="getPostInfo" resultType="com.games.tap.vo.PostInfo">
+        SELECT fpost.*,f.name AS forum_name,avatar,level,IFNULL(username,'用户已注销') AS username,
+        (CASE
+            WHEN #{uid} IS null THEN false
+        <if test="uid!=null ">
+            WHEN pl.id IS null THEN false
+        </if>
+            ELSE true
+        END) AS is_like
+        FROM (SELECT * FROM post WHERE pid=#{pid}) fpost
+            LEFT JOIN user u ON fpost.uid = u.uid
+            LEFT JOIN forum_user fu ON fpost.fid = fu.fid AND fpost.uid = fu.uid
+            LEFT JOIN forum f ON fpost.fid = f.fid
+        <if test="uid!=null ">
+            LEFT JOIN post_like pl ON fpost.pid = pl.pid AND pl.uid = #{uid}
+        </if>
     </select>
 
     <update id="updateReadingNum">
@@ -28,8 +42,8 @@
     </insert>
 
     <delete id="deleteByPId">
-        DELETE FROM reply WHERE pid=#{pid};
         DELETE FROM post WHERE pid=#{pid};
+        DELETE FROM reply WHERE pid=#{pid};
     </delete>
 
 </mapper>
