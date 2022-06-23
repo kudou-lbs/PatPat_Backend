@@ -141,8 +141,7 @@ public class PostController {
 
     @PassToken
     @Operation(summary = "取消帖子点赞")
-    @RequestMapping(value = "/post/cancel",method = RequestMethod.DELETE)
-    @RequestMapping(value = "/post/unlike",method = RequestMethod.POST)
+    @RequestMapping(value = "/post/unlike",method = RequestMethod.DELETE)
     public Echo postCancelLike(String uid,String pid){
         if (!StringUtils.isNumeric(uid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         if (!StringUtils.isNumeric(pid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);

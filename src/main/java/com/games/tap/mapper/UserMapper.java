@@ -49,6 +49,7 @@ public interface UserMapper {
     Integer isCollectionExited(Long uid,Long pid);
 
     Integer addCollectionNum(Long pid);
+
     Integer subCollectionNum(Long pid);
 
     List<UserPostInfo> getUserCollectList(@Param("uid")Long uid, @Param("offset")Long offset, @Param("pageSize")Long pageSize);

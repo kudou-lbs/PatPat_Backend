@@ -98,4 +98,38 @@ public class ReplyController {
         }
         return Echo.success();
     }
+
+    @PassToken
+    @Operation(summary = "回复点赞")
+    @RequestMapping(value = "/reply/like",method = RequestMethod.POST)
+    public Echo postLike(String uid,String rid){
+        if (!StringUtils.isNumeric(uid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+        if (!StringUtils.isNumeric(rid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+        long uId=Long.parseLong(uid),rId=Long.parseLong(rid);
+        if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
+        if (replyMapper.getReplyById(rId) == null) return Echo.fail("回复不存在");
+        if (replyMapper.isReplyExited(uId,rId) != null) return Echo.fail("已经点赞");
+
+        Integer like= replyMapper.replyLike(uId,rId);
+        replyMapper.addReplyLikeNum(rId);
+        if (like == 0) return Echo.fail("点赞失败");
+        return Echo.success("点赞成功");
+    }
+
+    @PassToken
+    @Operation(summary = "取消回复点赞")
+    @RequestMapping(value = "/reply/unlike",method = RequestMethod.DELETE)
+    public Echo postCancelLike(String uid,String rid){
+        if (!StringUtils.isNumeric(uid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+        if (!StringUtils.isNumeric(rid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+        long uId=Long.parseLong(uid),rId=Long.parseLong(rid);
+        if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
+        if (replyMapper.getReplyById(rId) == null) return Echo.fail("回复不存在");
+        if (replyMapper.isReplyExited(uId,rId) == null) return Echo.fail("还没有点赞");
+
+        Integer like= replyMapper.replyCancelLike(uId,rId);
+        replyMapper.subReplyLikeNum(rId);
+        if (like == 0) return Echo.fail("取消点赞失败");
+        return Echo.success("取消点赞成功");
+    }
 }
