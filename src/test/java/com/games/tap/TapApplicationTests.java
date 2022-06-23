@@ -20,7 +20,7 @@ import javax.annotation.Resource;
 class TapApplicationTests {
 	@Resource
 	UserMapper userMapper;
-	
+
 	@Test
 	void contextLoads() {
 

@@ -108,9 +108,8 @@ public class UserController {
         } else {
             Echo echo = UserService.checkList(null, offset, pageSize);
             if (echo != null) return echo;
-            Long start = null, size = null;
+            Long start = null, size = Long.parseLong(pageSize);
             if (offset != null) start = Long.parseLong(offset);
-            if (pageSize != null) size = Long.parseLong(pageSize);
             List<UserInfo> list = userMapper.getUserList(start, size);
             if (list == null || list.isEmpty()) return Echo.fail();
             return Echo.success(list);

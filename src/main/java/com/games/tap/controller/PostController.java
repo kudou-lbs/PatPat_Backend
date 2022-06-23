@@ -71,12 +71,12 @@ public class PostController {
 
     @Operation(summary = "删除帖子",description = "通过id删除帖子，注意：删除帖子其对应的回复也会删除")
     @RequestMapping(value = "/post",method = RequestMethod.DELETE)
-    public Echo deletePost(String id){
-        if(id==null||id.equals(""))return Echo.define(RetCode.PARAM_IS_EMPTY);
-        if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long pid=Long.parseLong(id);
-        if(postMapper.getPostByPId(pid)==null)return Echo.fail("帖子不存在");
-        if(postMapper.deleteByPId(pid)!=0)return Echo.success();
+    public Echo deletePost(String pid){
+        if(pid==null||pid.equals(""))return Echo.define(RetCode.PARAM_IS_EMPTY);
+        if (!StringUtils.isNumeric(pid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+        Long id=Long.parseLong(pid);
+        if(postMapper.getPostByPId(id)==null)return Echo.fail("帖子不存在");
+        if(postMapper.deleteByPId(id)!=0)return Echo.success();
         return Echo.fail();
     }
 }

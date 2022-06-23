@@ -13,7 +13,7 @@ public interface PostMapper {
 
     int updateReadingNum(Long pid);
 
-    int updateLastDate(Long pid);
+    int updateLastDate(@Param("pid")Long pid,@Param("lastDate")String lastDate);
 
     int insertPost(Post post);
 

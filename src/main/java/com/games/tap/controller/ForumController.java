@@ -13,6 +13,8 @@ import com.games.tap.util.PassToken;
 import com.games.tap.util.RetCode;
 import com.games.tap.vo.ForumInfo;
 import com.games.tap.vo.LikeForum;
+import com.games.tap.vo.PostBasicInfo;
+import com.games.tap.vo.PostInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -165,23 +167,29 @@ public class ForumController {//TODO 加入权限校验
     }
 
     @PassToken
-    @Operation(summary = "获取论坛的帖子", description = "取得帖子列表，order定义排序，0 回复时间排序，1 发布时间排序，2 回复数量排序")
+    @Operation(summary = "获取论坛的帖子", description = "取得帖子列表，order定义排序，0 回复时间排序，1 发布时间排序，2 回复数量排序，fid必选，其他可选")
     @RequestMapping(value = "/forum/post", method = RequestMethod.GET)
-    public Echo getForumPost(String fid,String offset, String pageSize,String order) {
+    public Echo getForumPost(String uid,String fid,String offset, String pageSize,String order) {
         if(fid==null||fid.equals(""))return Echo.define(RetCode.PARAM_IS_EMPTY);
         Echo echo=UserService.checkList(fid,offset,pageSize);
         if(echo!=null)return echo;
-        Long id = Long.parseLong(fid),start=null,size=null;
-        if (userMapper.getUserById(id) == null) return Echo.fail("论坛不存在");
-        if(offset!=null)start=Long.parseLong(offset);
-        if(pageSize!=null)size=Long.parseLong(pageSize);
+        Long fId = Long.parseLong(fid),start=null,size=null,uId=null;
+        if (userMapper.getUserById(fId) == null) return Echo.fail("论坛不存在");
+        if(uid!=null&&!uid.equals("")){
+            if (!StringUtils.isNumeric(uid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+            uId=Long.parseLong(uid);
+            if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
+        }
         int rank=0;
         if (order != null) {
             if (!StringUtils.isNumeric(order)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
             rank=Integer.parseInt(order);
             if (rank<0||rank>2) return Echo.define(RetCode.PARAM_IS_INVALID);
         }
-        List<Post>list= forumMapper.getForumPostList(id,start,size,rank);
+        if(offset!=null)start=Long.parseLong(offset);
+        if(pageSize!=null)size=Long.parseLong(pageSize);
+
+        List<PostBasicInfo>list= forumMapper.getForumPostList(fId,uId,start,size,rank);
         if (list == null || list.isEmpty()) return Echo.fail("数据为空");
         return Echo.success(list);
     }

@@ -35,13 +35,14 @@ public class UserService {
 
     public static Echo checkList(String id, String offset, String pageSize) {
         if (id != null && !StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        if (offset != null) {
-            if (!StringUtils.isNumeric(offset)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-            if (Long.parseLong(offset) < 0) return Echo.define(RetCode.PARAM_IS_INVALID);
-        }
         if (pageSize != null) {
             if (!StringUtils.isNumeric(pageSize)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
             if (Long.parseLong(pageSize) <= 0) return Echo.define(RetCode.PARAM_IS_INVALID);
+        }else if(offset!=null)
+            return Echo.define(RetCode.PARAM_IS_EMPTY);
+        if (offset != null) {
+            if (!StringUtils.isNumeric(offset)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+            if (Long.parseLong(offset) < 0) return Echo.define(RetCode.PARAM_IS_INVALID);
         }
         return null;
     }

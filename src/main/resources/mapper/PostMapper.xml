@@ -6,14 +6,26 @@
 
 <mapper namespace="com.games.tap.mapper.PostMapper">
 
-    <insert id="insertPost" parameterType="com.games.tap.domain.Post" useGeneratedKeys="true" keyProperty="pId">
-        INSERT INTO post (content, fid, last_date, post_time, title, uid, picture)
-        VALUES (#{content},#{fId},#{lastDate},#{postTime},#{title},#{uId},#{picture})
-    </insert>
+    <select id="getPostByPId" resultType="com.games.tap.domain.Post">
+        SELECT * FROM post WHERE pid=#{pid}
+    </select>
+
+    <select id="getUserPostList" resultType="com.games.tap.domain.Post">
+
+    </select>
 
     <update id="updateReadingNum">
         UPDATE post SET reading_num=reading_num+1 WHERE pid=#{pid}
     </update>
+
+    <update id="updateLastDate">
+        UPDATE post SET last_date=#{lastDate} WHERE pid=#{pid}
+    </update>
+
+    <insert id="insertPost" parameterType="com.games.tap.domain.Post" useGeneratedKeys="true" keyProperty="pId">
+        INSERT INTO post (content, fid, last_date, post_time, title, uid, picture)
+        VALUES (#{content},#{fId},#{lastDate},#{postTime},#{title},#{uId},#{picture})
+    </insert>
 
     <delete id="deleteByPId">
         DELETE FROM reply WHERE pid=#{pid};
