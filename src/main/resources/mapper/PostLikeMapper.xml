@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.games.tap.mapper.PostLikeMapper">
+
+    <insert id="postLike">
+        insert into post_like(pid, uid) VALUES (#{pid},#{uid})
+    </insert>
+    <delete id="postCancelLike">
+        delete from post_like where uid=#{uid} and pid=#{pid}
+    </delete>
+    <delete id="deletePostLikeByPid">
+        delete from post_like where pid=#{pid}
+    </delete>
+    <select id="getPidByUid" resultType="java.lang.Long">
+        select pid from post_like where uid=#{uid}
+    </select>
+    <select id="getPidList" resultType="java.lang.Long">
+        select pid from post_like where uid=#{uid}
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+    <select id="getPostLikes" resultType="java.lang.Integer">
+        select count(*) from post_like where pid=#{pid}
+    </select>
+    <select id="postIsLiked" resultType="java.lang.Integer">
+        select * from post_like where pid=#{pid} and uid=#{uid}
+    </select>
+
+</mapper>

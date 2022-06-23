@@ -28,8 +28,16 @@ public class GameService {
         return gameMapper.getOrderList(offset,pageSize);
     }
 
-    public List<Game> getById(Long gId){
+    public Game getById(Long gId){
         return gameMapper.getById(gId);
+    }
+
+    public List<Long> getGidByType(String type){
+        return gameMapper.getGidByType(type);
+    }
+
+    public List<Long> getTypeList(String type,Long offset, Long pageSize){
+        return gameMapper.getTypeList(type,offset,pageSize);
     }
 
     public Integer isExisted(Long gId){

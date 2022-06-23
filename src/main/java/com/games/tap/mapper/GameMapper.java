@@ -8,12 +8,15 @@ import java.util.List;
 public interface GameMapper {
     List<Game> getAllGame();
     List<Game> OrderByHot();
-    List<Game> getById(Long gId);
+    Game getById(Long gId);
     Integer isExisted(Long gId);
     Integer isTypeExited(Long gId,String type);
 
     List<Game> getGameList(@Param("offset")Long offset, @Param("pageSize")Long pageSize);
     List<Game> getOrderList(@Param("offset")Long offset, @Param("pageSize")Long pageSize);
+    List<Long> getTypeList(String type,@Param("offset")Long offset, @Param("pageSize")Long pageSize);
+
+    List<Long> getGidByType(String type);
 
     int insertGame(Game game);
     int insertType(Long gId, String[] types);

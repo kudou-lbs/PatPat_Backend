@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -34,7 +35,6 @@ public class GameController {
         } else if (pageSize == null) {
             return Echo.fail("pageSize不能为空");
         } else {
-            List<Game> list;
             if (!StringUtils.isNumeric(pageSize)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
             if (Long.parseLong(pageSize) <= 0) return Echo.define(RetCode.PARAM_IS_INVALID);
             long size=Long.parseLong(pageSize),start;
@@ -44,7 +44,7 @@ public class GameController {
                 if (Long.parseLong(offset) < 0) return Echo.define(RetCode.PARAM_IS_INVALID);
                 start=Long.parseLong(offset);
             }
-            list= gameService.getGameList(start,size);
+            List<Game> list= gameService.getGameList(start,size);
             if (list == null || list.isEmpty()) return Echo.fail();
             return Echo.success(list);
         }
@@ -61,7 +61,6 @@ public class GameController {
         } else if (pageSize == null) {
             return Echo.fail("pageSize不能为空");
         } else {
-            List<Game> list;
             if (!StringUtils.isNumeric(pageSize)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
             if (Long.parseLong(pageSize) <= 0) return Echo.define(RetCode.PARAM_IS_INVALID);
             long size=Long.parseLong(pageSize),start;
@@ -71,7 +70,46 @@ public class GameController {
                 if (Long.parseLong(offset) < 0) return Echo.define(RetCode.PARAM_IS_INVALID);
                 start=Long.parseLong(offset);
             }
-            list= gameService.getOrderList(start,size);
+            List<Game> list= gameService.getOrderList(start,size);
+            if (list == null || list.isEmpty()) return Echo.fail();
+            return Echo.success(list);
+        }
+    }
+
+    @PassToken
+    @Operation(summary = "根据游戏类型返回游戏信息")
+    @RequestMapping(value = "/game/type",method = RequestMethod.GET)
+    public Echo getByType(String type,String offset, String pageSize){
+        if(type==null||type=="") return Echo.fail("请输入游戏类型");
+        if (offset == null && pageSize == null) {
+            List<Long> gIds=gameService.getGidByType(type);
+            if (gIds.size()==0) return Echo.fail("没有找到该类型游戏");
+            List<Game> list=new ArrayList<>();
+            for (Long gId : gIds) {
+                Game game=gameService.getById(gId);
+                list.add(game);
+            }
+            if (list == null || list.isEmpty()) return Echo.fail();
+            return Echo.success(list);
+        } else if (pageSize == null) {
+            return Echo.fail("pageSize不能为空");
+        }else {
+            if (!StringUtils.isNumeric(pageSize)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+            if (Long.parseLong(pageSize) <= 0) return Echo.define(RetCode.PARAM_IS_INVALID);
+            long size=Long.parseLong(pageSize),start;
+            if (offset == null)start=0L;
+            else {
+                if (!StringUtils.isNumeric(offset)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+                if (Long.parseLong(offset) < 0) return Echo.define(RetCode.PARAM_IS_INVALID);
+                start=Long.parseLong(offset);
+            }
+            List<Long> gIds=gameService.getTypeList(type,start,size);
+            if (gIds.size()==0) return Echo.fail("没有找到该类型游戏");
+            List<Game> list=new ArrayList<>();
+            for (Long gId : gIds) {
+                Game game=gameService.getById(gId);
+                list.add(game);
+            }
             if (list == null || list.isEmpty()) return Echo.fail();
             return Echo.success(list);
         }
@@ -82,8 +120,8 @@ public class GameController {
     @RequestMapping(value = "/game",method = RequestMethod.GET)
     public Echo getById(String gId){
         if (!StringUtils.isNumeric(gId)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        List<Game> gameInfo = gameService.getById(Long.parseLong(gId));
-        if (gameInfo == null||gameInfo.isEmpty()) return Echo.fail();
+        Game gameInfo = gameService.getById(Long.parseLong(gId));
+        if (gameInfo == null) return Echo.fail();
         return Echo.success(gameInfo);
     }
 
