@@ -9,21 +9,23 @@
     <select id="getFanList" resultType="com.games.tap.vo.UserInfo">
         SELECT uid,nickname,avatar,intro,fans_num FROM concern LEFT JOIN user
         ON user.uid=concern.following_uid WHERE followed_uid=#{uId}
+        <if test="pageSize!=null ">
+            LIMIT #{pageSize}
+        </if>
+        <if test="offset!=null ">
+            OFFSET #{offset}
+        </if>
     </select>
 
     <select id="getFollowList" resultType="com.games.tap.vo.UserInfo">
         SELECT uid,nickname,avatar,intro,fans_num FROM concern LEFT JOIN user
         ON user.uid=concern.followed_uid WHERE following_uid=#{uId}
-    </select>
-
-    <select id="getPartFanList" resultType="com.games.tap.vo.UserInfo">
-        SELECT uid,nickname,avatar,intro,fans_num FROM concern LEFT JOIN user
-        ON user.uid=concern.following_uid WHERE followed_uid=#{id} LIMIT #{pageSize} OFFSET #{offset}
-    </select>
-
-    <select id="getPartFollowList" resultType="com.games.tap.vo.UserInfo">
-        SELECT uid,nickname,avatar,intro,fans_num FROM concern LEFT JOIN user
-        ON user.uid=concern.followed_uid WHERE following_uid=#{id} LIMIT #{pageSize} OFFSET #{offset}
+        <if test="pageSize!=null ">
+            LIMIT #{pageSize}
+        </if>
+        <if test="offset!=null ">
+            OFFSET #{offset}
+        </if>
     </select>
 
     <select id="isFollow" resultType="com.games.tap.domain.Concern">

@@ -2,15 +2,19 @@ package com.games.tap.controller;
 
 import com.games.tap.domain.Forum;
 import com.games.tap.domain.ForumUser;
+import com.games.tap.domain.Post;
 import com.games.tap.mapper.ForumMapper;
 import com.games.tap.mapper.ForumUserMapper;
 import com.games.tap.mapper.UserMapper;
 import com.games.tap.service.ImageService;
+import com.games.tap.service.UserService;
 import com.games.tap.util.Echo;
 import com.games.tap.util.PassToken;
 import com.games.tap.util.RetCode;
 import com.games.tap.vo.ForumInfo;
 import com.games.tap.vo.LikeForum;
+import com.games.tap.vo.PostBasicInfo;
+import com.games.tap.vo.PostInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -94,7 +98,9 @@ public class ForumController {//TODO 加入权限校验
     @RequestMapping(value = "/forum/{id}", method = RequestMethod.DELETE)
     public Echo deleteForum(@PathVariable("id") String id) {
         if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        if (forumMapper.deleteForumById(Long.parseLong(id)) != 0) return Echo.success();
+        Long fid=Long.parseLong(id);
+        if(forumMapper.getForumById(fid)==null)return Echo.fail("论坛不存在");
+        if (forumMapper.deleteForumById(fid) != 0) return Echo.success();
         return Echo.fail();
     }
 
@@ -112,6 +118,7 @@ public class ForumController {//TODO 加入权限校验
     @Operation(summary = "通过id获取关注该论坛的用户", description = "id是论坛的id")
     @RequestMapping(value = "/forum/user", method = RequestMethod.GET)
     public Echo getForumUser(String id) {
+        if(id==null||id.equals(""))return Echo.define(RetCode.PARAM_IS_EMPTY);
         if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         List<ForumUser> forumUsers = forumUserMapper.getLikeForumUser(Long.parseLong(id));
         if (forumUsers == null||forumUsers.isEmpty()) return Echo.fail();
@@ -126,43 +133,63 @@ public class ForumController {//TODO 加入权限校验
             @Parameter(name = "offset",description = "起始位置")
     })
     @RequestMapping(value = "/forum", method = RequestMethod.GET)
-    public Echo getForums(String offset, String pageSize,String uid) {
-        if (offset == null && pageSize == null) {
-            List<Forum> list = forumMapper.getAllForum();
-            if (list == null || list.isEmpty()) return Echo.fail();
-            return Echo.success(list);
-        } else if (pageSize == null) {
-            return Echo.fail("pageSize不能为空");
+    public Echo getForums(String offset, String pageSize, String uid) {
+        Echo echo = UserService.checkList(uid, offset, pageSize);
+        if (echo != null) return echo;
+        Long id, size = null, start = null;
+        if (offset != null && !offset.equals("")) start = Long.parseLong(offset);
+        if (pageSize != null && !pageSize.equals("")) size = Long.parseLong(pageSize);
+        List<ForumInfo> list;
+        if (uid != null && !uid.equals("")) {
+            id = Long.parseLong(uid);
+            if (userMapper.getUserById(id) == null) return Echo.define(RetCode.USER_NOT_EXIST);
+            list = forumMapper.getForumListWithUserId(id, start, size);
         } else {
-            List<ForumInfo> list;
-            if (!StringUtils.isNumeric(pageSize)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-            if (Long.parseLong(pageSize) <= 0) return Echo.define(RetCode.PARAM_IS_INVALID);
-            long size=Long.parseLong(pageSize),start;
-            if (offset == null)start=0L;
-            else {
-                if (!StringUtils.isNumeric(offset)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-                if (Long.parseLong(offset) < 0) return Echo.define(RetCode.PARAM_IS_INVALID);
-                start=Long.parseLong(offset);
-            }
-            if(uid!=null){
-                if (!StringUtils.isNumeric(uid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-                Long id=Long.parseLong(uid);
-                if (userMapper.getUserById(id) == null) return Echo.define(RetCode.USER_NOT_EXIST);
-                list= forumMapper.getForumListWithUserId(id,start,size);
-            }else
-                list= forumMapper.getForumList(start,size);
-            if (list == null || list.isEmpty()) return Echo.fail();
-            return Echo.success(list);
+            list = forumMapper.getForumList(start, size);
         }
+        if (list == null || list.isEmpty()) return Echo.fail();
+        return Echo.success(list);
     }
 
     @Operation(summary = "获取用户关注的论坛", description = "取得列表")
     @RequestMapping(value = "/forum/like", method = RequestMethod.GET)
-    public Echo getLikeForum(String uid) {
-        if (!StringUtils.isNumeric(uid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long id = Long.parseLong(uid);
+    public Echo getLikeForum(String uid,String offset, String pageSize) {
+        if(uid==null||uid.equals(""))return Echo.define(RetCode.PARAM_IS_EMPTY);
+        Echo echo=UserService.checkList(uid,offset,pageSize);
+        if(echo!=null)return echo;
+        Long id = Long.parseLong(uid),start=null,size=null;
         if (userMapper.getUserById(id) == null) return Echo.define(RetCode.USER_NOT_EXIST);
-        List<LikeForum>list= forumUserMapper.getLikeForum(id);
+        if(offset!=null)start=Long.parseLong(offset);
+        if(pageSize!=null)size=Long.parseLong(pageSize);
+        List<LikeForum>list= forumUserMapper.getLikeForum(id,start,size);
+        if (list == null || list.isEmpty()) return Echo.fail("数据为空");
+        return Echo.success(list);
+    }
+
+    @PassToken
+    @Operation(summary = "获取论坛的帖子", description = "取得帖子列表，order定义排序，0 回复时间排序，1 发布时间排序，2 回复数量排序，fid必选，其他可选")
+    @RequestMapping(value = "/forum/post", method = RequestMethod.GET)
+    public Echo getForumPost(String uid,String fid,String offset, String pageSize,String order) {
+        if(fid==null||fid.equals(""))return Echo.define(RetCode.PARAM_IS_EMPTY);
+        Echo echo=UserService.checkList(fid,offset,pageSize);
+        if(echo!=null)return echo;
+        Long fId = Long.parseLong(fid),start=null,size=null,uId=null;
+        if (userMapper.getUserById(fId) == null) return Echo.fail("论坛不存在");
+        if(uid!=null&&!uid.equals("")){
+            if (!StringUtils.isNumeric(uid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+            uId=Long.parseLong(uid);
+            if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
+        }
+        int rank=0;
+        if (order != null) {
+            if (!StringUtils.isNumeric(order)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+            rank=Integer.parseInt(order);
+            if (rank<0||rank>2) return Echo.define(RetCode.PARAM_IS_INVALID);
+        }
+        if(offset!=null)start=Long.parseLong(offset);
+        if(pageSize!=null)size=Long.parseLong(pageSize);
+
+        List<PostBasicInfo>list= forumMapper.getForumPostList(fId,uId,start,size,rank);
         if (list == null || list.isEmpty()) return Echo.fail("数据为空");
         return Echo.success(list);
     }
@@ -170,6 +197,7 @@ public class ForumController {//TODO 加入权限校验
     @Operation(summary = "用户关注论坛", description = "没有则新建论坛用户，有则更新")
     @RequestMapping(value = "forum/like", method = RequestMethod.POST)
     public Echo postLikeForum(String fid, String uid) {
+        if(fid==null||fid.equals("")||uid==null||uid.equals(""))return Echo.define(RetCode.PARAM_IS_EMPTY);
         if (!StringUtils.isNumeric(uid) || !StringUtils.isNumeric(fid))
             return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         Long fId = Long.parseLong(fid), uId = Long.parseLong(uid);
@@ -211,6 +239,7 @@ public class ForumController {//TODO 加入权限校验
     @Operation(summary = "用户取消关注论坛", description = "用户的论坛信息没有删除，只是取消关注")
     @RequestMapping(value = "forum/like", method = RequestMethod.DELETE)
     public Echo deleteLikeForum(String fid, String uid) {
+        if(fid==null||fid.equals("")||uid==null||uid.equals(""))return Echo.define(RetCode.PARAM_IS_EMPTY);
         if (!StringUtils.isNumeric(uid) || !StringUtils.isNumeric(fid))
             return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         Long fId = Long.parseLong(fid), uId = Long.parseLong(uid);

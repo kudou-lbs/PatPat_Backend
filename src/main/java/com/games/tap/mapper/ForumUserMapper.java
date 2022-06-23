@@ -12,7 +12,7 @@ public interface ForumUserMapper {
 
     List<ForumUser> getLikeForumUser(Long id);
 
-    List<LikeForum>getLikeForum(Long id);
+    List<LikeForum>getLikeForum(@Param("id")Long id,@Param("offset")Long offset, @Param("pageSize")Long pageSize);
 
     Boolean isLike(@Param("uid")Long uid,@Param("fid")Long fid);
 

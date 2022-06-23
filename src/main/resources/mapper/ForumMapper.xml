@@ -10,16 +10,57 @@
         SELECT * FROM forum;
     </select>
 
+    <select id="getForumPostList" resultType="com.games.tap.vo.PostBasicInfo">
+        SELECT fpost.pid,fpost.uid,IFNULL(username,'用户已注销') AS username,
+        avatar, level,post_time,like_num,reply_num,title,content,picture,
+        (CASE
+            WHEN #{uid} IS null THEN false
+        <if test="uid!=null ">
+            WHEN pl.id IS null THEN false
+        </if>
+            ELSE true
+        END) AS is_like
+        FROM (SELECT * FROM post WHERE fid=#{fid}) fpost
+            LEFT JOIN user u ON fpost.uid = u.uid
+            LEFT JOIN forum_user fu ON fpost.fid = fu.fid AND fpost.uid = fu.uid
+        <if test="uid!=null ">
+            LEFT JOIN post_like pl ON fu.uid = pl.uid AND pl.uid = #{uid}
+        </if>
+        ORDER BY
+        <choose>
+            <when test="rank==1 ">post_time</when>
+            <when test="rank==2 ">reply_num</when>
+            <otherwise>last_date</otherwise>
+        </choose>
+        DESC
+        <if test="pageSize!=null ">
+            LIMIT #{pageSize}
+        </if>
+        <if test="offset!=null ">
+            OFFSET #{offset}
+        </if>
+    </select>
+
     <select id="getForumList" resultType="com.games.tap.vo.ForumInfo">
         SELECT fid,name,icon,follow_num,false AS is_like FROM forum ORDER BY follow_num DESC
-        LIMIT #{pageSize} OFFSET #{offset}
+        <if test="pageSize!=null ">
+            LIMIT #{pageSize}
+        </if>
+        <if test="offset!=null ">
+            OFFSET #{offset}
+        </if>
     </select>
 
     <select id="getForumListWithUserId" resultType="com.games.tap.vo.ForumInfo">
         SELECT forum.fid,name,icon,follow_num,IFNULL(is_like,false) AS is_like FROM forum LEFT JOIN
             (SELECT fid,is_like FROM forum_user WHERE uid=#{uid})AS user_forum
         ON forum.fid=user_forum.fid ORDER BY follow_num DESC
-        LIMIT #{pageSize} OFFSET #{offset}
+        <if test="pageSize!=null ">
+            LIMIT #{pageSize}
+        </if>
+        <if test="offset!=null ">
+            OFFSET #{offset}
+        </if>
     </select>
 
     <select id="getForumById" resultType="com.games.tap.domain.Forum">
@@ -39,7 +80,9 @@
     </update>
 
     <delete id="deleteForumById">
-        DELETE FROM forum WHERE fid=#{id}
+        DELETE FROM reply WHERE fid=#{id};
+        DELETE FROM post WHERE fid=#{id};
+        DELETE FROM forum WHERE fid=#{id};
     </delete>
 
 </mapper>

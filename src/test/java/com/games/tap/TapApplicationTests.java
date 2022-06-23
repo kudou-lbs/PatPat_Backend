@@ -23,7 +23,7 @@ class TapApplicationTests {
 
 	@Test
 	void contextLoads() {
-		log.info(String.valueOf(TypeEnum.MMO));
+
 	}
 
 }

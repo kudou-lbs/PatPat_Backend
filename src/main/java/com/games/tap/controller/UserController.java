@@ -105,21 +105,12 @@ public class UserController {
             List<User> list = userMapper.getAllUser();
             if (list == null || list.isEmpty()) return Echo.fail();
             return Echo.success(list);
-        } else if (pageSize == null) {
-            return Echo.fail("pageSize不能为空");
         } else {
-            List<UserInfo> list;
-            if (offset == null) {
-                if (!StringUtils.isNumeric(pageSize)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-                if (Long.parseLong(pageSize) <= 0) return Echo.define(RetCode.PARAM_IS_INVALID);
-                list = userMapper.getUserList(0L, Long.parseLong(pageSize));
-            } else {
-                if (!StringUtils.isNumeric(pageSize) || !StringUtils.isNumeric(offset))
-                    return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-                if (Long.parseLong(pageSize) <= 0 || Long.parseLong(offset) < 0)
-                    return Echo.define(RetCode.PARAM_IS_INVALID);
-                list = userMapper.getUserList(Long.parseLong(offset), Long.parseLong(pageSize));
-            }
+            Echo echo = UserService.checkList(null, offset, pageSize);
+            if (echo != null) return echo;
+            Long start = null, size = Long.parseLong(pageSize);
+            if (offset != null) start = Long.parseLong(offset);
+            List<UserInfo> list = userMapper.getUserList(start, size);
             if (list == null || list.isEmpty()) return Echo.fail();
             return Echo.success(list);
         }
@@ -229,9 +220,13 @@ public class UserController {
 
     @Operation(summary = "粉丝列表", description = "获取关注该用户的粉丝列表")
     @RequestMapping(value = "/fan/{id}", method = RequestMethod.GET)
-    public Echo getFanList(@PathVariable String id) {
-        if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        List<UserInfo> list = conMapper.getFanList(Long.parseLong(id));
+    public Echo getFanList(@PathVariable String id, String offset, String pageSize) {
+        Echo echo = UserService.checkList(id, offset, pageSize);
+        if (echo != null) return echo;
+        Long start = null, size = null;
+        if (offset != null) start = Long.parseLong(offset);
+        if (pageSize != null) size = Long.parseLong(pageSize);
+        List<UserInfo> list = conMapper.getFanList(Long.parseLong(id), start, size);
         if (list == null || list.isEmpty()) return Echo.fail("数据为空");
         return Echo.success(list);
     }
@@ -239,9 +234,13 @@ public class UserController {
     @PassToken
     @Operation(summary = "关注列表", description = "获取该用户关注的用户列表")
     @RequestMapping(value = "/follow/{id}", method = RequestMethod.GET)
-    public Echo getFollowList(@PathVariable String id) {
-        if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        List<UserInfo> list = conMapper.getFollowList(Long.parseLong(id));
+    public Echo getFollowList(@PathVariable String id, String offset, String pageSize) {
+        Echo echo = UserService.checkList(id, offset, pageSize);
+        if (echo != null) return echo;
+        Long start = null, size = null;
+        if (offset != null) start = Long.parseLong(offset);
+        if (pageSize != null) size = Long.parseLong(pageSize);
+        List<UserInfo> list = conMapper.getFollowList(Long.parseLong(id), start, size);
         if (list == null || list.isEmpty()) return Echo.fail("数据为空");
         return Echo.success(list);
     }

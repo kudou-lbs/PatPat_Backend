@@ -50,6 +50,10 @@ public class Post {
     @Schema(description = "点赞数量")
     private Integer likeNum;
 
+    @Column(name = "collect_num",columnDefinition = "int(11) default 0")
+    @Schema(description = "收藏数量")
+    private Integer collectNum;
+
     @Column(name = "picture",columnDefinition = "varchar(200)")
     @Schema(description = "帖子图片路径")
     private String picture;
@@ -62,4 +66,11 @@ public class Post {
     @Schema(description = "阅读数量")
     private Integer readingNum;
 
+    public Post(){}
+
+    public Post(Long uid,Long fid,String title){
+        this.uId=uid;
+        this.fId=fid;
+        this.title=title;
+    }
 }

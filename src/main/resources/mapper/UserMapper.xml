@@ -12,7 +12,13 @@
 
     <select id="getUserList" resultType="com.games.tap.vo.UserInfo">
         SELECT uid,nickname,avatar,intro,fans_num
-        FROM user ORDER BY fans_num DESC LIMIT #{pageSize} OFFSET #{offset}
+        FROM user ORDER BY fans_num DESC
+        <if test="pageSize!=null ">
+            LIMIT #{pageSize}
+        </if>
+        <if test="offset!=null ">
+            OFFSET #{offset}
+        </if>
     </select>
 
     <select id="getUserAvatarById" resultType="java.lang.String">
@@ -61,6 +67,8 @@
     </insert>
 
     <delete id="deleteUserById">
-        delete from user where id=#{id}
+        DELETE FROM collection WHERE uid=#{id};
+        DELETE FROM forum_user WHERE uid=#{id};
+        DELETE FROM user WHERE uid=#{id};
     </delete>
 </mapper>

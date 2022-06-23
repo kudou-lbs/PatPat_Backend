@@ -60,9 +60,9 @@
 
 
     <select id="getAllGame" resultType="com.games.tap.domain.Game">
-        SELECT table_type.gid as gid,game.hot,game.name,
+        SELECT game.gid as gid,game.hot,game.name,
                game.picture,game.score,game.url,game.intro,game.icon,table_type.type as types
-        FROM game right outer join
+        FROM game left join
              (SELECT game_type.gid,GROUP_CONCAT(game_type.type SEPARATOR ',') type
               FROM game_type
               GROUP BY game_type.gid)as table_type
@@ -71,9 +71,9 @@
 
 
     <select id="getGameList" resultType="com.games.tap.domain.Game">
-        SELECT table_type.gid as gid,game.hot,game.name,
+        SELECT game.gid as gid,game.hot,game.name,
                game.picture,game.score,game.url,game.intro,game.icon,table_type.type as types
-        FROM game right outer join
+        FROM game left join
              (SELECT game_type.gid,GROUP_CONCAT(game_type.type SEPARATOR ',') type
               FROM game_type
               GROUP BY game_type.gid)as table_type
@@ -82,9 +82,9 @@
     </select>
 
     <select id="OrderByHot" resultType="com.games.tap.domain.Game">
-        SELECT table_type.gid as gid,game.hot,game.name,
+        SELECT game.gid as gid,game.hot,game.name,
                game.picture,game.score,game.url,game.intro,game.icon,table_type.type as types
-        FROM game right outer join
+        FROM game left join
              (SELECT game_type.gid,GROUP_CONCAT(game_type.type SEPARATOR ',') type
               FROM game_type
               GROUP BY game_type.gid)as table_type
@@ -94,9 +94,9 @@
 
 
     <select id="getOrderList" resultType="com.games.tap.domain.Game">
-        SELECT table_type.gid as gid,game.hot,game.name,
+        SELECT game.gid as gid,game.hot,game.name,
                game.picture,game.score,game.url,game.intro,game.icon,table_type.type as types
-        FROM game right outer join
+        FROM game left join
              (SELECT game_type.gid,GROUP_CONCAT(game_type.type SEPARATOR ',') type
               FROM game_type
               GROUP BY game_type.gid)as table_type
@@ -106,9 +106,8 @@
     </select>
 
     <select id="getById" resultType="com.games.tap.domain.Game">
-        SELECT table_type.gid as gid,game.hot,game.name,
-               game.picture,game.score,game.url,game.intro,game.icon,table_type.type as types
-        FROM game right outer join
+        SELECT game.gid,hot,name,picture,score,url,intro,icon,table_type.type as types
+        FROM game left join
              (SELECT game_type.gid,GROUP_CONCAT(game_type.type SEPARATOR ',') type
               FROM game_type
               GROUP BY game_type.gid)as table_type
