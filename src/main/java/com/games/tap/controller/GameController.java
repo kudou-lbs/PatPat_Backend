@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -78,12 +79,27 @@ public class GameController {
     }
 
     @PassToken
+    @Operation(summary = "根据游戏类型返回游戏信息")
+    @RequestMapping(value = "/game/type",method = RequestMethod.GET)
+    public Echo getByType(String type){
+        if(type==null||type=="") return Echo.fail("请输入游戏类型");
+        List<Long> gIds=gameService.getGidByType(type);
+        if (gIds.size()==0) return Echo.fail("没有找到该类型游戏");
+        List<Game> list=new ArrayList<>();
+        for (Long gId : gIds) {
+            Game game=gameService.getById(gId);
+            list.add(game);
+        }
+        return Echo.success(list);
+    }
+
+    @PassToken
     @Operation(summary = "根据id返回游戏信息")
     @RequestMapping(value = "/game",method = RequestMethod.GET)
     public Echo getById(String gId){
         if (!StringUtils.isNumeric(gId)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        List<Game> gameInfo = gameService.getById(Long.parseLong(gId));
-        if (gameInfo == null||gameInfo.isEmpty()) return Echo.fail();
+        Game gameInfo = gameService.getById(Long.parseLong(gId));
+        if (gameInfo == null) return Echo.fail();
         return Echo.success(gameInfo);
     }
 

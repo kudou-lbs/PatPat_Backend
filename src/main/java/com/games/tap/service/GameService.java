@@ -2,7 +2,6 @@ package com.games.tap.service;
 
 import com.games.tap.domain.Game;
 import com.games.tap.mapper.GameMapper;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -28,8 +27,12 @@ public class GameService {
         return gameMapper.getOrderList(offset,pageSize);
     }
 
-    public List<Game> getById(Long gId){
+    public Game getById(Long gId){
         return gameMapper.getById(gId);
+    }
+
+    public List<Long> getGidByType(String type){
+        return gameMapper.getGidByType(type);
     }
 
     public Integer isExisted(Long gId){

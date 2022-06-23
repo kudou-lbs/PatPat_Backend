@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.games.tap.mapper.PostLikeMapper">
+
+    <insert id="postLike">
+        insert into post_like(pid, uid) VALUES (#{pid},#{uid})
+    </insert>
+    <delete id="postCancelLike">
+        delete from post_like where uid=#{uid} and pid=#{pid}
+    </delete>
+
+</mapper>

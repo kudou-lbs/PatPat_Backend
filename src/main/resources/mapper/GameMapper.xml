@@ -122,4 +122,8 @@
     <select id="isTypeExited" resultType="java.lang.Integer">
         select * from game_type where gid=#{gId} and type=#{type}
     </select>
+    <select id="getGidByType" resultType="java.lang.Long">
+        select gid from game_type where type=#{type}
+    </select>
+
 </mapper>
