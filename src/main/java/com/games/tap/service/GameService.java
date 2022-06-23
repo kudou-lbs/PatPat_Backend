@@ -2,6 +2,7 @@ package com.games.tap.service;
 
 import com.games.tap.domain.Game;
 import com.games.tap.mapper.GameMapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -33,6 +34,10 @@ public class GameService {
 
     public List<Long> getGidByType(String type){
         return gameMapper.getGidByType(type);
+    }
+
+    public List<Long> getTypeList(String type,Long offset, Long pageSize){
+        return gameMapper.getTypeList(type,offset,pageSize);
     }
 
     public Integer isExisted(Long gId){

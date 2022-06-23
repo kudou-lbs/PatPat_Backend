@@ -14,6 +14,7 @@ public interface GameMapper {
 
     List<Game> getGameList(@Param("offset")Long offset, @Param("pageSize")Long pageSize);
     List<Game> getOrderList(@Param("offset")Long offset, @Param("pageSize")Long pageSize);
+    List<Long> getTypeList(String type,@Param("offset")Long offset, @Param("pageSize")Long pageSize);
 
     List<Long> getGidByType(String type);
 

@@ -12,5 +12,21 @@
     <delete id="postCancelLike">
         delete from post_like where uid=#{uid} and pid=#{pid}
     </delete>
+    <delete id="deletePostLikeByPid">
+        delete from post_like where pid=#{pid}
+    </delete>
+    <select id="getPidByUid" resultType="java.lang.Long">
+        select pid from post_like where uid=#{uid}
+    </select>
+    <select id="getPidList" resultType="java.lang.Long">
+        select pid from post_like where uid=#{uid}
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+    <select id="getPostLikes" resultType="java.lang.Integer">
+        select count(*) from post_like where pid=#{pid}
+    </select>
+    <select id="postIsLiked" resultType="java.lang.Integer">
+        select * from post_like where pid=#{pid} and uid=#{uid}
+    </select>
 
 </mapper>
