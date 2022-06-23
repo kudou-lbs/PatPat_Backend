@@ -1,9 +1,11 @@
 package com.games.tap.controller;
 
 import com.games.tap.domain.Reply;
+import com.games.tap.domain.TypeEnum;
 import com.games.tap.mapper.PostMapper;
 import com.games.tap.mapper.ReplyMapper;
 import com.games.tap.mapper.UserMapper;
+import com.games.tap.service.LACService;
 import com.games.tap.util.DateUtil;
 import com.games.tap.util.Echo;
 import com.games.tap.util.PassToken;
@@ -29,6 +31,8 @@ public class ReplyController {
     PostMapper postMapper;
     @Resource
     UserMapper userMapper;
+    @Resource
+    LACService lacService;
 
     @Operation(summary = "新增回复", description = "前四个参数必带，后两个全为空或全不空，全空为新增主回复，不空为新增楼中楼")
     @RequestMapping(value = "/reply", method = RequestMethod.POST)
@@ -72,7 +76,7 @@ public class ReplyController {
     }
 
     @PassToken
-    @Operation(summary = "获取子贴回复数据", description = "")
+    @Operation(summary = "获取子贴回复数据", description = "获取主回复和对应的子回复")
     @RequestMapping(value = "/reply", method = RequestMethod.GET)
     public Echo getReply(String rid) {
         return Echo.success();
@@ -101,34 +105,34 @@ public class ReplyController {
 
     @PassToken
     @Operation(summary = "回复点赞")
-    @RequestMapping(value = "/reply/like",method = RequestMethod.POST)
-    public Echo postLike(String uid,String rid){
+    @RequestMapping(value = "/reply/like", method = RequestMethod.POST)
+    public Echo postLike(String uid, String rid) {
         if (!StringUtils.isNumeric(uid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         if (!StringUtils.isNumeric(rid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        long uId=Long.parseLong(uid),rId=Long.parseLong(rid);
+        long uId = Long.parseLong(uid), rId = Long.parseLong(rid);
         if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
         if (replyMapper.getReplyById(rId) == null) return Echo.fail("回复不存在");
-        if (replyMapper.isReplyExited(uId,rId) != null) return Echo.fail("已经点赞");
+        if (lacService.isExited(uId, rId, TypeEnum.REPLY) != null) return Echo.fail("已经点赞");
 
-        Integer like= replyMapper.replyLike(uId,rId);
-        replyMapper.addReplyLikeNum(rId);
+        Integer like = lacService.like(uId, rId, TypeEnum.REPLY);
+        lacService.add(rId, TypeEnum.REPLY);
         if (like == 0) return Echo.fail("点赞失败");
         return Echo.success("点赞成功");
     }
 
     @PassToken
     @Operation(summary = "取消回复点赞")
-    @RequestMapping(value = "/reply/unlike",method = RequestMethod.DELETE)
-    public Echo postCancelLike(String uid,String rid){
+    @RequestMapping(value = "/reply/like", method = RequestMethod.DELETE)
+    public Echo postCancelLike(String uid, String rid) {
         if (!StringUtils.isNumeric(uid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         if (!StringUtils.isNumeric(rid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        long uId=Long.parseLong(uid),rId=Long.parseLong(rid);
+        long uId = Long.parseLong(uid), rId = Long.parseLong(rid);
         if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
         if (replyMapper.getReplyById(rId) == null) return Echo.fail("回复不存在");
-        if (replyMapper.isReplyExited(uId,rId) == null) return Echo.fail("还没有点赞");
+        if (lacService.isExited(uId, rId, TypeEnum.REPLY) == null) return Echo.fail("还没有点赞");
 
-        Integer like= replyMapper.replyCancelLike(uId,rId);
-        replyMapper.subReplyLikeNum(rId);
+        Integer like = lacService.unlike(uId, rId, TypeEnum.REPLY);
+        lacService.sub(rId, TypeEnum.REPLY);
         if (like == 0) return Echo.fail("取消点赞失败");
         return Echo.success("取消点赞成功");
     }

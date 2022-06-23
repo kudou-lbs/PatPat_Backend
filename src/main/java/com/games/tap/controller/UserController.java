@@ -223,23 +223,23 @@ public class UserController {
     }
 
     @PassToken
-    @Operation(summary = "获取用户发布的帖子列表",description = "通过uid查找用户的帖子,order定义排序，0 回复时间排序，1 发布时间排序，2 回复数量排序，默认0")
-    @RequestMapping(value = "user/post",method = RequestMethod.GET)
-    public Echo getUserPostList(String uid,String offset,String pageSize,String order){
-        if(uid==null||uid.equals(""))return Echo.define(RetCode.PARAM_IS_EMPTY);
+    @Operation(summary = "获取用户发布的帖子列表", description = "通过uid查找用户的帖子,order定义排序，0 回复时间排序，1 发布时间排序，2 回复数量排序，默认0")
+    @RequestMapping(value = "user/post", method = RequestMethod.GET)
+    public Echo getUserPostList(String uid, String offset, String pageSize, String order) {
+        if (uid == null || uid.equals("")) return Echo.define(RetCode.PARAM_IS_EMPTY);
         Echo echo = UserService.checkList(uid, offset, pageSize);
         if (echo != null) return echo;
-        Long start = null, size = null,id=Long.parseLong(uid);
-        if(userMapper.getUserById(id)==null)return Echo.define(RetCode.USER_NOT_EXIST);
-        int rank=0;
+        Long start = null, size = null, id = Long.parseLong(uid);
+        if (userMapper.getUserById(id) == null) return Echo.define(RetCode.USER_NOT_EXIST);
+        int rank = 0;
         if (order != null) {
             if (!StringUtils.isNumeric(order)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-            rank=Integer.parseInt(order);
-            if (rank<0||rank>2) return Echo.define(RetCode.PARAM_IS_INVALID);
+            rank = Integer.parseInt(order);
+            if (rank < 0 || rank > 2) return Echo.define(RetCode.PARAM_IS_INVALID);
         }
         if (offset != null) start = Long.parseLong(offset);
         if (pageSize != null) size = Long.parseLong(pageSize);
-        List<UserPostInfo> list= userMapper.getUserPostList(id,start,size,rank);
+        List<UserPostInfo> list = userMapper.getUserPostList(id, start, size, rank);
         if (list == null || list.isEmpty()) return Echo.fail("数据为空");
         return Echo.success(list);
     }
@@ -249,8 +249,8 @@ public class UserController {
     public Echo getFanList(@PathVariable String id, String offset, String pageSize) {
         Echo echo = UserService.checkList(id, offset, pageSize);
         if (echo != null) return echo;
-        Long start = null, size = null,uid=Long.parseLong(id);
-        if(userMapper.getUserById(uid)==null)return Echo.define(RetCode.USER_NOT_EXIST);
+        Long start = null, size = null, uid = Long.parseLong(id);
+        if (userMapper.getUserById(uid) == null) return Echo.define(RetCode.USER_NOT_EXIST);
         if (offset != null) start = Long.parseLong(offset);
         if (pageSize != null) size = Long.parseLong(pageSize);
         List<UserInfo> list = conMapper.getFanList(uid, start, size);
@@ -264,8 +264,8 @@ public class UserController {
     public Echo getFollowList(@PathVariable String id, String offset, String pageSize) {
         Echo echo = UserService.checkList(id, offset, pageSize);
         if (echo != null) return echo;
-        Long start = null, size = null,uid=Long.parseLong(id);
-        if(userMapper.getUserById(uid)==null)return Echo.define(RetCode.USER_NOT_EXIST);
+        Long start = null, size = null, uid = Long.parseLong(id);
+        if (userMapper.getUserById(uid) == null) return Echo.define(RetCode.USER_NOT_EXIST);
         if (offset != null) start = Long.parseLong(offset);
         if (pageSize != null) size = Long.parseLong(pageSize);
         List<UserInfo> list = conMapper.getFollowList(uid, start, size);
@@ -302,72 +302,6 @@ public class UserController {
             return Echo.success();
         } else
             return Echo.fail("取关失败");
-    }
-
-    @PassToken
-    @Operation(summary = "帖子收藏")
-    @RequestMapping(value = "/post/collection",method = RequestMethod.POST)
-    public Echo collectionLike(String uid,String pid){
-        if (!StringUtils.isNumeric(uid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        if (!StringUtils.isNumeric(pid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long uId=Long.parseLong(uid);
-        Long pId=Long.parseLong(pid);
-        if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
-        if (postMapper.getPostByPId(pId) == null) return Echo.fail("帖子不存在");
-        if (userService.isCollectionExited(uId,pId) != null) return Echo.fail("已经收藏");
-
-        Integer like= userService.postCollection(uId,pId);
-        userService.addCollectionNum(pId);
-        if (like == 0) return Echo.fail("收藏失败");
-        return Echo.success("收藏成功");
-    }
-
-    @PassToken
-    @Operation(summary = "取消帖子收藏")
-    @RequestMapping(value = "/post/cancel",method = RequestMethod.DELETE)
-    public Echo postCancelLike(String uid,String pid){
-        if (!StringUtils.isNumeric(uid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        if (!StringUtils.isNumeric(pid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long uId=Long.parseLong(uid);
-        Long pId=Long.parseLong(pid);
-        if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
-        if (postMapper.getPostByPId(pId) == null) return Echo.fail("帖子不存在");
-        if (userService.isCollectionExited(uId,pId) == null) return Echo.fail("还没有收藏");
-
-        Integer like= userService.postCancelCollection(uId,pId);
-        userService.subCollectionNum(pId);
-        if (like == 0) return Echo.fail("取消收藏失败");
-        return Echo.success("取消收藏成功");
-    }
-
-    @PassToken
-    @Operation(summary = "根据收藏获取帖子内容")
-    @RequestMapping(value = "/post/like/getposts",method = RequestMethod.GET)
-    public Echo getPostByLike(String uid,String offset, String pageSize){
-        if (!StringUtils.isNumeric(uid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long uId=Long.parseLong(uid);
-        if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
-
-        if (offset == null && pageSize == null) {
-            List<UserPostInfo> postInfos=userService.getUserCollectList(uId,null,null);
-            if (postInfos == null || postInfos.isEmpty()) return Echo.fail();
-            return Echo.success(postInfos);
-        } else if (pageSize == null) {
-            return Echo.fail("pageSize不能为空");
-        }else {
-            if (!StringUtils.isNumeric(pageSize)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-            if (Long.parseLong(pageSize) <= 0) return Echo.define(RetCode.PARAM_IS_INVALID);
-            long size=Long.parseLong(pageSize),start;
-            if (offset == null)start=0L;
-            else {
-                if (!StringUtils.isNumeric(offset)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-                if (Long.parseLong(offset) < 0) return Echo.define(RetCode.PARAM_IS_INVALID);
-                start=Long.parseLong(offset);
-            }
-            List<UserPostInfo> postInfos=userService.getUserCollectList(uId,start,size);
-            if (postInfos == null || postInfos.isEmpty()) return Echo.fail();
-            return Echo.success(postInfos);
-        }
     }
 
 }

@@ -1,9 +1,10 @@
 package com.games.tap.service;
 
-import com.games.tap.domain.PostLike;
+import com.games.tap.domain.TypeEnum;
+import com.games.tap.mapper.CollectMapper;
 import com.games.tap.mapper.PostLikeMapper;
+import com.games.tap.mapper.ReplyLikeMapper;
 import com.games.tap.vo.UserPostInfo;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -13,30 +14,82 @@ import java.util.List;
 public class LACService {
     @Resource
     PostLikeMapper postLikeMapper;
-    /**
-     * 帖子点赞相关
-     */
-    public Integer postLike(Long uid, Long pid){
-        return postLikeMapper.postLike(uid, pid);
+    @Resource
+    CollectMapper collectMapper;
+    @Resource
+    ReplyLikeMapper replyLikeMapper;
+
+    public Integer like(Long uid, Long id, TypeEnum type) {
+        switch (type) {
+            case POST:
+                return postLikeMapper.postLike(uid, id);
+            case REPLY:
+                return replyLikeMapper.replyLike(uid, id);
+            case COLLECT:
+                return collectMapper.postCollection(uid, id);
+            default:
+                return null;
+        }
     }
 
-    public Integer postCancelLike(Long uid,Long pid){
-        return postLikeMapper.postCancelLike(uid,pid);
+    public Integer unlike(Long uid, Long id, TypeEnum type) {
+        switch (type) {
+            case POST:
+                return postLikeMapper.postCancelLike(uid, id);
+            case REPLY:
+                return replyLikeMapper.replyCancelLike(uid, id);
+            case COLLECT:
+                return collectMapper.postCancelCollection(uid, id);
+            default:
+                return null;
+        }
     }
 
-    public List<UserPostInfo> getUserPostList(Long uid, Long offset, Long pageSize){
-        return postLikeMapper.getUserPostList(uid,offset,pageSize);
+    public Integer isExited(Long uid, Long id, TypeEnum type) {
+        switch (type) {
+            case POST:
+                return postLikeMapper.isPostExited(uid, id);
+            case REPLY:
+                return replyLikeMapper.isReplyExited(uid, id);
+            case COLLECT:
+                return collectMapper.isCollectionExited(uid, id);
+            default:
+                return null;
+        }
     }
 
-    public Integer addLikeNum(Long pid){
-        return postLikeMapper.addLikeNum(pid);
+    public Integer add(Long id, TypeEnum type) {
+        switch (type) {
+            case POST:
+                return postLikeMapper.addLikeNum(id);
+            case REPLY:
+                return replyLikeMapper.addReplyLikeNum(id);
+            case COLLECT:
+                return collectMapper.addCollectionNum(id);
+            default:
+                return null;
+        }
     }
 
-    public Integer subLikeNum(Long pid){
-        return postLikeMapper.subLikeNum(pid);
+    public Integer sub(Long id, TypeEnum type) {
+        switch (type) {
+            case POST:
+                return postLikeMapper.subLikeNum(id);
+            case REPLY:
+                return replyLikeMapper.subReplyLikeNum(id);
+            case COLLECT:
+                return collectMapper.subCollectionNum(id);
+            default:
+                return null;
+        }
     }
 
-    public Integer isExited(Long uid,Long pid){
-        return postLikeMapper.isExited(uid,pid);
+    public List<UserPostInfo> getUserPostList(Long uid, Long offset, Long pageSize) {
+        return postLikeMapper.getUserPostList(uid, offset, pageSize);
+    }
+
+    public List<UserPostInfo> getUserCollectList(Long uid, Long offset, Long pageSize) {
+        return collectMapper.getUserCollectList(uid, offset, pageSize);
     }
 }
+

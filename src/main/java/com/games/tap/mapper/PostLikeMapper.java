@@ -11,12 +11,13 @@ public interface PostLikeMapper {
 
     Integer postCancelLike(Long uid,Long pid);
 
-    Integer isExited(Long uid,Long pid);
+    Integer isPostExited(Long uid, Long pid);
 
     Integer getPostLikes(Long pid);
 
     List<UserPostInfo> getUserPostList(@Param("uid")Long uid, @Param("offset")Long offset, @Param("pageSize")Long pageSize);
 
     Integer addLikeNum(Long pid);
+
     Integer subLikeNum(Long pid);
 }

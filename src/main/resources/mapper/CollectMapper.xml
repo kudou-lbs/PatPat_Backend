@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.games.tap.mapper.CollectMapper">
+
+    <insert id="postCollection">
+        insert into collection(pid, uid) VALUES (#{pid},#{uid})
+    </insert>
+
+    <delete id="postCancelCollection">
+        delete from collection where uid=#{uid} and pid=#{pid}
+    </delete>
+
+    <select id="isCollectionExited" resultType="java.lang.Integer">
+        select * from collection where uid=#{uid} and pid=#{pid}
+    </select>
+
+    <update id="addCollectionNum">
+        UPDATE post SET collect_num=post.collect_num+1 WHERE pid=#{pid}
+    </update>
+
+    <update id="subCollectionNum">
+        UPDATE post SET collect_num=post.collect_num-1 WHERE post.collect_num>=0 and pid=#{pid}
+    </update>
+
+    <select id="getUserCollectList" resultType="com.games.tap.vo.UserPostInfo">
+        SELECT post.*,f.name AS forum_name,avatar,level,IFNULL(username,'用户已注销') AS username,
+        (IF(pl.id IS null, false, true)) AS is_like
+        FROM (SELECT * FROM collection WHERE uid=#{uid}) pl
+        LEFT JOIN post ON post.pid = pl.pid AND pl.uid = #{uid}
+        LEFT JOIN user u ON pl.uid = u.uid
+        LEFT JOIN forum_user fu ON post.fid = fu.fid AND pl.uid = fu.uid
+        LEFT JOIN forum f ON post.fid = f.fid
+        ORDER BY last_date DESC
+        <if test="pageSize!=null ">
+            LIMIT #{pageSize}
+        </if>
+        <if test="offset!=null ">
+            OFFSET #{offset}
+        </if>
+    </select>
+</mapper>

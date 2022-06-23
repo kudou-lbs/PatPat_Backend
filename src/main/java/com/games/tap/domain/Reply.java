@@ -26,7 +26,7 @@ public class Reply {
     @Schema(description = "用户Id")
     private Long uId;
 
-    @Column(name = "fid", columnDefinition = "bigint(20)")
+    @Column(name = "fid", columnDefinition = "bigint(20)",nullable = false)
     @Schema(description = "论坛Id",required = true)
     private Long fId;
 

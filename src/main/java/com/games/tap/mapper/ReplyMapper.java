@@ -21,13 +21,4 @@ public interface ReplyMapper {
     int deleteById(Long rid);
 
     int deleteByFloorNum(@Param("floor")Integer floor,@Param("pid")Long pid);
-
-    Integer replyLike(Long uid,Long rid);
-
-    Integer replyCancelLike(Long uid,Long rid);
-
-    Integer isReplyExited(Long uid,Long rid);
-
-    Integer addReplyLikeNum(Long rid);
-    Integer subReplyLikeNum(Long rid);
 }

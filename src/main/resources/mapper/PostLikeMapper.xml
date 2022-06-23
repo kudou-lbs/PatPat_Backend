@@ -43,7 +43,7 @@
         </if>
     </select>
 
-    <select id="isExited" resultType="java.lang.Integer">
+    <select id="isPostExited" resultType="java.lang.Integer">
         select * from post_like where uid=#{uid} and pid=#{pid}
     </select>
 

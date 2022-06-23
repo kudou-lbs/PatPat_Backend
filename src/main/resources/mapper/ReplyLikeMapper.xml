@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.games.tap.mapper.ReplyLikeMapper">
+
+    <insert id="replyLike">
+        insert into reply_like(rid, uid) VALUES (#{rid},#{uid})
+    </insert>
+
+    <delete id="replyCancelLike">
+        delete from reply_like where uid=#{uid} and rid=#{rid}
+    </delete>
+
+    <select id="isReplyExited" resultType="java.lang.Integer">
+        select * from reply_like where uid=#{uid} and rid=#{rid}
+    </select>
+
+    <update id="addReplyLikeNum">
+        UPDATE reply SET like_num=reply.like_num+1 WHERE rid=#{rid}
+    </update>
+
+    <update id="subReplyLikeNum">
+        UPDATE reply SET like_num=reply.like_num-1 WHERE reply.like_num>=0 and rid=#{rid}
+    </update>
+</mapper>
