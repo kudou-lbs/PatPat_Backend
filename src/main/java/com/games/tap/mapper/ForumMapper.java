@@ -24,6 +24,10 @@ public interface ForumMapper {
 
     int insertForum(Forum forum);
 
+    int addPostNum(Long fid);
+
+    int subPostNum(Long fid);
+
     int updateForum(Forum forum);
 
     int deleteForumById(Long id);

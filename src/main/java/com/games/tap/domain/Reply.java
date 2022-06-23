@@ -65,4 +65,14 @@ public class Reply {
     @Transient
     private String replyToUserName;
 
+    public Reply(){}
+
+    public Reply(Long uid,Long fid,Long pid,String content,String time){
+        this.uId=uid;
+        this.fId=fid;
+        this.pId=pid;
+        this.content=content;
+        this.postTime=time;
+    }
+
 }

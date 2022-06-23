@@ -32,6 +32,23 @@
         UPDATE post SET reading_num=reading_num+1 WHERE pid=#{pid}
     </update>
 
+    <update id="addReplyNum">
+        UPDATE post SET reply_num=reply_num+1 WHERE pid=#{pid}
+    </update>
+
+    <update id="subReplyNum">
+        UPDATE post SET reply_num=
+        <choose>
+            <when test="num==null ">
+                reply_num-1
+            </when>
+            <otherwise>
+                reply_num-#{num}
+            </otherwise>
+        </choose>
+        WHERE pid=#{pid}
+    </update>
+
     <update id="updateLastDate">
         UPDATE post SET last_date=#{lastDate} WHERE pid=#{pid}
     </update>

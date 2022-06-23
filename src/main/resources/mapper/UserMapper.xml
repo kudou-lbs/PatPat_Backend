@@ -52,8 +52,8 @@
         select password from user where uid=#{id}
     </select>
 
-    <select id="getNicknameById" resultType="java.lang.String">
-        SELECT nickname FROM user WHERE uid=#{id}
+    <select id="getUsernameById" resultType="java.lang.String">
+        SELECT username FROM user WHERE uid=#{id}
     </select>
 
     <select id="getUserById" resultType="com.games.tap.domain.User">
