@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.games.tap.mapper.ReplyMapper">
+
+    <select id="getPostByPId" resultType="com.games.tap.domain.Post">
+        SELECT * FROM post WHERE pid=#{pid}
+    </select>
+
+    <select id="getPostInfo" resultType="com.games.tap.vo.PostInfo">
+        SELECT fpost.*,f.name AS forum_name,avatar,level,IFNULL(username,'用户已注销') AS username,
+        (CASE
+        WHEN #{uid} IS null THEN false
+        <if test="uid!=null ">
+            WHEN pl.id IS null THEN false
+        </if>
+        ELSE true
+        END) AS is_like
+        FROM (SELECT * FROM post WHERE pid=#{pid}) fpost
+        LEFT JOIN user u ON fpost.uid = u.uid
+        LEFT JOIN forum_user fu ON fpost.fid = fu.fid AND fpost.uid = fu.uid
+        LEFT JOIN forum f ON fpost.fid = f.fid
+        <if test="uid!=null ">
+            LEFT JOIN post_like pl ON fpost.pid = pl.pid AND pl.uid = #{uid}
+        </if>
+    </select>
+
+    <update id="updateReadingNum">
+        UPDATE post SET reading_num=reading_num+1 WHERE pid=#{pid}
+    </update>
+
+    <update id="updateLastDate">
+        UPDATE post SET last_date=#{lastDate} WHERE pid=#{pid}
+    </update>
+
+    <insert id="insertPost" parameterType="com.games.tap.domain.Post" useGeneratedKeys="true" keyProperty="pId">
+        INSERT INTO post (content, fid, last_date, post_time, title, uid, picture)
+        VALUES (#{content},#{fId},#{lastDate},#{postTime},#{title},#{uId},#{picture})
+    </insert>
+
+    <delete id="deleteByPId">
+        DELETE FROM post WHERE pid=#{pid};
+        DELETE FROM reply WHERE pid=#{pid};
+    </delete>
+
+</mapper>
