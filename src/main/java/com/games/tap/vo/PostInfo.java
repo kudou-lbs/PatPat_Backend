@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 @Data
 public class PostInfo extends PostBasicInfo{
     private Integer readingNum;
+    private Integer collectNum;
     private Long fid;
     private String forumName;
 }

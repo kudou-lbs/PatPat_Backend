@@ -6,10 +6,12 @@ import com.games.tap.mapper.PostMapper;
 import com.games.tap.mapper.ReplyMapper;
 import com.games.tap.mapper.UserMapper;
 import com.games.tap.service.LACService;
+import com.games.tap.service.UserService;
 import com.games.tap.util.DateUtil;
 import com.games.tap.util.Echo;
 import com.games.tap.util.PassToken;
 import com.games.tap.util.RetCode;
+import com.games.tap.vo.SubReply;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -36,10 +39,10 @@ public class ReplyController {
 
     @Operation(summary = "新增回复", description = "前四个参数必带，后两个全为空或全不空，全空为新增主回复，不空为新增楼中楼")
     @RequestMapping(value = "/reply", method = RequestMethod.POST)
-    public Echo addReply(String uid, String fid, String pid, String content, String replyToUId, String floorNum) {
+    public Echo addReply(String uid, String fid, String pid, String content, String replyToUid, String floorNum) {
         if (uid == null || uid.equals("") || fid == null || fid.equals("") || pid == null || pid.equals("")
                 || content == null || content.equals("")) return Echo.define(RetCode.PARAM_IS_EMPTY);
-        if ((replyToUId == null || replyToUId.equals("")) ^ (floorNum == null || floorNum.equals("")))
+        if ((replyToUid == null || replyToUid.equals("")) ^ (floorNum == null || floorNum.equals("")))
             return Echo.fail("floor和r2id不能一个为空一个不空");
         if (!StringUtils.isNumeric(uid) || !StringUtils.isNumeric(fid) || !StringUtils.isNumeric(pid))
             return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
@@ -48,10 +51,10 @@ public class ReplyController {
         if (postMapper.getFIdByPId(pId) != fId) return Echo.fail("fid和pid不匹配");
         String ctime = DateUtil.getCurrentTime();
         Reply reply = new Reply(uId, fId, pId, content, ctime);
-        if (replyToUId != null && !replyToUId.equals("")) {//新增楼中楼
-            if (!StringUtils.isNumeric(replyToUId) || !StringUtils.isNumeric(floorNum))
+        if (replyToUid != null && !replyToUid.equals("")) {//新增楼中楼
+            if (!StringUtils.isNumeric(replyToUid) || !StringUtils.isNumeric(floorNum))
                 return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-            long r2id = Long.parseLong(replyToUId);
+            long r2id = Long.parseLong(replyToUid);
             if (userMapper.getUsernameById(r2id) == null) return Echo.fail("回复的用户不存在");
             int floor = Integer.parseInt(floorNum);
             Long floorId = replyMapper.getRIdByFloor(floor, pId);
@@ -76,10 +79,32 @@ public class ReplyController {
     }
 
     @PassToken
-    @Operation(summary = "获取子贴回复数据", description = "获取主回复和对应的子回复")
+    @Operation(summary = "获取子贴回复数据", description = "获取主回复对应的子回复，uid可选，order定义排序，0为最新，1为最早")
     @RequestMapping(value = "/reply", method = RequestMethod.GET)
-    public Echo getReply(String rid) {
-        return Echo.success();
+    public Echo getReply(String rid, String uid, String offset, String pageSize, String order) {
+        if (rid == null || rid.equals("")) return Echo.define(RetCode.PARAM_IS_EMPTY);
+        Echo echo = UserService.checkList(rid, offset, pageSize);
+        if (echo != null) return echo;
+        Reply reply = replyMapper.getReplyById(Long.parseLong(rid));
+        if (reply == null) return Echo.fail("主回复不存在");
+        if (!reply.getIsFloor()) return Echo.fail("不是主回复");
+        int rank = 0;
+        if (order != null) {
+            if (!StringUtils.isNumeric(order)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+            rank = Integer.parseInt(order);
+            if (rank < 0 || rank > 1) return Echo.define(RetCode.PARAM_IS_INVALID);
+        }
+        Long size = null, start = null, uId = null;
+        if (uid != null && !uid.equals("")) {
+            if (!StringUtils.isNumeric(uid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+            uId = Long.parseLong(uid);
+            if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
+        }
+        if (offset != null) start = Long.parseLong(offset);
+        if (pageSize != null) size = Long.parseLong(pageSize);
+        List<SubReply> subReplyList = replyMapper.getSubReplyList(reply.getPId(), uId, reply.getFloorNum(), start, size, rank);
+        if (subReplyList == null || subReplyList.isEmpty()) return Echo.fail("子贴为空");
+        return Echo.success(subReplyList);
     }
 
     @Operation(summary = "删除回复", description = "通过rid删除回复")

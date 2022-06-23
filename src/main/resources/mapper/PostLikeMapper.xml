@@ -26,14 +26,14 @@
         select count(*) from post_like where pid=#{pid}
     </select>
 
-    <select id="getUserPostList" resultType="com.games.tap.vo.UserPostInfo">
-        SELECT post.*,f.name AS forum_name,avatar,level,IFNULL(username,'用户已注销') AS username,
-        (IF(pl.id IS null, false, true)) AS is_like
+    <select id="getUserLikePostList" resultType="com.games.tap.vo.UserPostInfo">
+        SELECT post.*,f.name AS forum_name,avatar,level,
+               IFNULL(username,'用户已注销') AS username, true AS is_like
         FROM (SELECT * FROM post_like WHERE uid=#{uid}) pl
-        LEFT JOIN post ON post.pid = pl.pid AND pl.uid = #{uid}
-        LEFT JOIN user u ON pl.uid = u.uid
-        LEFT JOIN forum_user fu ON post.fid = fu.fid AND pl.uid = fu.uid
-        LEFT JOIN forum f ON post.fid = f.fid
+            LEFT JOIN post ON post.pid = pl.pid
+            LEFT JOIN user u ON post.uid = u.uid
+            LEFT JOIN forum_user fu ON post.fid = fu.fid AND post.uid = fu.uid
+            LEFT JOIN forum f ON post.fid = f.fid
         ORDER BY last_date DESC
         <if test="pageSize!=null ">
             LIMIT #{pageSize}
@@ -44,7 +44,7 @@
     </select>
 
     <select id="isPostExited" resultType="java.lang.Integer">
-        select * from post_like where uid=#{uid} and pid=#{pid}
+        select * from post_like where uid=#{uid} and pid=#{pid} LIMIT 1
     </select>
 
 </mapper>

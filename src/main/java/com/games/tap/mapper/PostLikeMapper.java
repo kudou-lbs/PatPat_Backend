@@ -15,7 +15,7 @@ public interface PostLikeMapper {
 
     Integer getPostLikes(Long pid);
 
-    List<UserPostInfo> getUserPostList(@Param("uid")Long uid, @Param("offset")Long offset, @Param("pageSize")Long pageSize);
+    List<UserPostInfo> getUserLikePostList(@Param("uid")Long uid, @Param("offset")Long offset, @Param("pageSize")Long pageSize);
 
     Integer addLikeNum(Long pid);
 

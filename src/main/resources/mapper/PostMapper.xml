@@ -7,7 +7,11 @@
 <mapper namespace="com.games.tap.mapper.PostMapper">
 
     <select id="getPostByPId" resultType="com.games.tap.domain.Post">
-        SELECT * FROM post WHERE pid=#{pid}
+        SELECT * FROM post WHERE pid=#{pid} LIMIT 1
+    </select>
+
+    <select id="getFIdByPId" resultType="java.lang.Long">
+        SELECT fid FROM post WHERE pid=#{pid}
     </select>
 
     <select id="getPostInfo" resultType="com.games.tap.vo.PostInfo">
@@ -25,6 +29,37 @@
             LEFT JOIN forum f ON fpost.fid = f.fid
         <if test="uid!=null ">
             LEFT JOIN post_like pl ON fpost.pid = pl.pid AND pl.uid = #{uid}
+        </if>
+        LIMIT 1
+    </select>
+
+    <select id="getPostReplyList" resultType="com.games.tap.vo.ReplyInfo">
+        SELECT r.rid, r.content, r.floor_num, r.like_num, r.post_time, r.reply_num, r.uid,
+            IFNULL(username,'用户已注销') AS username, u.avatar, fu.level,
+        (CASE
+            WHEN #{uid} IS null THEN false
+        <if test="uid!=null ">
+            WHEN rl.id IS null THEN false
+        </if>
+            ELSE true
+        END) AS is_like
+        FROM (SELECT * FROM reply WHERE pid=#{pid} AND is_floor=true)
+            AS r LEFT JOIN (SELECT uid, username,avatar FROM user) u ON r.uid=u.uid
+            LEFT JOIN forum_user fu ON fu.uid = u.uid AND fu.fid=r.fid
+        <if test="uid!=null ">
+            LEFT JOIN reply_like rl ON r.rid = rl.rid AND rl.uid = #{uid}
+        </if>
+        ORDER BY
+        <choose>
+            <when test="rank==0">floor_num</when>
+            <when test="rank==1 ">floor_num DESC</when>
+            <when test="rank==2 ">reply_num DESC</when>
+        </choose>
+        <if test="pageSize!=null ">
+            LIMIT #{pageSize}
+        </if>
+        <if test="offset!=null ">
+            OFFSET #{offset}
         </if>
     </select>
 

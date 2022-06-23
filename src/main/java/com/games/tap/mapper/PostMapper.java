@@ -2,6 +2,7 @@ package com.games.tap.mapper;
 
 import com.games.tap.domain.Post;
 import com.games.tap.vo.PostInfo;
+import com.games.tap.vo.ReplyInfo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -13,6 +14,9 @@ public interface PostMapper {
     Long getFIdByPId(Long pid);
 
     PostInfo getPostInfo(@Param("pid")Long pid,@Param("uid")Long uid);
+
+    List<ReplyInfo> getPostReplyList(@Param("pid") Long pid, @Param("uid")Long uid,@Param("offset") Long offset,
+                                    @Param("pageSize") Long pageSize, @Param("rank") int rank);
 
     int updateReadingNum(Long pid);
 

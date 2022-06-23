@@ -2,9 +2,11 @@ package com.games.tap.controller;
 
 import com.games.tap.domain.TypeEnum;
 import com.games.tap.service.LACService;
+import com.games.tap.service.UserService;
 import com.games.tap.util.Echo;
 import com.games.tap.util.PassToken;
 import com.games.tap.util.RetCode;
+import com.games.tap.vo.ReplyInfo;
 import com.games.tap.vo.UserPostInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import com.games.tap.domain.Post;
@@ -87,10 +89,30 @@ public class PostController {
     }
 
     @PassToken
-    @Operation(summary = "获取帖子回复", description = "获取帖子的回复，不包括子贴")//包括子贴，子贴只显示三条
+    @Operation(summary = "获取帖子回复", description = "获取帖子的回复，不包括子贴,uid可选，order定义排序，0为最早，1为最近，2为点赞最多")//包括子贴，子贴只显示三条
     @RequestMapping(value = "/post/reply", method = RequestMethod.GET)
-    public Echo getPostReply() {
-        return Echo.success();
+    public Echo getPostReply(String pid, String uid, String offset, String pageSize, String order) {
+        if (pid == null || pid.equals("")) return Echo.define(RetCode.PARAM_IS_EMPTY);
+        Echo echo = UserService.checkList(pid, offset, pageSize);
+        if (echo != null) return echo;
+        int rank = 0;
+        if (order != null) {
+            if (!StringUtils.isNumeric(order)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+            rank = Integer.parseInt(order);
+            if (rank < 0 || rank > 2) return Echo.define(RetCode.PARAM_IS_INVALID);
+        }
+        Long pId = Long.parseLong(pid), uId = null, size = null, start = null;
+        if (uid != null && !uid.equals("")) {
+            if (!StringUtils.isNumeric(uid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+            uId = Long.parseLong(uid);
+            if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
+        }
+        if (postMapper.getFIdByPId(pId) == null) return Echo.fail("帖子不存在");
+        if (offset != null) start = Long.parseLong(offset);
+        if (pageSize != null) size = Long.parseLong(pageSize);
+        List<ReplyInfo> list = postMapper.getPostReplyList(pId, uId, start, size, rank);
+        if (list == null || list.isEmpty()) return Echo.fail("数据为空");
+        return Echo.success(list);
     }
 
     @PassToken

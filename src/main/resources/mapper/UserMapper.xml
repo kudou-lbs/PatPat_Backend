@@ -25,18 +25,16 @@
         SELECT fpost.*,f.name AS forum_name,avatar,level,IFNULL(username,'用户已注销') AS username,
         (IF(pl.id IS null, false, true)) AS is_like
         FROM (SELECT * FROM post WHERE uid=#{uid}) fpost
-
-        LEFT JOIN user u ON fpost.uid = u.uid
-        LEFT JOIN forum_user fu ON fpost.fid = fu.fid AND fpost.uid = fu.uid
-        LEFT JOIN forum f ON fpost.fid = f.fid
-        LEFT JOIN post_like pl ON fpost.pid = pl.pid AND pl.uid = #{uid}
+            LEFT JOIN user u ON fpost.uid = u.uid
+            LEFT JOIN forum_user fu ON fpost.fid = fu.fid AND fpost.uid = fu.uid
+            LEFT JOIN forum f ON fpost.fid = f.fid
+            LEFT JOIN post_like pl ON fpost.pid = pl.pid AND pl.uid = #{uid}
         ORDER BY
         <choose>
             <when test="rank==1 ">post_time</when>
-            <when test="rank==2 ">reply_num</when>
-            <otherwise>last_date</otherwise>
+            <when test="rank==2 ">reply_num DESC</when>
+            <otherwise>post_time DESC</otherwise>
         </choose>
-        DESC
         <if test="pageSize!=null ">
             LIMIT #{pageSize}
         </if>
@@ -46,29 +44,29 @@
     </select>
 
     <select id="getUserAvatarById" resultType="java.lang.String">
-        select avatar from user where uid=#{uId}
+        select avatar from user where uid=#{uId} LIMIT 1
     </select>
 
     <select id="getPasswordById" resultType="java.lang.String">
-        select password from user where uid=#{id}
+        select password from user where uid=#{id} LIMIT 1
     </select>
 
     <select id="getUsernameById" resultType="java.lang.String">
-        SELECT username FROM user WHERE uid=#{id}
+        SELECT username FROM user WHERE uid=#{id} LIMIT 1
     </select>
 
     <select id="getUserById" resultType="com.games.tap.domain.User">
-        SELECT * FROM user WHERE uid=#{id}
+        SELECT * FROM user WHERE uid=#{id} LIMIT 1
     </select>
 
     <select id="getUserByUserName" resultType="com.games.tap.domain.User">
-        SELECT * FROM user WHERE username=#{name}
+        SELECT * FROM user WHERE username=#{name} LIMIT 1
     </select>
     <select id="getIdByUserName" resultType="java.lang.Long">
-        SELECT uid FROM user WHERE username=#{name}
+        SELECT uid FROM user WHERE username=#{name} LIMIT 1
     </select>
     <select id="getBackgroundById" resultType="java.lang.String">
-        select background from user where uid=#{uId}
+        select background from user where uid=#{uId} LIMIT 1
     </select>
 
     <!--    <cache readOnly="true"/>-->

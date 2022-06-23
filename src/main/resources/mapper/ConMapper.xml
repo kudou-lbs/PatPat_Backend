@@ -29,7 +29,7 @@
     </select>
 
     <select id="isFollow" resultType="com.games.tap.domain.Concern">
-        SELECT * FROM concern WHERE following_uid=#{following} and followed_uid=#{followed}
+        SELECT * FROM concern WHERE following_uid=#{following} and followed_uid=#{followed} LIMIT 1
     </select>
 
     <insert id="follow" useGeneratedKeys="true">

@@ -119,10 +119,10 @@
     </select>
 
     <select id="isExisted" resultType="java.lang.Integer">
-        select * from game where gid=#{gId}
+        select * from game where gid=#{gId} LIMIT 1
     </select>
     <select id="isTypeExited" resultType="java.lang.Integer">
-        select * from game_type where gid=#{gId} and type=#{type}
+        select * from game_type where gid=#{gId} and type=#{type} LIMIT 1
     </select>
     <select id="getGidByType" resultType="java.lang.Long">
         select gid from game_type where type=#{type}

@@ -223,7 +223,7 @@ public class UserController {
     }
 
     @PassToken
-    @Operation(summary = "获取用户发布的帖子列表", description = "通过uid查找用户的帖子,order定义排序，0 回复时间排序，1 发布时间排序，2 回复数量排序，默认0")
+    @Operation(summary = "获取用户发布的帖子列表", description = "通过uid查找用户的帖子,order定义排序，0 最近发布时间，1 最早发布时间，2 回复数量排序，默认0")
     @RequestMapping(value = "user/post", method = RequestMethod.GET)
     public Echo getUserPostList(String uid, String offset, String pageSize, String order) {
         if (uid == null || uid.equals("")) return Echo.define(RetCode.PARAM_IS_EMPTY);

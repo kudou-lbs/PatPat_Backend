@@ -7,7 +7,7 @@
 <mapper namespace="com.games.tap.mapper.ForumUserMapper">
 
     <select id="getForumUser" resultType="com.games.tap.domain.ForumUser">
-        SELECT * FROM forum_user WHERE fid=#{fid} AND uid=#{uid};
+        SELECT * FROM forum_user WHERE fid=#{fid} AND uid=#{uid} LIMIT 1;
     </select>
 
     <select id="getLikeForumUser" resultType="com.games.tap.domain.ForumUser">
@@ -31,7 +31,7 @@
     </select>
 
     <select id="isLike" resultType="java.lang.Boolean">
-        SELECT is_like FROM forum_user WHERE fid=#{fid} AND uid=#{uid}
+        SELECT is_like FROM forum_user WHERE fid=#{fid} AND uid=#{uid} LIMIT 1
     </select>
 
     <insert id="insertForumUser" parameterType="com.games.tap.domain.ForumUser" useGeneratedKeys="true" keyProperty="fId">

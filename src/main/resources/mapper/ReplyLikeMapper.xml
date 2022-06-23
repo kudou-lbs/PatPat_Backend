@@ -15,7 +15,7 @@
     </delete>
 
     <select id="isReplyExited" resultType="java.lang.Integer">
-        select * from reply_like where uid=#{uid} and rid=#{rid}
+        select * from reply_like where uid=#{uid} and rid=#{rid} LIMIT 1
     </select>
 
     <update id="addReplyLikeNum">

@@ -85,7 +85,7 @@ public class LACService {
     }
 
     public List<UserPostInfo> getUserPostList(Long uid, Long offset, Long pageSize) {
-        return postLikeMapper.getUserPostList(uid, offset, pageSize);
+        return postLikeMapper.getUserLikePostList(uid, offset, pageSize);
     }
 
     public List<UserPostInfo> getUserCollectList(Long uid, Long offset, Long pageSize) {
