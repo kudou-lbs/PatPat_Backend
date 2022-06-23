@@ -124,7 +124,7 @@ public class UserController {
     @RequestMapping(value = "/user/{id}", method = RequestMethod.PUT)
     public Echo updateUser(@PathVariable("id") String id, @RequestBody User user) {
         if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long uid = Long.parseLong(id);
+        long uid = Long.parseLong(id);
         if (!Objects.equals(uid, user.getUId())) return Echo.fail("请求id不一致，id不可更改");
         Echo echo = userService.checkUser(user);
         if (echo != null) return echo;
@@ -180,7 +180,7 @@ public class UserController {
     //文件上传
     public Echo uploadAvatar(@RequestParam("filename") MultipartFile file, @PathVariable("id") String id, HttpServletRequest request) {
         if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long uid = Long.parseLong(id);
+        long uid = Long.parseLong(id);
         if (!Objects.equals(uid, userService.getIdByToken(request.getHeader("token"))))// TODO 最后改成 @RequestHeader的格式
             return Echo.define(RetCode.PERMISSION_NO_ACCESS);
         if (userMapper.getUserById(uid) == null) return Echo.fail("用户不存在");
@@ -198,7 +198,7 @@ public class UserController {
     @RequestMapping(value = "/user/{id}/background", method = RequestMethod.GET)
     public Echo getImgPathByOwner(@PathVariable("id") String id) {
         if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long uid = Long.parseLong(id);
+        long uid = Long.parseLong(id);
         String path = userMapper.getBackgroundById(uid);
         if (path == null || path.equals("")) return Echo.fail();
         return Echo.success(path);
@@ -209,7 +209,7 @@ public class UserController {
     //文件上传
     public Echo uploadBack(@RequestParam("filename") MultipartFile file, @PathVariable("id") String id, HttpServletRequest request) {
         if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long uid = Long.parseLong(id);
+        long uid = Long.parseLong(id);
         if (!Objects.equals(uid, userService.getIdByToken(request.getHeader("token"))))
             return Echo.define(RetCode.PERMISSION_NO_ACCESS);
         if (userMapper.getUserById(uid) == null) return Echo.fail("用户不存在");
@@ -279,7 +279,7 @@ public class UserController {
     public Echo follow(String followedId, String followingId, HttpServletRequest request) {
         if (!StringUtils.isNumeric(followedId) || !StringUtils.isNumeric(followingId))
             return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long ingId = Long.parseLong(followingId), edId = Long.parseLong(followedId);
+        long ingId = Long.parseLong(followingId), edId = Long.parseLong(followedId);
         if (!Objects.equals(ingId, userService.getIdByToken(request.getHeader("token"))))
             return Echo.define(RetCode.PERMISSION_NO_ACCESS);
         if (conMapper.isFollow(ingId, edId) != null) return Echo.fail("已经关注过了");
@@ -294,7 +294,7 @@ public class UserController {
     public Echo unfollow(String followedId, String followingId, HttpServletRequest request) {
         if (!StringUtils.isNumeric(followedId) || !StringUtils.isNumeric(followingId))
             return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long ingId = Long.parseLong(followingId), edId = Long.parseLong(followedId);
+        long ingId = Long.parseLong(followingId), edId = Long.parseLong(followedId);
         if (!Objects.equals(ingId, userService.getIdByToken(request.getHeader("token"))))
             return Echo.define(RetCode.PERMISSION_NO_ACCESS);
         if (conMapper.isFollow(ingId, edId) == null) return Echo.fail("还没有关注");

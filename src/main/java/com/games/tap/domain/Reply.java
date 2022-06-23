@@ -60,9 +60,19 @@ public class Reply {
 
     @Column(name = "is_floor",columnDefinition = "tinyint(1)")
     @Schema(description = "是否是子贴（否则为楼中楼回复）")
-    private Integer isFloor;
+    private Boolean isFloor;
 
     @Transient
     private String replyToUserName;
+
+    public Reply(){}
+
+    public Reply(Long uid,Long fid,Long pid,String content,String time){
+        this.uId=uid;
+        this.fId=fid;
+        this.pId=pid;
+        this.content=content;
+        this.postTime=time;
+    }
 
 }

@@ -71,8 +71,7 @@ public class ForumController {//TODO 加入权限校验
     @RequestMapping(value = "/forum/{id}", method = RequestMethod.PUT)
     public Echo updateForum(@PathVariable("id") String id, String name, String intro, MultipartFile icon) {
         if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long fid = Long.parseLong(id);
-        Forum saveForum = forumMapper.getForumById(fid);
+        Forum saveForum = forumMapper.getForumById(Long.parseLong(id));
         if (saveForum == null) return Echo.fail("论坛不存在");
         if ((name == null || name.equals("")) && (intro == null || intro.equals("")) && icon == null)
             return Echo.define(RetCode.PARAM_IS_EMPTY);
@@ -98,7 +97,7 @@ public class ForumController {//TODO 加入权限校验
     @RequestMapping(value = "/forum/{id}", method = RequestMethod.DELETE)
     public Echo deleteForum(@PathVariable("id") String id) {
         if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long fid=Long.parseLong(id);
+        long fid=Long.parseLong(id);
         if(forumMapper.getForumById(fid)==null)return Echo.fail("论坛不存在");
         if (forumMapper.deleteForumById(fid) != 0) return Echo.success();
         return Echo.fail();
@@ -200,7 +199,7 @@ public class ForumController {//TODO 加入权限校验
         if(fid==null||fid.equals("")||uid==null||uid.equals(""))return Echo.define(RetCode.PARAM_IS_EMPTY);
         if (!StringUtils.isNumeric(uid) || !StringUtils.isNumeric(fid))
             return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long fId = Long.parseLong(fid), uId = Long.parseLong(uid);
+        long fId = Long.parseLong(fid), uId = Long.parseLong(uid);
         if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
         if (forumMapper.getForumById(fId) == null) return Echo.fail("论坛不存在");
         ForumUser forumUser = forumUserMapper.getForumUser(uId, fId);
@@ -220,7 +219,7 @@ public class ForumController {//TODO 加入权限校验
         if(fid==null||uid==null||role==null)return Echo.define(RetCode.PARAM_IS_EMPTY);
         if (!StringUtils.isNumeric(uid) || !StringUtils.isNumeric(fid) || !StringUtils.isNumeric(role))
             return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long fId = Long.parseLong(fid), uId = Long.parseLong(uid);
+        long fId = Long.parseLong(fid), uId = Long.parseLong(uid);
         int identity = Integer.parseInt(role);
         if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
         if (forumMapper.getForumById(fId) == null) return Echo.fail("论坛不存在");
@@ -242,7 +241,7 @@ public class ForumController {//TODO 加入权限校验
         if(fid==null||fid.equals("")||uid==null||uid.equals(""))return Echo.define(RetCode.PARAM_IS_EMPTY);
         if (!StringUtils.isNumeric(uid) || !StringUtils.isNumeric(fid))
             return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long fId = Long.parseLong(fid), uId = Long.parseLong(uid);
+        long fId = Long.parseLong(fid), uId = Long.parseLong(uid);
         if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
         if (forumMapper.getForumById(fId) == null) return Echo.fail("论坛不存在");
         Boolean isLike = forumUserMapper.isLike(uId, fId);

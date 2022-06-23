@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.games.tap.mapper.ReplyMapper">
+
+    <select id="getReplyById" resultType="com.games.tap.domain.Reply">
+        SELECT * FROM reply WHERE rid=#{rid} LIMIT 1
+    </select>
+
+    <select id="getRIdByFloor">
+        SELECT rid
+        FROM reply
+        WHERE pid = #{pid}
+          AND floor_num = #{floor}
+          AND is_floor = true
+        LIMIT 1
+    </select>
+
+    <update id="subFloorReplyNum">
+        UPDATE reply
+        SET reply_num=reply_num - 1
+        WHERE pid = #{pid}
+          AND floor_num = #{floor}
+          AND is_floor = true
+    </update>
+
+    <update id="addFloorReplyNum">
+        UPDATE reply
+        SET reply_num=reply_num + 1
+        WHERE rid=#{rid}
+    </update>
+
+    <insert id="insertReply" parameterType="com.games.tap.domain.Reply" useGeneratedKeys="true" keyProperty="rId">
+#          TODO
+    </insert>
+
+    <delete id="deleteById">
+        DELETE FROM reply WHERE rid=#{rid}
+    </delete>
+
+    <delete id="deleteByFloorNum">
+        DELETE FROM reply WHERE pid=#{pid} AND floor_num=#{floor}
+    </delete>
+
+</mapper>

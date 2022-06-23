@@ -52,7 +52,7 @@ public class PostController {
             return Echo.fail("内容和图片不可同时为空");
         if (!StringUtils.isNumeric(uid) || !StringUtils.isNumeric(fid))
             return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long fId=Long.parseLong(fid),uId=Long.parseLong(uid);
+        long fId=Long.parseLong(fid),uId=Long.parseLong(uid);
         if(userMapper.getUserById(uId)==null)return Echo.define(RetCode.USER_NOT_EXIST);
         if(forumMapper.getForumById(fId)==null)return Echo.fail("论坛不存在");
         Post post=new Post(uId,fId,title);
@@ -65,8 +65,9 @@ public class PostController {
         String ctime= DateUtil.getCurrentTime();
         post.setPostTime(ctime);
         post.setLastDate(ctime);
-        if(postMapper.insertPost(post)!=0)return Echo.success();
-        return Echo.fail();
+        if(postMapper.insertPost(post)==0)return Echo.fail("新增帖子失败");
+        if(forumMapper.addPostNum(fId)==0)return Echo.fail("论坛更新失败");
+        return Echo.success();
     }
 
     @PassToken
@@ -88,12 +89,19 @@ public class PostController {
     }
 
     @PassToken
+    @Operation(summary = "",description = "")
+    @RequestMapping(value = "/post/reply",method = RequestMethod.GET)
+    public Echo getPostReply(){
+        return Echo.success();
+    }
+
+    @PassToken
     @Operation(summary = "帖子阅读量加1",description = "通过id增加帖子阅读量，当用户点击帖子时调用")
     @RequestMapping(value = "/post/read",method = RequestMethod.POST)
     public Echo readPost(String pid){
         if(pid==null||pid.equals(""))return Echo.define(RetCode.PARAM_IS_EMPTY);
         if (!StringUtils.isNumeric(pid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long id=Long.parseLong(pid);
+        long id=Long.parseLong(pid);
         if(postMapper.getPostByPId(id)==null)return Echo.fail("帖子不存在");
         if(postMapper.updateReadingNum(id)!=0)return Echo.success();
         return Echo.fail();
@@ -104,13 +112,12 @@ public class PostController {
     public Echo deletePost(String pid){
         if(pid==null||pid.equals(""))return Echo.define(RetCode.PARAM_IS_EMPTY);
         if (!StringUtils.isNumeric(pid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long id=Long.parseLong(pid);
-        if(postMapper.getPostByPId(id)==null)return Echo.fail("帖子不存在");
-        if(postMapper.deleteByPId(id)!=0){
-            
-            return Echo.success();
-        }
-        return Echo.fail();
+        long id=Long.parseLong(pid);
+        Long fid= postMapper.getFIdByPId(id);
+        if(fid==null)return Echo.fail("帖子不存在");
+        if(postMapper.deleteByPId(id)==0) return Echo.fail("帖子删除失败");
+        if(forumMapper.subPostNum(fid)==0)return Echo.fail("论坛更新失败");
+        return Echo.success();
     }
     @Resource
     LACService lacService;
@@ -121,8 +128,7 @@ public class PostController {
     public Echo postLike(String uid,String pid){
         if (!StringUtils.isNumeric(uid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         if (!StringUtils.isNumeric(pid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Long uId=Long.parseLong(uid);
-        Long pId=Long.parseLong(pid);
+        long uId=Long.parseLong(uid),pId=Long.parseLong(pid);
         if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
         if (postMapper.getPostByPId(pId) == null) return Echo.fail("帖子不存在");
         if (lacService.isExited(uId,pId) != null) return Echo.fail("已经点赞");
@@ -136,6 +142,7 @@ public class PostController {
     @PassToken
     @Operation(summary = "取消帖子点赞")
     @RequestMapping(value = "/post/cancel",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/post/unlike",method = RequestMethod.POST)
     public Echo postCancelLike(String uid,String pid){
         if (!StringUtils.isNumeric(uid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         if (!StringUtils.isNumeric(pid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);

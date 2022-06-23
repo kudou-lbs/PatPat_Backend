@@ -22,7 +22,7 @@ public interface UserMapper {
 
     Long getIdByUserName(String name);
 
-    String getNicknameById(Long id);
+    String getUsernameById(Long id);
 
     String getUserAvatarById(Long id);
 

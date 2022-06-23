@@ -79,6 +79,14 @@
         UPDATE forum SET intro=#{intro},name=#{name},icon=#{icon} WHERE fid=#{fId}
     </update>
 
+    <update id="addPostNum">
+        UPDATE forum SET post_num=post_num+1 WHERE fid=#{fid}
+    </update>
+
+    <update id="subPostNum">
+        UPDATE forum SET post_num=post_num-1 WHERE fid=#{fid}
+    </update>
+
     <delete id="deleteForumById">
         DELETE FROM forum WHERE fid=#{id};
         DELETE FROM post WHERE fid=#{id};
