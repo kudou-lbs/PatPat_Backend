@@ -71,6 +71,10 @@
         SELECT * FROM forum WHERE name=#{name} LIMIT 1
     </select>
 
+    <select id="selectIconById" resultType="java.lang.String">
+        select icon from forum where fid=#{fid}
+    </select>
+
     <insert id="insertForum" parameterType="com.games.tap.domain.Forum" useGeneratedKeys="true" keyProperty="fId">
         INSERT INTO forum (intro, name, icon) VALUES (#{intro},#{name},#{icon})
     </insert>

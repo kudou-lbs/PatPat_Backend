@@ -151,6 +151,10 @@ public class UserController {
     @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE)
     public Echo deleteById(@PathVariable("id") String id) {// FIXME 用户只能注销自己的用户，管理员才有任意操作的权限
         if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+        String avatarPath=userMapper.selectAvatarById(Long.parseLong(id));
+        imageService.deleteFiles(avatarPath);
+        String picPath=userMapper.selectBackById(Long.parseLong(id));
+        imageService.deleteFiles(picPath);
         if (userMapper.deleteUserById(Long.parseLong(id)) != 0) return Echo.success();
         else return Echo.fail();
     }

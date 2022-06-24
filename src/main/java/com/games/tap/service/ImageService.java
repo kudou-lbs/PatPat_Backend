@@ -88,4 +88,21 @@ public class ImageService {
 //        game.setPicture(path);
 //        return gameService.insertPic(game);
 //    }
+
+
+    /**
+     * 删除图片
+     */
+    public boolean deleteFiles(String pathName){
+
+        boolean flag = false;
+        //根据路径创建文件对象
+        File file = new File(uploadPath+pathName);
+        //路径是个文件且不为空时删除文件
+        if(file.isFile()&&file.exists()){
+            flag = file.delete();
+        }
+        //删除失败时，返回false
+        return flag;
+    }
 }

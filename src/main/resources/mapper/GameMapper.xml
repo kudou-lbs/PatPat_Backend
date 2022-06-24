@@ -131,5 +131,9 @@
         select gid from game_type where type=#{type}
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
+    <select id="selectByName" resultType="java.lang.Long">
+        select gid from game where name=#{name}
+    </select>
+
 
 </mapper>

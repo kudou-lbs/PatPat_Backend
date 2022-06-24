@@ -23,7 +23,7 @@
     </update>
 
     <update id="subCollectionNum">
-        UPDATE post SET collect_num=post.collect_num-1 WHERE post.collect_num>=0 and pid=#{pid}
+        UPDATE post SET collect_num=post.collect_num-1 WHERE post.collect_num>0 and pid=#{pid}
     </update>
 
     <select id="getUserCollectList" resultType="com.games.tap.vo.UserPostInfo">

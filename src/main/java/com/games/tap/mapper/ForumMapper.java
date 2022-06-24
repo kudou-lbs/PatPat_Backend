@@ -31,4 +31,6 @@ public interface ForumMapper {
     int updateForum(Forum forum);
 
     int deleteForumById(Long id);
+
+    String selectIconById(Long fid);
 }

@@ -62,6 +62,9 @@
             OFFSET #{offset}
         </if>
     </select>
+    <select id="getPicById" resultType="java.lang.String">
+        select picture from post where pid=#{pid}
+    </select>
 
     <update id="updateReadingNum">
         UPDATE post SET reading_num=reading_num+1 WHERE pid=#{pid}

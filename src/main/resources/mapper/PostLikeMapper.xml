@@ -15,7 +15,7 @@
     </update>
 
     <update id="subLikeNum">
-        UPDATE post SET like_num=post.like_num-1 WHERE post.like_num>=0 and pid=#{pid}
+        UPDATE post SET like_num=post.like_num-1 WHERE post.like_num>0 and pid=#{pid}
     </update>
 
     <delete id="postCancelLike">

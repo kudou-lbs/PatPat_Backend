@@ -71,4 +71,8 @@ public class GameService {
     public int updateGame(Game game){
         return gameMapper.updateGame(game);
     }
+
+    public Long selectByName(String name){
+        return gameMapper.selectByName(name);
+    }
 }

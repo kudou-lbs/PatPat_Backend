@@ -11,6 +11,7 @@ public interface GameMapper {
     Game getById(Long gId);
     Integer isExisted(Long gId);
     Integer isTypeExited(Long gId,String type);
+    Long selectByName(String name);
 
     List<Game> getGameList(@Param("offset")Long offset, @Param("pageSize")Long pageSize);
     List<Game> getOrderList(@Param("offset")Long offset, @Param("pageSize")Long pageSize);
@@ -26,4 +27,5 @@ public interface GameMapper {
     int deleteGameById(Long gId);
 
     int updateGame(Game game);
+
 }

@@ -30,4 +30,5 @@ public interface PostMapper {
 
     int deleteByPId(Long pid);
 
+    String getPicById(Long pid);
 }

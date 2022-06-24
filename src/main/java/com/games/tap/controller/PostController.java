@@ -135,6 +135,8 @@ public class PostController {
         long id = Long.parseLong(pid);
         Long fid = postMapper.getFIdByPId(id);
         if (fid == null) return Echo.fail("帖子不存在");
+        String path=postMapper.getPicById(id);
+        imageService.deleteFiles(path);
         if (postMapper.deleteByPId(id) == 0) return Echo.fail("帖子删除失败");
         if (forumMapper.subPostNum(fid) == 0) return Echo.fail("论坛更新失败");
         return Echo.success();
@@ -206,6 +208,7 @@ public class PostController {
     }
 
 
+    @PassToken
     @Operation(summary = "帖子收藏")
     @RequestMapping(value = "/post/collect", method = RequestMethod.POST)
     public Echo collectionLike(String uid, String pid) {
@@ -223,6 +226,7 @@ public class PostController {
         return Echo.success("收藏成功");
     }
 
+    @PassToken
     @Operation(summary = "取消帖子收藏")
     @RequestMapping(value = "/post/collect", method = RequestMethod.DELETE)
     public Echo collectionCancelLike(String uid, String pid) {

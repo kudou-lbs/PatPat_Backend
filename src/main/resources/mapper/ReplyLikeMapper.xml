@@ -23,6 +23,6 @@
     </update>
 
     <update id="subReplyLikeNum">
-        UPDATE reply SET like_num=reply.like_num-1 WHERE reply.like_num>=0 and rid=#{rid}
+        UPDATE reply SET like_num=reply.like_num-1 WHERE reply.like_num>0 and rid=#{rid}
     </update>
 </mapper>

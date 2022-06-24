@@ -68,6 +68,12 @@
     <select id="getBackgroundById" resultType="java.lang.String">
         select background from user where uid=#{uId} LIMIT 1
     </select>
+    <select id="selectAvatarById" resultType="java.lang.String">
+        select avatar from user where uid=#{uid}
+    </select>
+    <select id="selectBackById" resultType="java.lang.String">
+        select background from user where uid=#{uid}
+    </select>
 
     <!--    <cache readOnly="true"/>-->
     <update id="updateUserAvatar">
