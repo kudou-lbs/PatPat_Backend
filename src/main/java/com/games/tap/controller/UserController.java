@@ -2,10 +2,9 @@ package com.games.tap.controller;
 
 import com.games.tap.domain.User;
 import com.games.tap.mapper.ConMapper;
-import com.games.tap.mapper.PostMapper;
 import com.games.tap.mapper.UserMapper;
 import com.games.tap.service.ImageService;
-import com.games.tap.service.UserService;
+import com.games.tap.util.ToolUtil;
 import com.games.tap.util.*;
 import com.games.tap.vo.UserInfo;
 import com.games.tap.vo.UserPostInfo;
@@ -30,10 +29,6 @@ public class UserController {
     @Resource
     UserMapper userMapper;
     @Resource
-    PostMapper postMapper;
-    @Resource
-    UserService userService;
-    @Resource
     PasswordEncoder encoder;
     @Resource
     ImageService imageService;
@@ -41,7 +36,7 @@ public class UserController {
     ConMapper conMapper;
 
     @PassToken
-    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    @RequestMapping(value = "/user/login", method = RequestMethod.GET)
     @Operation(summary = "用户登录", description = "返回token，与用户相关的需要header携带token才能进行操作", parameters = {
             @Parameter(name = "username", description = "账户名", required = true),
             @Parameter(name = "password", description = "密码", required = true)
@@ -64,7 +59,7 @@ public class UserController {
     }
 
     @PassToken
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    @RequestMapping(value = "/user/register", method = RequestMethod.POST)
     @Operation(summary = "用户注册", description = "注册账号", parameters = {
             @Parameter(name = "username", description = "账户名", required = true),
             @Parameter(name = "password", description = "密码", required = true),
@@ -73,7 +68,7 @@ public class UserController {
     })
     public Echo register(@RequestBody User user) {
         // 合法性校验
-        Echo echo = userService.checkUser(user);
+        Echo echo = ToolUtil.checkUser(user);
         if (echo != null) return echo;
         if (userMapper.getUserByUserName(user.getUsername()) != null)
             return Echo.define(RetCode.USER_HAS_EXISTED);
@@ -93,7 +88,7 @@ public class UserController {
     }
 
     @Operation(summary = "登录校验", description = "携带参数为header中的token，登录获取，过期需要重新登录")
-    @PostMapping("/testToken")
+    @PostMapping("/user/test")
     public String testToken(HttpServletRequest request) {
         String token = request.getHeader("token");
         if (token.isEmpty()) return "请求失败";
@@ -110,7 +105,7 @@ public class UserController {
             if (list == null || list.isEmpty()) return Echo.fail();
             return Echo.success(list);
         } else {
-            Echo echo = UserService.checkList(null, offset, pageSize);
+            Echo echo = ToolUtil.checkList(null, offset, pageSize);
             if (echo != null) return echo;
             Long start = null, size = Long.parseLong(pageSize);
             if (offset != null) start = Long.parseLong(offset);
@@ -120,29 +115,33 @@ public class UserController {
         }
     }
 
-    @Operation(summary = "更改用户信息", description = "传入用户的完整信息,对单个用户进行更改")
+    @Operation(summary = "更改用户信息", description = "传入用户的部分信息,对单个用户进行更改")
     @RequestMapping(value = "/user/{id}", method = RequestMethod.PUT)
     public Echo updateUser(@PathVariable("id") String id, @RequestBody User user) {
         if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         long uid = Long.parseLong(id);
-        if (!Objects.equals(uid, user.getUId())) return Echo.fail("请求id不一致，id不可更改");
-        Echo echo = userService.checkUser(user);
-        if (echo != null) return echo;
+//        if (!Objects.equals(uid, user.getUId())) return Echo.fail("请求id不一致，id不可更改");
         User saveUser = userMapper.getUserById(uid);
-        Long did = userMapper.getIdByUserName(user.getUsername());
-        if (did != null && !did.equals(uid)) return Echo.fail("用户名已存在");
-        else if (did == null) saveUser.setUsername(user.getUsername());
+        if(user.getUsername()!=null){
+            Long did = userMapper.getIdByUserName(user.getUsername());
+            if (did != null && !did.equals(uid)) return Echo.fail("用户名已存在");
+            else if (did == null) saveUser.setUsername(user.getUsername());
+        }
         if (user.getIntro() != null) saveUser.setIntro(user.getIntro());
         if (user.getNickname() != null) saveUser.setNickname(user.getNickname());
         if (user.getGender() != null && user.getGender() >= 0 && user.getGender() < 3)
             saveUser.setGender(user.getGender());
-        if (!Objects.equals(saveUser.getRegisterTime(), user.getRegisterTime()))
+        if (user.getRegisterTime()!=null&&!Objects.equals(saveUser.getRegisterTime(), user.getRegisterTime()))
             return Echo.fail("注册时间不可更改");
-        if (!Objects.equals(saveUser.getFansNum(), user.getFansNum())
-                || !Objects.equals(saveUser.getFollowNum(), user.getFollowNum()))
+        if ((user.getFansNum()!=null&&!Objects.equals(saveUser.getFansNum(), user.getFansNum()))
+                || (user.getFollowNum()!=null&&!Objects.equals(saveUser.getFollowNum(), user.getFollowNum())))
             return Echo.fail("关注和粉丝数不可显式修改");
-        if (!encoder.matches(user.getPassword(), saveUser.getPassword()))
-            saveUser.setPassword(encoder.encode(user.getPassword()));
+        if (user.getPassword()!=null&&!encoder.matches(user.getPassword(), saveUser.getPassword())){
+            if(ToolUtil.checkPassword(user.getPassword())){
+                saveUser.setPassword(encoder.encode(user.getPassword()));
+            }else
+                return Echo.fail("密码格式错误");
+        }
         if (userMapper.updateUser(saveUser) != 0) return Echo.success();
         else return Echo.fail();
     }
@@ -181,7 +180,7 @@ public class UserController {
     public Echo uploadAvatar(@RequestParam("filename") MultipartFile file, @PathVariable("id") String id, HttpServletRequest request) {
         if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         long uid = Long.parseLong(id);
-        if (!Objects.equals(uid, userService.getIdByToken(request.getHeader("token"))))// TODO 最后改成 @RequestHeader的格式
+        if (!Objects.equals(uid, ToolUtil.getIdByToken(request.getHeader("token"))))// TODO 最后改成 @RequestHeader的格式
             return Echo.define(RetCode.PERMISSION_NO_ACCESS);
         if (userMapper.getUserById(uid) == null) return Echo.fail("用户不存在");
         Map<String, String> map = imageService.uploadImage(file);
@@ -210,7 +209,7 @@ public class UserController {
     public Echo uploadBack(@RequestParam("filename") MultipartFile file, @PathVariable("id") String id, HttpServletRequest request) {
         if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         long uid = Long.parseLong(id);
-        if (!Objects.equals(uid, userService.getIdByToken(request.getHeader("token"))))
+        if (!Objects.equals(uid, ToolUtil.getIdByToken(request.getHeader("token"))))
             return Echo.define(RetCode.PERMISSION_NO_ACCESS);
         if (userMapper.getUserById(uid) == null) return Echo.fail("用户不存在");
         Map<String, String> map = imageService.uploadImage(file);
@@ -227,7 +226,7 @@ public class UserController {
     @RequestMapping(value = "user/post", method = RequestMethod.GET)
     public Echo getUserPostList(String uid, String offset, String pageSize, String order) {
         if (uid == null || uid.equals("")) return Echo.define(RetCode.PARAM_IS_EMPTY);
-        Echo echo = UserService.checkList(uid, offset, pageSize);
+        Echo echo = ToolUtil.checkList(uid, offset, pageSize);
         if (echo != null) return echo;
         Long start = null, size = null, id = Long.parseLong(uid);
         if (userMapper.getUserById(id) == null) return Echo.define(RetCode.USER_NOT_EXIST);
@@ -245,9 +244,9 @@ public class UserController {
     }
 
     @Operation(summary = "粉丝列表", description = "获取关注该用户的粉丝列表")
-    @RequestMapping(value = "/fan/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/user/{id}/fan", method = RequestMethod.GET)
     public Echo getFanList(@PathVariable String id, String offset, String pageSize) {
-        Echo echo = UserService.checkList(id, offset, pageSize);
+        Echo echo = ToolUtil.checkList(id, offset, pageSize);
         if (echo != null) return echo;
         Long start = null, size = null, uid = Long.parseLong(id);
         if (userMapper.getUserById(uid) == null) return Echo.define(RetCode.USER_NOT_EXIST);
@@ -260,9 +259,9 @@ public class UserController {
 
     @PassToken
     @Operation(summary = "关注列表", description = "获取该用户关注的用户列表")
-    @RequestMapping(value = "/follow/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/user/{id}/follow", method = RequestMethod.GET)
     public Echo getFollowList(@PathVariable String id, String offset, String pageSize) {
-        Echo echo = UserService.checkList(id, offset, pageSize);
+        Echo echo = ToolUtil.checkList(id, offset, pageSize);
         if (echo != null) return echo;
         Long start = null, size = null, uid = Long.parseLong(id);
         if (userMapper.getUserById(uid) == null) return Echo.define(RetCode.USER_NOT_EXIST);
@@ -275,12 +274,12 @@ public class UserController {
 
     @PassToken
     @Operation(summary = "关注用户", description = "关注其他用户")
-    @RequestMapping(value = "/concern", method = RequestMethod.POST)
+    @RequestMapping(value = "/user/concern", method = RequestMethod.POST)
     public Echo follow(String followedId, String followingId, HttpServletRequest request) {
         if (!StringUtils.isNumeric(followedId) || !StringUtils.isNumeric(followingId))
             return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         long ingId = Long.parseLong(followingId), edId = Long.parseLong(followedId);
-        if (!Objects.equals(ingId, userService.getIdByToken(request.getHeader("token"))))
+        if (!Objects.equals(ingId, ToolUtil.getIdByToken(request.getHeader("token"))))
             return Echo.define(RetCode.PERMISSION_NO_ACCESS);
         if (conMapper.isFollow(ingId, edId) != null) return Echo.fail("已经关注过了");
         if (conMapper.follow(ingId, edId) > 0) {
@@ -290,12 +289,12 @@ public class UserController {
     }
 
     @Operation(summary = "取消关注", description = "取消关注其他用户")
-    @RequestMapping(value = "/concern", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/user/concern", method = RequestMethod.DELETE)
     public Echo unfollow(String followedId, String followingId, HttpServletRequest request) {
         if (!StringUtils.isNumeric(followedId) || !StringUtils.isNumeric(followingId))
             return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         long ingId = Long.parseLong(followingId), edId = Long.parseLong(followedId);
-        if (!Objects.equals(ingId, userService.getIdByToken(request.getHeader("token"))))
+        if (!Objects.equals(ingId, ToolUtil.getIdByToken(request.getHeader("token"))))
             return Echo.define(RetCode.PERMISSION_NO_ACCESS);
         if (conMapper.isFollow(ingId, edId) == null) return Echo.fail("还没有关注");
         if (conMapper.unfollow(ingId, edId) > 0) {

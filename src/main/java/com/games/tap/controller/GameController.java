@@ -26,7 +26,7 @@ public class GameController {
             @Parameter(name = "pageSize",description = "返回数量",required = true),
             @Parameter(name = "offset",description = "起始位置")
     })
-    @RequestMapping(value = "/games",method = RequestMethod.GET)
+    @RequestMapping(value = "/game/list",method = RequestMethod.GET)
     public Echo getAllGame(String offset, String pageSize){
         if (offset == null && pageSize == null) {
             List<Game> list = gameService.getAllGame();
@@ -150,7 +150,7 @@ public class GameController {
 
     @PassToken
     @Operation(summary = "批量插入游戏信息")
-    @RequestMapping(value = "/games",method = RequestMethod.POST)
+    @RequestMapping(value = "/game/list",method = RequestMethod.POST)
     public Echo insertMGame(@RequestBody List<Game> games){
         for (Game game : games) {
             Long gId = game.getGId();

@@ -7,7 +7,8 @@
 <mapper namespace="com.games.tap.mapper.ConMapper">
 
     <select id="getFanList" resultType="com.games.tap.vo.UserInfo">
-        SELECT uid,nickname,avatar,intro,fans_num FROM concern LEFT JOIN user
+        SELECT uid,avatar,intro,fans_num,IFNULL(nickname,'用户已注销') AS nickname
+        FROM concern LEFT JOIN user
         ON user.uid=concern.following_uid WHERE followed_uid=#{uId}
         <if test="pageSize!=null ">
             LIMIT #{pageSize}
@@ -18,7 +19,8 @@
     </select>
 
     <select id="getFollowList" resultType="com.games.tap.vo.UserInfo">
-        SELECT uid,nickname,avatar,intro,fans_num FROM concern LEFT JOIN user
+        SELECT uid,avatar,intro,fans_num,IFNULL(nickname,'用户已注销') AS nickname
+        FROM concern LEFT JOIN user
         ON user.uid=concern.followed_uid WHERE following_uid=#{uId}
         <if test="pageSize!=null ">
             LIMIT #{pageSize}

@@ -16,8 +16,8 @@
 
     <select id="getSubReplyList" resultType="com.games.tap.vo.SubReply">
         SELECT r.rid, r.content, r.like_num, r.post_time, r.uid, r.reply_to_uid AS r2id,
-            IFNULL(u1.username,'用户已注销') AS username, u1.avatar,
-            IFNULL(u2.username,'用户已注销') AS r2name, fu.level,
+            IFNULL(u1.nickname,'用户已注销') AS nickname, u1.avatar,
+            IFNULL(u2.nickname,'用户已注销') AS r2name, IFNULL(level,1)AS level,
         (CASE
             WHEN #{uid} IS null THEN false
         <if test="uid!=null ">
@@ -26,8 +26,8 @@
             ELSE true
         END) AS is_like
         FROM (SELECT * FROM reply WHERE pid=#{pid} AND floor_num=#{floor} AND is_floor=false)
-            AS r LEFT JOIN (SELECT uid, username,avatar FROM user) u1 ON r.uid=u1.uid
-            LEFT JOIN (SELECT uid, username FROM user) u2 ON r.reply_to_uid = u2.uid
+            AS r LEFT JOIN (SELECT uid, nickname,avatar FROM user) u1 ON r.uid=u1.uid
+            LEFT JOIN (SELECT uid, nickname FROM user) u2 ON r.reply_to_uid = u2.uid
             LEFT JOIN forum_user fu ON fu.uid = u1.uid AND fu.fid=r.fid
         <if test="uid!=null ">
             LEFT JOIN reply_like rl ON r.rid = rl.rid AND rl.uid = #{uid}

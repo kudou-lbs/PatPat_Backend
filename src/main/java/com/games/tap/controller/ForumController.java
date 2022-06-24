@@ -2,19 +2,15 @@ package com.games.tap.controller;
 
 import com.games.tap.domain.Forum;
 import com.games.tap.domain.ForumUser;
-import com.games.tap.domain.Post;
 import com.games.tap.mapper.ForumMapper;
 import com.games.tap.mapper.ForumUserMapper;
 import com.games.tap.mapper.UserMapper;
 import com.games.tap.service.ImageService;
-import com.games.tap.service.UserService;
+import com.games.tap.util.ToolUtil;
 import com.games.tap.util.Echo;
 import com.games.tap.util.PassToken;
 import com.games.tap.util.RetCode;
-import com.games.tap.vo.ForumInfo;
-import com.games.tap.vo.LikeForum;
-import com.games.tap.vo.PostBasicInfo;
-import com.games.tap.vo.PostInfo;
+import com.games.tap.vo.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -104,12 +100,24 @@ public class ForumController {//TODO 加入权限校验
     }
 
     @PassToken
-    @Operation(summary = "通过id获取论坛", description = "id是论坛的id")
+    @Operation(summary = "获取论坛详细信息", description = "fid是论坛的id,传入uid判断是否传等级信息")
     @RequestMapping(value = "/forum/{id}", method = RequestMethod.GET)
-    public Echo getForum(@PathVariable("id") String id) {
-        if (!StringUtils.isNumeric(id)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        Forum forum = forumMapper.getForumById(Long.parseLong(id));
-        if (forum == null) return Echo.fail();
+    public Echo getForum(@PathVariable("id") String fid,String uid) {
+        if (!StringUtils.isNumeric(fid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+        long fId=Long.parseLong(fid);
+        if(uid!=null&&!uid.equals("")){
+            if (!StringUtils.isNumeric(uid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+            long uId=Long.parseLong(uid);
+            if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
+            if(forumUserMapper.getForumUser(uId,fId)!=null){
+                ForumUserInfo forum = forumMapper.getForumInfo(fId,uId);
+                if (forum == null) return Echo.fail("论坛不存在");
+                forum.setMaxExp(ToolUtil.maxExp(forum.getLevel()));
+                return Echo.success(forum);
+            }
+        }
+        Forum forum= forumMapper.getForumById(fId);
+        if (forum == null) return Echo.fail("论坛不存在");
         return Echo.success(forum);
     }
 
@@ -133,7 +141,7 @@ public class ForumController {//TODO 加入权限校验
     })
     @RequestMapping(value = "/forum", method = RequestMethod.GET)
     public Echo getForums(String offset, String pageSize, String uid) {
-        Echo echo = UserService.checkList(uid, offset, pageSize);
+        Echo echo = ToolUtil.checkList(uid, offset, pageSize);
         if (echo != null) return echo;
         Long id, size = null, start = null;
         if (offset != null && !offset.equals("")) start = Long.parseLong(offset);
@@ -154,7 +162,7 @@ public class ForumController {//TODO 加入权限校验
     @RequestMapping(value = "/forum/like", method = RequestMethod.GET)
     public Echo getLikeForum(String uid,String offset, String pageSize) {
         if(uid==null||uid.equals(""))return Echo.define(RetCode.PARAM_IS_EMPTY);
-        Echo echo=UserService.checkList(uid,offset,pageSize);
+        Echo echo= ToolUtil.checkList(uid,offset,pageSize);
         if(echo!=null)return echo;
         Long id = Long.parseLong(uid),start=null,size=null;
         if (userMapper.getUserById(id) == null) return Echo.define(RetCode.USER_NOT_EXIST);
@@ -162,18 +170,23 @@ public class ForumController {//TODO 加入权限校验
         if(pageSize!=null)size=Long.parseLong(pageSize);
         List<LikeForum>list= forumUserMapper.getLikeForum(id,start,size);
         if (list == null || list.isEmpty()) return Echo.fail("数据为空");
+        for(LikeForum item:list){
+            item.setMaxExp(ToolUtil.maxExp(item.getLevel()));
+        }
         return Echo.success(list);
     }
 
     @PassToken
-    @Operation(summary = "获取论坛的帖子", description = "取得帖子列表，order定义排序，0 回复时间排序，1 发布时间排序，2 回复数量排序，fid必选，其他可选")
+    @Operation(summary = "获取论坛的帖子", description = "取得帖子列表，order定义排序，0 回复时间排序，1 发布时间排序，2 回复数量排序，fid为空时返回随机帖子，其他可选")
     @RequestMapping(value = "/forum/post", method = RequestMethod.GET)
     public Echo getForumPost(String uid,String fid,String offset, String pageSize,String order) {
-        if(fid==null||fid.equals(""))return Echo.define(RetCode.PARAM_IS_EMPTY);
-        Echo echo=UserService.checkList(fid,offset,pageSize);
+        Echo echo= ToolUtil.checkList(fid,offset,pageSize);
         if(echo!=null)return echo;
-        Long fId = Long.parseLong(fid),start=null,size=null,uId=null;
-        if (userMapper.getUserById(fId) == null) return Echo.fail("论坛不存在");
+        Long fId = null,start=null,size=null,uId=null;
+        if(fid!=null&&!fid.equals("")){
+            fId = Long.parseLong(fid);
+            if (userMapper.getUserById(fId) == null) return Echo.fail("论坛不存在");
+        }
         if(uid!=null&&!uid.equals("")){
             if (!StringUtils.isNumeric(uid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
             uId=Long.parseLong(uid);

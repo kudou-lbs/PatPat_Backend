@@ -29,7 +29,7 @@ public class ForumUser {
     private Integer exp;
 
     @Column(name = "identity", columnDefinition = "int(2) default 0")
-    @Schema(description = "论坛权限，0为普通用户，1为管理员，管理帖子，2为版主，管理论坛")
+    @Schema(description = "论坛权限，0为普通用户，1为论坛会员，2为管理员，管理帖子，3为版主，管理论坛")
     private Integer identity;
 
     @Column(name = "is_like", columnDefinition = "tinyint(1) default 0")

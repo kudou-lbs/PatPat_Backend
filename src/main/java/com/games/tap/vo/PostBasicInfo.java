@@ -6,7 +6,7 @@ import lombok.Data;
 public class PostBasicInfo {
     private Long pid;
     private Long uid;
-    private String username;
+    private String nickname;
     private String avatar;
     private Integer level;
     private String postTime;

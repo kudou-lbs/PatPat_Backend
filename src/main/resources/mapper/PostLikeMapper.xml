@@ -27,8 +27,8 @@
     </select>
 
     <select id="getUserLikePostList" resultType="com.games.tap.vo.UserPostInfo">
-        SELECT post.*,f.name AS forum_name,avatar,level,
-               IFNULL(username,'用户已注销') AS username, true AS is_like
+        SELECT post.*,f.name AS forum_name,avatar,IFNULL(level,1)AS level,
+               IFNULL(nickname,'用户已注销') AS nickname, true AS is_like
         FROM (SELECT * FROM post_like WHERE uid=#{uid}) pl
             LEFT JOIN post ON post.pid = pl.pid
             LEFT JOIN user u ON post.uid = u.uid

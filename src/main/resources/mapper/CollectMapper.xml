@@ -27,8 +27,9 @@
     </update>
 
     <select id="getUserCollectList" resultType="com.games.tap.vo.UserPostInfo">
-        SELECT post.*,f.name AS forum_name,avatar,level,IFNULL(username,'用户已注销') AS username,
-        (IF(c.id IS null, false, true)) AS is_like
+        SELECT post.*,f.name AS forum_name,avatar,IFNULL(level,1)AS level,
+               IFNULL(nickname,'用户已注销') AS nickname,
+               (IF(c.id IS null, false, true)) AS is_like
         FROM (SELECT * FROM collection WHERE uid=#{uid}) c
             LEFT JOIN post ON post.pid = c.pid
             LEFT JOIN user u ON post.uid = u.uid

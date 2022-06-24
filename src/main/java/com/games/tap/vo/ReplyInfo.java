@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class ReplyInfo {
 
-    private String username;
+    private String nickname;
     private String avatar;
     private Integer level;
     private Long rid;
