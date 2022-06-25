@@ -30,7 +30,7 @@ public class DruidConfig {
         //reg.setServlet(new StatViewServlet());
         //reg.addUrlMappings("/druid/*");
         // 添加IP白名单
-        servletRegistrationBean.addInitParameter("allow", "127.0.0.1");
+        servletRegistrationBean.addInitParameter("allow", "");
         // 添加IP黑名单，当白名单和黑名单重复时，黑名单优先级更高
         //servletRegistrationBean.addInitParameter("deny", "127.0.0.1");
         // 添加控制台管理用户

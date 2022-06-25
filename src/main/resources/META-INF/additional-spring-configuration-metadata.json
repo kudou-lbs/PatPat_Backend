@@ -1,0 +1,48 @@
+{
+  "properties": [
+    {
+      "name": "spring.datasource.initial-size",
+      "type": "java.lang.Integer",
+      "description": "Description for spring.datasource.initial-size."
+    },
+    {
+      "name": "spring.datasource.min-idle",
+      "type": "java.lang.Integer",
+      "description": "Description for spring.datasource.min-idle."
+    },
+    {
+      "name": "spring.datasource.max-active",
+      "type": "java.lang.Integer",
+      "description": "Description for spring.datasource.max-active."
+    },
+    {
+      "name": "spring.datasource.max-wait",
+      "type": "java.lang.Integer",
+      "description": "Description for spring.datasource.max-wait."
+    },
+    {
+      "name": "spring.datasource.pool-prepared-statements",
+      "type": "java.lang.Boolean",
+      "description": "Description for spring.datasource.pool-prepared-statements."
+    },
+    {
+      "name": "spring.datasource.max-pool-prepared-statement-per-connection-size",
+      "type": "java.lang.Integer",
+      "description": "Description for spring.datasource.max-pool-prepared-statement-per-connection-size."
+    },
+    {
+      "name": "spring.datasource.keep-alive",
+      "type": "java.lang.Boolean",
+      "description": "Description for spring.datasource.keep-alive."
+    },
+    {
+      "name": "spring.datasource.filters",
+      "type": "java.lang.String",
+      "description": "Description for spring.datasource.filters."
+    },
+    {
+      "name": "web.upload-path",
+      "type": "java.lang.String",
+      "description": "Description for web.upload-path."
+    }
+  ] }

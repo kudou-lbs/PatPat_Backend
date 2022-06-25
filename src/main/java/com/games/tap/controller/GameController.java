@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @Tag(name = "game",description = "游戏数据接口，提供数据操作、排行榜、分类、搜索等功能")
@@ -80,7 +81,7 @@ public class GameController {
     @Operation(summary = "根据游戏类型返回游戏信息")
     @RequestMapping(value = "/game/type",method = RequestMethod.GET)
     public Echo getByType(String type,String offset, String pageSize){
-        if(type==null||type=="") return Echo.fail("请输入游戏类型");
+        if(type==null|| type.equals("")) return Echo.fail("请输入游戏类型");
         if (offset == null && pageSize == null) {
             List<Long> gIds=gameService.getGidByType(type);
             if (gIds.size()==0) return Echo.fail("没有找到该类型游戏");
@@ -89,7 +90,6 @@ public class GameController {
                 Game game=gameService.getById(gId);
                 list.add(game);
             }
-            if (list == null || list.isEmpty()) return Echo.fail();
             return Echo.success(list);
         } else if (pageSize == null) {
             return Echo.fail("pageSize不能为空");
@@ -110,7 +110,6 @@ public class GameController {
                 Game game=gameService.getById(gId);
                 list.add(game);
             }
-            if (list == null || list.isEmpty()) return Echo.fail();
             return Echo.success(list);
         }
     }
@@ -131,19 +130,15 @@ public class GameController {
     public Echo insertGame(Game game){
         if(gameService.isExisted(game.getGId()) != null){
             gameService.updateGame(game);
-            if (game.getTypes()!=null&&game.getTypes()!=""){
-                String[] type = game.getTypes().split("  ");
+            if (game.getTypes()!=null&& !Objects.equals(game.getTypes(), "")){
+                String[] type = game.getTypes().split(",");
                 gameService.deleteTypeById(game.getGId());
                 gameService.insertType(game.getGId(),type);
             }
         }
         gameService.insertGame(game);
         Long gId=game.getGId();
-        String[] types=game.getTypes().split("  ");
-//        int types[] = new int[str.length];
-//        for(int i=0;i<str.length;i++) {
-//            types[i] = Integer.parseInt(str[i]);
-//        }
+        String[] types=game.getTypes().split(",");
         gameService.insertType(gId,types);
         return Echo.success();
     }
@@ -157,16 +152,12 @@ public class GameController {
             Integer result=gameService.isExisted(gId);
             if(result == null) {
                 gameService.insertGame(game);
-                String[] types = game.getTypes().split("  ");
-//            int types[] = new int[str.length];
-//            for(int i=0;i<str.length;i++) {
-//                types[i] = Integer.parseInt(str[i]);
-//            }
+                String[] types = game.getTypes().split(",");
                 gameService.insertType(gId, types);
             }else{
                 gameService.updateGame(game);
-                if (game.getTypes()!=null&&game.getTypes()!=""){
-                    String[] type = game.getTypes().split("  ");
+                if (game.getTypes()!=null&& !Objects.equals(game.getTypes(), "")){
+                    String[] type = game.getTypes().split(",");
                     gameService.deleteTypeById(game.getGId());
                     gameService.insertType(game.getGId(),type);
                 }
@@ -190,8 +181,8 @@ public class GameController {
     public Echo updateGame(Game game){
         if(gameService.isExisted(game.getGId()) == null) return Echo.fail("该游戏不存在");
         gameService.updateGame(game);
-        if (game.getTypes()!=null&&game.getTypes()!=""){
-            String[] type = game.getTypes().split("  ");
+        if (game.getTypes()!=null&& !Objects.equals(game.getTypes(), "")){
+            String[] type = game.getTypes().split(",");
             gameService.deleteTypeById(game.getGId());
             gameService.insertType(game.getGId(),type);
         }
@@ -204,7 +195,7 @@ public class GameController {
     public Echo insertType(String gId,String types){
         if (!StringUtils.isNumeric(gId)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         if(gameService.isExisted(Long.parseLong(gId)) == null) return Echo.fail("该游戏不存在");
-        String[] type = types.split("  ");
+        String[] type = types.split(",");
         for (String s : type) {
             if(gameService.isTypeExited(Long.parseLong(gId),s)!=null)
                 return Echo.fail("游戏已经有该标签");
@@ -219,7 +210,7 @@ public class GameController {
     public Echo deleteType(String gId, String types){
         if (!StringUtils.isNumeric(gId)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         if(gameService.isExisted(Long.parseLong(gId)) == null) return Echo.fail("该游戏不存在");
-        String[] type = types.split("  ");
+        String[] type = types.split(",");
         for (String s : type) {
             if(gameService.isTypeExited(Long.parseLong(gId),s)==null)
                 return Echo.fail("游戏没有该标签");
