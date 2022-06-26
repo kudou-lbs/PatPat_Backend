@@ -14,7 +14,13 @@ import java.util.List;
 @Setter
 @ToString
 @Entity
-@Table(name = "post")
+@Table(name = "post",indexes = {
+        @Index(name ="fl_idx",columnList = "fid"),
+        @Index(name = "fl_idx",columnList ="last_date"),
+        @Index(name = "pu_idx",columnList = "uid"),
+        @Index(name = "prl_idx",columnList = "reading_num"),
+        @Index(name = "prl_idx",columnList = "like_num")
+})
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

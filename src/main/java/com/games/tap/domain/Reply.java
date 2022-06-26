@@ -14,7 +14,11 @@ import java.util.List;
 @Setter
 @ToString
 @Entity
-@Table(name = "reply")
+@Table(name = "reply",indexes = {
+        @Index(name = "rpf_idx",columnList = "pid"),
+        @Index(name="rpf_idx",columnList = "floor_num"),
+        @Index(name = "rpf_idx",columnList = "post_time")
+})
 public class Reply {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

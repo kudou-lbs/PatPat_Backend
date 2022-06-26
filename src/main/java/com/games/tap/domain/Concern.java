@@ -11,7 +11,8 @@ import javax.persistence.*;
 @Setter
 @ToString
 @Entity
-@Table(name = "concern")
+@Table(name = "concern",uniqueConstraints = @UniqueConstraint(name = "cffu_idx",columnNames = {"following_uid","followed_uid"}),
+        indexes = @Index(name = "cfu_idx",columnList = "followed_uid"))
 @Schema(description = "用户间相互关注的信息")
 public class Concern {
     @Id

@@ -12,7 +12,7 @@
 
     <select id="getUserList" resultType="com.games.tap.vo.UserInfo">
         SELECT uid,nickname,avatar,intro,fans_num
-        FROM user ORDER BY fans_num DESC
+        FROM user WHERE fans_num>=0 ORDER BY fans_num DESC
         <if test="pageSize!=null ">
             LIMIT #{pageSize}
         </if>
@@ -23,16 +23,33 @@
 
     <select id="getUserPostList" resultType="com.games.tap.vo.UserPostInfo">
         SELECT fpost.*,f.name AS forum_name,avatar,IFNULL(nickname,'用户已注销') AS nickname,
-        (IF(pl.id IS null, false, true)) AS is_like,IFNULL(level,1)AS level,
-        FROM (SELECT * FROM post WHERE uid=#{uid}) fpost
+        (CASE
+        WHEN #{uid} IS null THEN false
+        <if test="uid!=null ">
+            WHEN pl.id IS null THEN false
+        </if>
+            ELSE true
+        END) AS is_like, IFNULL(level,1)AS level
+        FROM (SELECT * FROM post
+        <where>
+            <if test="uid!=null and rank!=3 ">
+                uid=#{uid}
+            </if>
+            <if test="rank==3 ">
+                reading_num>=0 AND like_num>=0 ORDER BY reading_num,like_num LIMIT 10000
+            </if>
+        </where>) fpost
             LEFT JOIN user u ON fpost.uid = u.uid
             LEFT JOIN forum_user fu ON fpost.fid = fu.fid AND fpost.uid = fu.uid
             LEFT JOIN forum f ON fpost.fid = f.fid
+        <if test="uid!=null ">
             LEFT JOIN post_like pl ON fpost.pid = pl.pid AND pl.uid = #{uid}
+        </if>
         ORDER BY
         <choose>
             <when test="rank==1 ">post_time</when>
             <when test="rank==2 ">reply_num DESC</when>
+            <when test="rank==3 ">RAND()</when>
             <otherwise>post_time DESC</otherwise>
         </choose>
         <if test="pageSize!=null ">

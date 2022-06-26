@@ -177,16 +177,14 @@ public class ForumController {//TODO 加入权限校验
     }
 
     @PassToken
-    @Operation(summary = "获取论坛的帖子", description = "取得帖子列表，order定义排序，0 回复时间排序，1 发布时间排序，2 回复数量排序，fid为空时返回随机帖子，其他可选")
+    @Operation(summary = "获取论坛的帖子", description = "取得帖子列表，order定义排序，0 回复时间排序，1 发布时间排序，2 回复数量排序，fid必选，其他可选")
     @RequestMapping(value = "/forum/post", method = RequestMethod.GET)
     public Echo getForumPost(String uid,String fid,String offset, String pageSize,String order) {
-        Echo echo= ToolUtil.checkList(fid,offset,pageSize);
+        if(fid==null||fid.equals(""))return Echo.define(RetCode.PARAM_IS_EMPTY);
+        Echo echo=ToolUtil.checkList(fid,offset,pageSize);
         if(echo!=null)return echo;
-        Long fId = null,start=null,size=null,uId=null;
-        if(fid!=null&&!fid.equals("")){
-            fId = Long.parseLong(fid);
-            if (userMapper.getUserById(fId) == null) return Echo.fail("论坛不存在");
-        }
+        Long fId = Long.parseLong(fid),start=null,size=null,uId=null;
+        if (userMapper.getUserById(fId) == null) return Echo.fail("论坛不存在");
         if(uid!=null&&!uid.equals("")){
             if (!StringUtils.isNumeric(uid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
             uId=Long.parseLong(uid);

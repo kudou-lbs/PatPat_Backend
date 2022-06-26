@@ -222,19 +222,21 @@ public class UserController {
     }
 
     @PassToken
-    @Operation(summary = "获取用户发布的帖子列表", description = "通过uid查找用户的帖子,order定义排序，0 最近发布时间，1 最早发布时间，2 回复数量排序，默认0")
+    @Operation(summary = "获取用户发布的帖子列表或随机帖子", description = "通过uid查找用户的帖子,order定义排序，0 最近发布时间，1 最早发布时间，2 回复数量排序，3 随机，默认0,随机时不能获取用户发帖")
     @RequestMapping(value = "user/post", method = RequestMethod.GET)
     public Echo getUserPostList(String uid, String offset, String pageSize, String order) {
-        if (uid == null || uid.equals("")) return Echo.define(RetCode.PARAM_IS_EMPTY);
         Echo echo = ToolUtil.checkList(uid, offset, pageSize);
         if (echo != null) return echo;
-        Long start = null, size = null, id = Long.parseLong(uid);
-        if (userMapper.getUserById(id) == null) return Echo.define(RetCode.USER_NOT_EXIST);
+        Long start = null, size = null, id = null;
+        if(uid!=null&&!uid.equals("")){
+            id = Long.parseLong(uid);
+            if (userMapper.getUserById(id) == null) return Echo.fail("论坛不存在");
+        }
         int rank = 0;
         if (order != null) {
             if (!StringUtils.isNumeric(order)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
             rank = Integer.parseInt(order);
-            if (rank < 0 || rank > 2) return Echo.define(RetCode.PARAM_IS_INVALID);
+            if (rank < 0 || rank > 3) return Echo.define(RetCode.PARAM_IS_INVALID);
         }
         if (offset != null) start = Long.parseLong(offset);
         if (pageSize != null) size = Long.parseLong(pageSize);
