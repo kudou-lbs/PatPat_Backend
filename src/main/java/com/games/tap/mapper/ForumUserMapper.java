@@ -22,6 +22,8 @@ public interface ForumUserMapper {
 
     int unlikeForum(@Param("uid")Long uid,@Param("fid")Long fid);
 
+    int updateLevelAndExp(@Param("uid")Long uid,@Param("fid")Long fid,@Param("exp")Integer exp,@Param("level")Integer level);
+
     int updateIdentity(@Param("uid")Long uid,@Param("fid")Long fid,@Param("identity")Integer identity);
 
     int deleteForumUser(@Param("uid")Long uid,@Param("fid")Long fid);

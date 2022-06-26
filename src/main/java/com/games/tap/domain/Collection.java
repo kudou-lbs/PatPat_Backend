@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Setter
 @ToString
 @Entity
-@Table(name = "collection")
+@Table(name = "collection",uniqueConstraints = @UniqueConstraint(name = "cup_idx",columnNames = {"uid","pid"}))
 public class Collection {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

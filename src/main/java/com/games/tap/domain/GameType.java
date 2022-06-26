@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Setter
 @ToString
 @Entity
-@Table(name = "game_type")
+@Table(name = "game_type",uniqueConstraints = @UniqueConstraint(name = "gt_idx",columnNames = {"gid","type"}))
 public class GameType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -15,8 +15,8 @@
     </select>
 
     <select id="getLikeForum" resultType="com.games.tap.vo.LikeForum">
-        SELECT user_forum.fid, name, icon, level, title AS last_title
-        FROM ((SELECT fid, level FROM forum_user WHERE uid = #{id} AND is_like=true) AS user_forum
+        SELECT user_forum.fid, name, icon, level, exp, title AS last_title
+        FROM ((SELECT fid, level, exp FROM forum_user WHERE uid = #{id} AND is_like=true) AS user_forum
         LEFT JOIN forum ON user_forum.fid = forum.fid)
         LEFT JOIN (SELECT fid, title FROM post
         WHERE (fid, last_date) IN (SELECT fid, MAX(last_date) FROM post GROUP BY fid))
@@ -50,6 +50,10 @@
 
     <update id="updateIdentity" >
         UPDATE forum_user SET identity=#{identity} WHERE fid=#{fid} AND uid=#{uid}
+    </update>
+
+    <update id="updateLevelAndExp">
+        UPDATE forum_user SET exp=#{exp},level=#{level} WHERE fid=#{fid} AND uid=#{uid}
     </update>
 
     <delete id="deleteForumUser">

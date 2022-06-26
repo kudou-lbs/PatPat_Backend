@@ -1,12 +1,14 @@
 package com.games.tap.controller;
 
+import com.games.tap.domain.ForumUser;
 import com.games.tap.domain.Reply;
 import com.games.tap.domain.TypeEnum;
+import com.games.tap.mapper.ForumUserMapper;
 import com.games.tap.mapper.PostMapper;
 import com.games.tap.mapper.ReplyMapper;
 import com.games.tap.mapper.UserMapper;
 import com.games.tap.service.LACService;
-import com.games.tap.service.UserService;
+import com.games.tap.util.ToolUtil;
 import com.games.tap.util.DateUtil;
 import com.games.tap.util.Echo;
 import com.games.tap.util.PassToken;
@@ -34,6 +36,8 @@ public class ReplyController {
     PostMapper postMapper;
     @Resource
     UserMapper userMapper;
+    @Resource
+    ForumUserMapper forumUserMapper;
     @Resource
     LACService lacService;
 
@@ -75,6 +79,14 @@ public class ReplyController {
         if (postMapper.addReplyNum(pId) == 0) return Echo.fail("更新帖子回复数失败");
         if (replyMapper.insertReply(reply) == 0) return Echo.fail("新增回复失败");
         if (postMapper.updateLastDate(pId, ctime) == 0) return Echo.fail("更新帖子最新回复时间失败");
+        ForumUser forumUser = forumUserMapper.getForumUser(uId, fId);
+        if (forumUser != null) {
+            int exp = forumUser.getExp() + 3 * ToolUtil.expRatio(forumUser.getIdentity());
+            forumUser.setExp(exp);
+            ToolUtil.checkExp(forumUser);
+            if (forumUserMapper.updateLevelAndExp(uId, fId, forumUser.getExp(), forumUser.getLevel()) == 0)
+                return Echo.fail("更新用户经验值失败");
+        }
         return Echo.success();
     }
 
@@ -83,7 +95,7 @@ public class ReplyController {
     @RequestMapping(value = "/reply", method = RequestMethod.GET)
     public Echo getReply(String rid, String uid, String offset, String pageSize, String order) {
         if (rid == null || rid.equals("")) return Echo.define(RetCode.PARAM_IS_EMPTY);
-        Echo echo = UserService.checkList(rid, offset, pageSize);
+        Echo echo = ToolUtil.checkList(rid, offset, pageSize);
         if (echo != null) return echo;
         Reply reply = replyMapper.getReplyById(Long.parseLong(rid));
         if (reply == null) return Echo.fail("主回复不存在");

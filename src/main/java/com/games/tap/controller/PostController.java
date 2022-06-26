@@ -1,8 +1,10 @@
 package com.games.tap.controller;
 
+import com.games.tap.domain.ForumUser;
 import com.games.tap.domain.TypeEnum;
+import com.games.tap.mapper.ForumUserMapper;
 import com.games.tap.service.LACService;
-import com.games.tap.service.UserService;
+import com.games.tap.util.ToolUtil;
 import com.games.tap.util.Echo;
 import com.games.tap.util.PassToken;
 import com.games.tap.util.RetCode;
@@ -24,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +43,8 @@ public class PostController {
     UserMapper userMapper;
     @Resource
     ForumMapper forumMapper;
+    @Resource
+    ForumUserMapper forumUserMapper;
 
     @Operation(summary = "发布帖子", description = "帖子必须有标题，内容和图片不可同时为空")
     @RequestMapping(value = "/post", method = RequestMethod.POST)
@@ -67,6 +70,14 @@ public class PostController {
         post.setLastDate(ctime);
         if (postMapper.insertPost(post) == 0) return Echo.fail("新增帖子失败");
         if (forumMapper.addPostNum(fId) == 0) return Echo.fail("论坛更新失败");
+        ForumUser forumUser = forumUserMapper.getForumUser(uId, fId);
+        if (forumUser != null) {
+            int exp = forumUser.getExp() + 10 * ToolUtil.expRatio(forumUser.getIdentity());
+            forumUser.setExp(exp);
+            ToolUtil.checkExp(forumUser);
+            if (forumUserMapper.updateLevelAndExp(uId, fId, forumUser.getExp(), forumUser.getLevel()) == 0)
+                return Echo.fail("更新用户经验值失败");
+        }
         return Echo.success();
     }
 
@@ -93,7 +104,7 @@ public class PostController {
     @RequestMapping(value = "/post/reply", method = RequestMethod.GET)
     public Echo getPostReply(String pid, String uid, String offset, String pageSize, String order) {
         if (pid == null || pid.equals("")) return Echo.define(RetCode.PARAM_IS_EMPTY);
-        Echo echo = UserService.checkList(pid, offset, pageSize);
+        Echo echo = ToolUtil.checkList(pid, offset, pageSize);
         if (echo != null) return echo;
         int rank = 0;
         if (order != null) {
@@ -125,6 +136,22 @@ public class PostController {
         if (postMapper.getPostByPId(id) == null) return Echo.fail("帖子不存在");
         if (postMapper.updateReadingNum(id) != 0) return Echo.success();
         return Echo.fail();
+    }
+
+    @Operation(summary = "获取用户关注论坛和关注人的帖子列表", description = "通过uid查找帖子")
+    @RequestMapping(value = "/post/related", method = RequestMethod.GET)
+    public Echo getUserPostList(String uid, String offset, String pageSize) {
+        if (uid == null || uid.equals("")) return Echo.define(RetCode.PARAM_IS_EMPTY);
+        Echo echo = ToolUtil.checkList(uid, offset, pageSize);
+        if (echo != null) return echo;
+        Long start = null, size = null, id = Long.parseLong(uid);
+        if (userMapper.getUserById(id) == null) return Echo.define(RetCode.USER_NOT_EXIST);
+
+        if (offset != null) start = Long.parseLong(offset);
+        if (pageSize != null) size = Long.parseLong(pageSize);
+        List<UserPostInfo> list = postMapper.getRelatedPost(id, start, size);
+        if (list == null || list.isEmpty()) return Echo.fail("数据为空");
+        return Echo.success(list);
     }
 
     @Operation(summary = "删除帖子", description = "通过id删除帖子，注意：删除帖子其对应的回复也会删除")

@@ -9,7 +9,8 @@ import javax.persistence.*;
 @Setter
 @ToString
 @Entity
-@Table(name = "user",uniqueConstraints = {@UniqueConstraint(columnNames = {"uid"})})
+@Table(name = "user",uniqueConstraints = {@UniqueConstraint(name = "uun_idx",columnNames = {"username"})},
+        indexes = @Index(name = "ufn_idx",columnList = "fans_num"))
 @Schema(description = "用户信息")
 public class User {
     @Id
@@ -50,7 +51,7 @@ public class User {
     @Schema(description = "背景图路径")
     private String background;
 
-    @Column(name = "username", columnDefinition = "varchar(40) ",nullable = false,unique = true)
+    @Column(name = "username", columnDefinition = "varchar(40) ",nullable = false)
     @Schema(description = "账户名",required = true)
     private String username;
 

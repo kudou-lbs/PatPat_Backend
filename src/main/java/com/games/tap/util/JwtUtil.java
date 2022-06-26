@@ -22,7 +22,7 @@ import java.util.Map;
 public class JwtUtil {
 
     private static final String JWT_SECRET_KEY = "qat1qat2qat3tap2tap1tap";
-    private static final long EXPIRE_TIME = 2 * 60 * 60 * 1000;
+    private static final long EXPIRE_TIME = 8 * 60 * 60 * 1000;
     private static final ObjectMapper om = new ObjectMapper();
 
     /**

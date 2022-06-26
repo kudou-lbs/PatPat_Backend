@@ -14,7 +14,8 @@ import java.util.List;
 @Setter
 @ToString
 @Entity
-@Table(name = "forum")
+@Table(name = "forum",uniqueConstraints = @UniqueConstraint(name = "fn_idx",columnNames = {"name"}),
+        indexes = {@Index(name = "ffn_idx",columnList = "follow_num")})
 @Schema(description = "论坛信息")
 public class Forum {
     @Id
@@ -23,7 +24,7 @@ public class Forum {
     @Schema(description = "主键Id",accessMode = Schema.AccessMode.READ_ONLY)
     private Long fId;
 
-    @Column(name = "name", columnDefinition = "varchar(50)",nullable = false,unique = true)
+    @Column(name = "name", columnDefinition = "varchar(50)",nullable = false)
     @Schema(description = "论坛名")
     private String name;
 

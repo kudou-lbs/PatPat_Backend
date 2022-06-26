@@ -11,18 +11,18 @@
     </select>
 
     <select id="getForumPostList" resultType="com.games.tap.vo.PostBasicInfo">
-        SELECT fpost.pid,fpost.uid,IFNULL(username,'用户已注销') AS username,
-        avatar, level,post_time,like_num,reply_num,title,content,picture,
+        SELECT fpost.pid,fpost.uid,post_time,like_num,reply_num,title,content,picture,avatar,
+        IFNULL(nickname,'用户已注销') AS nickname,IFNULL(level,1)AS level,
         (CASE
-            WHEN #{uid} IS null THEN false
+        WHEN #{uid} IS null THEN false
         <if test="uid!=null ">
             WHEN pl.id IS null THEN false
         </if>
             ELSE true
         END) AS is_like
         FROM (SELECT * FROM post WHERE fid=#{fid}) fpost
-            LEFT JOIN (SELECT uid, username,avatar FROM user) u ON fpost.uid = u.uid
-            LEFT JOIN forum_user fu ON fpost.fid = fu.fid AND fpost.uid = fu.uid
+        LEFT JOIN (SELECT uid, nickname,avatar FROM user) u ON fpost.uid = u.uid
+        LEFT JOIN forum_user fu ON fpost.fid = fu.fid AND fpost.uid = fu.uid
         <if test="uid!=null ">
             LEFT JOIN post_like pl ON fpost.pid = pl.pid AND pl.uid = #{uid}
         </if>
@@ -42,7 +42,8 @@
     </select>
 
     <select id="getForumList" resultType="com.games.tap.vo.ForumInfo">
-        SELECT fid,name,icon,follow_num,false AS is_like FROM forum ORDER BY follow_num DESC
+        SELECT fid,name,icon,follow_num,false AS is_like FROM forum WHERE follow_num>=0
+        ORDER BY follow_num DESC
         <if test="pageSize!=null ">
             LIMIT #{pageSize}
         </if>
@@ -54,7 +55,8 @@
     <select id="getForumListWithUserId" resultType="com.games.tap.vo.ForumInfo">
         SELECT forum.fid,name,icon,follow_num,IFNULL(is_like,false) AS is_like FROM forum LEFT JOIN
             (SELECT fid,is_like FROM forum_user WHERE uid=#{uid})AS user_forum
-        ON forum.fid=user_forum.fid ORDER BY follow_num DESC
+        ON forum.fid=user_forum.fid WHERE follow_num>=0
+        ORDER BY follow_num DESC
         <if test="pageSize!=null ">
             LIMIT #{pageSize}
         </if>
@@ -65,6 +67,11 @@
 
     <select id="getForumById" resultType="com.games.tap.domain.Forum">
         SELECT * FROM forum WHERE fid=#{id} LIMIT 1
+    </select>
+
+    <select id="getForumInfo" resultType="com.games.tap.vo.ForumUserInfo">
+        SELECT f.*,exp,level,is_like FROM (SELECT * FROM forum WHERE fid=#{fid} LIMIT 1)
+            AS f LEFT JOIN forum_user fu ON f.fid= fu.fid AND fu.uid=#{uid}
     </select>
 
     <select id="getForumByName" resultType="com.games.tap.domain.Forum">

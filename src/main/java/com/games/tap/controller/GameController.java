@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @Tag(name = "game",description = "游戏数据接口，提供数据操作、排行榜、分类、搜索等功能")
@@ -29,7 +30,7 @@ public class GameController {
             @Parameter(name = "pageSize",description = "返回数量",required = true),
             @Parameter(name = "offset",description = "起始位置")
     })
-    @RequestMapping(value = "/games",method = RequestMethod.GET)
+    @RequestMapping(value = "/game/list",method = RequestMethod.GET)
     public Echo getAllGame(String offset, String pageSize){
         if (offset == null && pageSize == null) {
             List<Game> list = gameService.getAllGame();
@@ -136,10 +137,10 @@ public class GameController {
                 return Echo.fail("不同id，不能具有相同游戏名");
 
             gameService.updateGame(game);
-            if (game.getTypes() != null && !game.getTypes().equals("") ) {
+            if (game.getTypes()!=null&& !Objects.equals(game.getTypes(), "")){
                 String[] type = game.getTypes().split(",");
                 gameService.deleteTypeById(game.getGId());
-                gameService.insertType(game.getGId(), type);
+                gameService.insertType(game.getGId(),type);
             }
             return Echo.success();
         }
@@ -154,7 +155,7 @@ public class GameController {
 
     @PassToken
     @Operation(summary = "批量插入游戏信息")
-    @RequestMapping(value = "/games",method = RequestMethod.POST)
+    @RequestMapping(value = "/game/list",method = RequestMethod.POST)
     public Echo insertMGame(@RequestBody List<Game> games){
         for (Game game : games) {
             Long gId = game.getGId();
@@ -171,10 +172,10 @@ public class GameController {
                     return Echo.fail("不同id，不能具有相同游戏名");
 
                 gameService.updateGame(game);
-                if (game.getTypes() != null && !game.getTypes().equals("")) {
+                if (game.getTypes()!=null&& !Objects.equals(game.getTypes(), "")){
                     String[] type = game.getTypes().split(",");
                     gameService.deleteTypeById(game.getGId());
-                    gameService.insertType(game.getGId(), type);
+                    gameService.insertType(game.getGId(),type);
                 }
             }
         }
@@ -199,10 +200,10 @@ public class GameController {
             return Echo.fail("不同id，不能具有相同游戏名");
 
         gameService.updateGame(game);
-        if (game.getTypes() != null && !game.getTypes().equals("")) {
+        if (game.getTypes()!=null&& !Objects.equals(game.getTypes(), "")){
             String[] type = game.getTypes().split(",");
             gameService.deleteTypeById(game.getGId());
-            gameService.insertType(game.getGId(), type);
+            gameService.insertType(game.getGId(),type);
         }
         return Echo.success();
     }

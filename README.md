@@ -52,3 +52,9 @@ mvn spring-boot:run
 
 2022-06-23
 - Completed the reply interface and post interface
+
+2022-06-24
+- Completed the upgrade function
+
+2022-06-26
+- The index for the database is established and some SQL statements are optimized
