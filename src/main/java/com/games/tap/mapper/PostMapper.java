@@ -14,24 +14,25 @@ public interface PostMapper {
 
     Long getFIdByPId(Long pid);
 
-    PostInfo getPostInfo(@Param("pid")Long pid,@Param("uid")Long uid);
+    String getPicByPId(Long pid);
 
-    List<ReplyInfo> getPostReplyList(@Param("pid") Long pid, @Param("uid")Long uid,@Param("offset") Long offset,
-                                    @Param("pageSize") Long pageSize, @Param("rank") int rank);
+    PostInfo getPostInfo(@Param("pid") Long pid, @Param("uid") Long uid);
 
-    List<UserPostInfo> getRelatedPost(@Param("uid")Long uid, @Param("offset") Long offset, @Param("pageSize") Long pageSize);
+    List<ReplyInfo> getPostReplyList(@Param("pid") Long pid, @Param("uid") Long uid, @Param("offset") Long offset,
+                                     @Param("pageSize") Long pageSize, @Param("rank") int rank);
+
+    List<UserPostInfo> getRelatedPost(@Param("uid") Long uid, @Param("offset") Long offset, @Param("pageSize") Long pageSize);
 
     int updateReadingNum(Long pid);
 
     int addReplyNum(Long pid);
 
-    int subReplyNum(Long pid,Integer num);
+    int subReplyNum(Long pid, Integer num);
 
-    int updateLastDate(@Param("pid")Long pid,@Param("lastDate")String lastDate);
+    int updateLastDate(@Param("pid") Long pid, @Param("lastDate") String lastDate);
 
     int insertPost(Post post);
 
     int deleteByPId(Long pid);
 
-    String getPicById(Long pid);
 }

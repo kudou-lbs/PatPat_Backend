@@ -19,9 +19,11 @@ public interface ForumMapper {
     List<PostBasicInfo> getForumPostList(@Param("fid") Long fid, @Param("uid") Long uid, @Param("offset") Long offset,
                                          @Param("pageSize") Long pageSize, @Param("rank") int rank);
 
+    List<String> getPicsByFId(Long fid);
+
     Forum getForumByName(String name);
 
-    ForumUserInfo getForumInfo(@Param("fid")Long fid, @Param("uid")Long uid);
+    ForumUserInfo getForumInfo(@Param("fid") Long fid, @Param("uid") Long uid);
 
     Forum getForumById(Long id);
 

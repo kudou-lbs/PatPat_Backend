@@ -162,14 +162,14 @@ public class PostController {
         long id = Long.parseLong(pid);
         Long fid = postMapper.getFIdByPId(id);
         if (fid == null) return Echo.fail("帖子不存在");
-        String path=postMapper.getPicById(id);
-        imageService.deleteFiles(path);
+        String path = postMapper.getPicByPId(id);
+        if (!imageService.deleteFiles(path)) return Echo.fail("图片删除失败");
         if (postMapper.deleteByPId(id) == 0) return Echo.fail("帖子删除失败");
         if (forumMapper.subPostNum(fid) == 0) return Echo.fail("论坛更新失败");
         return Echo.success();
     }
 
-    @PassToken
+
     @Operation(summary = "帖子点赞")
     @RequestMapping(value = "/post/like", method = RequestMethod.POST)
     public Echo postLike(String uid, String pid) {
@@ -186,7 +186,7 @@ public class PostController {
         return Echo.success("点赞成功");
     }
 
-    @PassToken
+
     @Operation(summary = "取消帖子点赞")
     @RequestMapping(value = "/post/like", method = RequestMethod.DELETE)
     public Echo postCancelLike(String uid, String pid) {
@@ -204,7 +204,7 @@ public class PostController {
         return Echo.success("取消点赞成功");
     }
 
-    @PassToken
+
     @Operation(summary = "获取用户点赞的帖子列表")
     @RequestMapping(value = "/post/like", method = RequestMethod.GET)
     public Echo getPostByLike(String uid, String offset, String pageSize) {
@@ -235,7 +235,6 @@ public class PostController {
     }
 
 
-    @PassToken
     @Operation(summary = "帖子收藏")
     @RequestMapping(value = "/post/collect", method = RequestMethod.POST)
     public Echo collectionLike(String uid, String pid) {
@@ -253,7 +252,6 @@ public class PostController {
         return Echo.success("收藏成功");
     }
 
-    @PassToken
     @Operation(summary = "取消帖子收藏")
     @RequestMapping(value = "/post/collect", method = RequestMethod.DELETE)
     public Echo collectionCancelLike(String uid, String pid) {

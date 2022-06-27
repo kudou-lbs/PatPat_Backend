@@ -81,14 +81,6 @@ public class ImageService {
         }
         return true;
     }
-//
-//    private int saveGamePic(String path){
-//        //将图片信息存入数据库
-//        Game game=new Game();
-//        game.setPicture(path);
-//        return gameService.insertPic(game);
-//    }
-
 
     /**
      * 删除图片

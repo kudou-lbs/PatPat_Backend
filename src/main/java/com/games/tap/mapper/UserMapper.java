@@ -41,7 +41,4 @@ public interface UserMapper {
     int insertUser(User user);
 
     int deleteUserById(Long id);
-
-    String selectAvatarById(Long uid);
-    String selectBackById(Long uid);
 }

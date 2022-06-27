@@ -42,7 +42,7 @@
     </select>
 
     <select id="getForumList" resultType="com.games.tap.vo.ForumInfo">
-        SELECT fid,name,icon,follow_num,false AS is_like FROM forum WHERE follow_num>=0
+        SELECT fid,name,icon,follow_num,post_num,false AS is_like FROM forum WHERE follow_num>=0
         ORDER BY follow_num DESC
         <if test="pageSize!=null ">
             LIMIT #{pageSize}
@@ -53,7 +53,7 @@
     </select>
 
     <select id="getForumListWithUserId" resultType="com.games.tap.vo.ForumInfo">
-        SELECT forum.fid,name,icon,follow_num,IFNULL(is_like,false) AS is_like FROM forum LEFT JOIN
+        SELECT forum.fid,name,icon,follow_num,post_num,IFNULL(is_like,false) AS is_like FROM forum LEFT JOIN
             (SELECT fid,is_like FROM forum_user WHERE uid=#{uid})AS user_forum
         ON forum.fid=user_forum.fid WHERE follow_num>=0
         ORDER BY follow_num DESC
@@ -67,6 +67,10 @@
 
     <select id="getForumById" resultType="com.games.tap.domain.Forum">
         SELECT * FROM forum WHERE fid=#{id} LIMIT 1
+    </select>
+
+    <select id="getPicsByFId" resultType="java.lang.String">
+        select picture from post where fid=#{fid}
     </select>
 
     <select id="getForumInfo" resultType="com.games.tap.vo.ForumUserInfo">

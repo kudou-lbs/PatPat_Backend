@@ -25,7 +25,11 @@
         </if>
             ELSE true
         END) AS is_like
-        FROM (SELECT * FROM reply WHERE pid=#{pid} AND floor_num=#{floor} AND is_floor=false)
+        FROM (SELECT * FROM reply WHERE pid=#{pid} AND floor_num=#{floor}
+             <if test="offset!=0 and offset!=null">
+                 AND is_floor=false
+             </if>
+            )
             AS r LEFT JOIN (SELECT uid, nickname,avatar FROM user) u1 ON r.uid=u1.uid
             LEFT JOIN (SELECT uid, nickname FROM user) u2 ON r.reply_to_uid = u2.uid
             LEFT JOIN forum_user fu ON fu.uid = u1.uid AND fu.fid=r.fid

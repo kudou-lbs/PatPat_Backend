@@ -106,7 +106,7 @@
             OFFSET #{offset}
         </if>
     </select>
-    <select id="getPicById" resultType="java.lang.String">
+    <select id="getPicByPId" resultType="java.lang.String">
         select picture from post where pid=#{pid}
     </select>
 

@@ -37,7 +37,6 @@ public class ForumController {//TODO 加入权限校验
     @Resource
     ForumUserMapper forumUserMapper;
 
-    @PassToken
     @Operation(summary = "新建论坛", description = "输入论坛名和描述新建论坛", parameters = {
             @Parameter(name = "name", description = "论坛名", required = true),
             @Parameter(name = "intro", description = "介绍"),
@@ -90,7 +89,6 @@ public class ForumController {//TODO 加入权限校验
         }
     }
 
-    @PassToken
     @Operation(summary = "删除论坛", description = "通过id删除论坛")
     @RequestMapping(value = "/forum/{id}", method = RequestMethod.DELETE)
     public Echo deleteForum(@PathVariable("id") String id) {
@@ -98,7 +96,13 @@ public class ForumController {//TODO 加入权限校验
         long fid=Long.parseLong(id);
         if(forumMapper.getForumById(fid)==null)return Echo.fail("论坛不存在");
         String icon=forumMapper.selectIconById(fid);
-        imageService.deleteFiles(icon);
+        if(imageService.deleteFiles(icon))return Echo.fail("删除图片失败");
+        List<String>list=forumMapper.getPicsByFId(fid);
+        boolean flag=true;
+        for(String path:list){
+            flag&= imageService.deleteFiles(path);
+        }
+        if(!flag)return Echo.fail("删除图片失败");
         if (forumMapper.deleteForumById(fid) != 0) return Echo.success();
         return Echo.fail();
     }

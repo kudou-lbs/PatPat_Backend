@@ -23,7 +23,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -116,6 +119,13 @@ public class ReplyController {
         if (pageSize != null) size = Long.parseLong(pageSize);
         List<SubReply> subReplyList = replyMapper.getSubReplyList(reply.getPId(), uId, reply.getFloorNum(), start, size, rank);
         if (subReplyList == null || subReplyList.isEmpty()) return Echo.fail("子贴为空");
+        if(start==null||start==0){
+            Map<String, Object>map=new HashMap<>();
+            map.put("reply_list",subReplyList);
+            map.put("reply_num",reply.getReplyNum());
+            map.put("fid",reply.getFId());
+            return Echo.success(map);
+        }
         return Echo.success(subReplyList);
     }
 

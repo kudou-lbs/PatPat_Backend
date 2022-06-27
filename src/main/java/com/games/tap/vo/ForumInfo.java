@@ -9,4 +9,5 @@ public class ForumInfo {
     private String icon;
     private Boolean isLike;
     private Integer followNum;
+    private Integer postNum;
 }
