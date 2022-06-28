@@ -118,7 +118,7 @@ public class ForumController {//TODO 加入权限校验
             long uId=Long.parseLong(uid);
             if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
             if(forumUserMapper.getForumUser(uId,fId)!=null){
-                ForumUserInfo forum = forumMapper.getForumInfo(fId,uId);
+                UserForumInfo forum = forumMapper.getForumInfo(fId,uId);
                 if (forum == null) return Echo.fail("论坛不存在");
                 forum.setMaxExp(ToolUtil.maxExp(forum.getLevel()));
                 return Echo.success(forum);

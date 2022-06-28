@@ -21,7 +21,7 @@ import java.util.List;
         @Index(name = "prl_idx",columnList = "reading_num"),
         @Index(name = "prl_idx",columnList = "like_num")
 })
-public class Post {
+public class Post implements Item{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pid", columnDefinition = "bigint(20)")
@@ -78,5 +78,10 @@ public class Post {
         this.uId=uid;
         this.fId=fid;
         this.title=title;
+    }
+
+    @Override
+    public String getId() {
+        return pId.toString();
     }
 }

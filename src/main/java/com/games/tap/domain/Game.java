@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "game")
 @Schema(name = "Game",description = "游戏信息")
-public class Game {
+public class Game implements Item{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "gid", columnDefinition = "bigint(20)")
@@ -51,4 +51,8 @@ public class Game {
     @Transient
     private String types;
 
+    @Override
+    public String getId() {
+        return gId.toString();
+    }
 }

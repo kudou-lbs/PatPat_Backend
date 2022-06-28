@@ -2,7 +2,7 @@ package com.games.tap.mapper;
 
 import com.games.tap.domain.Forum;
 import com.games.tap.vo.ForumInfo;
-import com.games.tap.vo.ForumUserInfo;
+import com.games.tap.vo.UserForumInfo;
 import com.games.tap.vo.PostBasicInfo;
 import org.apache.ibatis.annotations.Param;
 
@@ -23,7 +23,7 @@ public interface ForumMapper {
 
     Forum getForumByName(String name);
 
-    ForumUserInfo getForumInfo(@Param("fid") Long fid, @Param("uid") Long uid);
+    UserForumInfo getForumInfo(@Param("fid") Long fid, @Param("uid") Long uid);
 
     Forum getForumById(Long id);
 

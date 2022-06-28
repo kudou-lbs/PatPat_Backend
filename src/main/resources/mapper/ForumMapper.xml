@@ -73,7 +73,7 @@
         select picture from post where fid=#{fid}
     </select>
 
-    <select id="getForumInfo" resultType="com.games.tap.vo.ForumUserInfo">
+    <select id="getForumInfo" resultType="com.games.tap.vo.UserForumInfo">
         SELECT f.*,exp,level,is_like FROM (SELECT * FROM forum WHERE fid=#{fid} LIMIT 1)
             AS f LEFT JOIN forum_user fu ON f.fid= fu.fid AND fu.uid=#{uid}
     </select>

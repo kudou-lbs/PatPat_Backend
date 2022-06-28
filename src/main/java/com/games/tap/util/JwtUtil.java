@@ -2,6 +2,7 @@ package com.games.tap.util;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -60,11 +61,14 @@ public class JwtUtil {
                         .verify(token)
                         .getExpiresAt();
                 return new Date().before(expiresAt);
+            }catch (JWTDecodeException e){
+                log.info("token验证失败");
+                return false;
             } catch (TokenExpiredException e) {
                 log.info("token已经过期");
                 return false;
             } catch (Exception e) {
-                log.warn("token验证失败");
+                log.warn("token出现未知错误");
                 e.printStackTrace();
                 return false;
             }

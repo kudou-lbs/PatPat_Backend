@@ -285,6 +285,7 @@ public class UserController {
         if (!StringUtils.isNumeric(followedId) || !StringUtils.isNumeric(followingId))
             return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         long ingId = Long.parseLong(followingId), edId = Long.parseLong(followedId);
+        if(ingId==edId)return Echo.fail("宁不能关注自己");
         if (!Objects.equals(ingId, ToolUtil.getIdByToken(request.getHeader("token"))))
             return Echo.define(RetCode.PERMISSION_NO_ACCESS);
         if (conMapper.isFollow(ingId, edId) != null) return Echo.fail("已经关注过了");
@@ -300,6 +301,7 @@ public class UserController {
         if (!StringUtils.isNumeric(followedId) || !StringUtils.isNumeric(followingId))
             return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         long ingId = Long.parseLong(followingId), edId = Long.parseLong(followedId);
+        if(ingId==edId)return Echo.fail("宁不能取关自己");
         if (!Objects.equals(ingId, ToolUtil.getIdByToken(request.getHeader("token"))))
             return Echo.define(RetCode.PERMISSION_NO_ACCESS);
         if (conMapper.isFollow(ingId, edId) == null) return Echo.fail("还没有关注");

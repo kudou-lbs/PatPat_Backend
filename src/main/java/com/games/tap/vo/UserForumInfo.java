@@ -3,7 +3,7 @@ package com.games.tap.vo;
 import lombok.Data;
 
 @Data
-public class ForumUserInfo {
+public class UserForumInfo {
     private Long fid;
     private String name;
     private String icon;

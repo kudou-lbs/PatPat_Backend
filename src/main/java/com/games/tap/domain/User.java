@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Table(name = "user",uniqueConstraints = {@UniqueConstraint(name = "uun_idx",columnNames = {"username"})},
         indexes = @Index(name = "ufn_idx",columnList = "fans_num"))
 @Schema(description = "用户信息")
-public class User {
+public class User implements Item{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "uid", columnDefinition = "bigint(20)")
@@ -74,5 +74,16 @@ public class User {
     public User(String userName, String password){
         this.username=userName;
         this.password=password;
+    }
+
+    public User(Long uid,String nickname,String intro){
+        this.uId=uid;
+        this.nickname=nickname;
+        this.intro=intro;
+    }
+
+    @Override
+    public String getId() {
+        return uId.toString();
     }
 }

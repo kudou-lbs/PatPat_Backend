@@ -17,7 +17,7 @@ import java.util.List;
 @Table(name = "forum",uniqueConstraints = @UniqueConstraint(name = "fn_idx",columnNames = {"name"}),
         indexes = {@Index(name = "ffn_idx",columnList = "follow_num")})
 @Schema(description = "论坛信息")
-public class Forum {
+public class Forum implements Item{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "fid", columnDefinition = "bigint(20)")
@@ -43,5 +43,10 @@ public class Forum {
     @Column(name = "post_num", columnDefinition = "int(11) default 0")
     @Schema(description = "帖子数")
     private Integer postNum;
+
+    @Override
+    public String getId() {
+        return fId.toString();
+    }
 
 }
