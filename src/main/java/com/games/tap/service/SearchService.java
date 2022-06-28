@@ -9,10 +9,7 @@ import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.CreateIndexResponse;
 import co.elastic.clients.elasticsearch.indices.DeleteIndexResponse;
-import com.games.tap.domain.Forum;
-import com.games.tap.domain.Item;
-import com.games.tap.domain.Post;
-import com.games.tap.domain.User;
+import com.games.tap.domain.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -52,6 +49,26 @@ public class SearchService {
                 , User.class
         );
         searchResponse.hits().hits().forEach(h -> System.out.println(h.highlight().get("nickname")));
+        return searchResponse.hits().hits();
+    }
+
+    public List<Hit<Game>> searchGame(String term, int page, int size) throws IOException {
+        SearchResponse<Game> searchResponse = client.search(s -> s
+                        .index("game")
+                        .source(r -> r.filter(f -> f.includes("gid", "name","score","hot","url","intro","picture","icon","types")
+                                .excludes("createTime","updateTime","@version","@timestamp")))
+                        .query(q -> q.bool(b -> b
+                                .should(h -> h.matchPhrase(m -> m.field("name").query(term).slop(1)))
+                                .should(h -> h.match(m -> m.field("intro").query(term)))
+                                .should(h -> h.match(m -> m.field("types").query(term)))
+                        ))
+                        .highlight(h -> h.fields("name", f -> f.preTags("<font color='red'>").postTags("</font>")))
+                        //分页查询
+                        .from(page)
+                        .size(size)
+                , Game.class
+        );
+        searchResponse.hits().hits().forEach(h -> System.out.println(h.source()));
         return searchResponse.hits().hits();
     }
 

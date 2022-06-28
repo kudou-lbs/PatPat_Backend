@@ -2,6 +2,7 @@ package com.games.tap.controller;
 
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.games.tap.domain.Forum;
+import com.games.tap.domain.Game;
 import com.games.tap.domain.User;
 import com.games.tap.service.SearchService;
 import com.games.tap.util.Echo;
@@ -64,7 +65,7 @@ public class SearchController {
                 });
                 return Echo.success(resList);
             }
-            case "post":
+            case "post": {
                 List<Hit<SearchedPost>> list = service.searchPost(key, page, size, SearchedPost.class);
                 if (list == null || list.isEmpty()) return Echo.fail("结果为空");
                 List<SearchedPost> resList = new ArrayList<>();
@@ -73,14 +74,26 @@ public class SearchController {
                     if (p != null) {
                         if (i.highlight().get("title") != null)
                             p.setTitle(i.highlight().get("title").get(0));
-                        if(i.highlight().get("forumName")!=null)
+                        if (i.highlight().get("forumName") != null)
                             p.setForumName(i.highlight().get("forumName").get(0));
                     }
                     resList.add(p);
                 });
                 return Echo.success(resList);
-            case "game":
-                return Echo.success();//TODO
+            }
+            case "game": {
+                List<Hit<Game>> list = service.searchGame(key, page, size);
+                if (list == null || list.isEmpty()) return Echo.fail("结果为空");
+                List<Game> resList = new ArrayList<>();
+                list.forEach(i -> {
+                    Game g = i.source();
+                    if (g != null && i.highlight().get("name") != null) {
+                        g.setName(i.highlight().get("name").get(0));
+                    }
+                    resList.add(g);
+                });
+                return Echo.success(resList);
+            }
             default:
                 return Echo.fail("搜索类型错误");
         }

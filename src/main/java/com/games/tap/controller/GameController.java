@@ -1,7 +1,11 @@
 package com.games.tap.controller;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.indices.CreateIndexResponse;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.games.tap.domain.Game;
-import com.games.tap.mapper.GameMapper;
 import com.games.tap.service.GameService;
 import com.games.tap.util.Echo;
 import com.games.tap.util.PassToken;
@@ -10,9 +14,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -22,8 +29,6 @@ import java.util.Objects;
 public class GameController {
     @Resource
     GameService gameService;
-    @Resource
-    GameMapper gameMapper;
 
     @PassToken
     @Operation(summary = "返回所有游戏信息", parameters = {
@@ -204,7 +209,7 @@ public class GameController {
     }
 
     @PassToken
-    @Operation(summary = "添加某个游戏（id）的部分标签（String types,以两个空格分开,例如“射击  益智  RPG”）")
+    @Operation(summary = "添加某个游戏（id）的部分标签")
     @RequestMapping(value = "/game/type", method = RequestMethod.POST)
     public Echo insertType(String gId, String types) {
         if (!StringUtils.isNumeric(gId)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
@@ -219,7 +224,7 @@ public class GameController {
     }
 
     @PassToken
-    @Operation(summary = "删除某个游戏（id）的部分标签（String types,以两个空格分开,例如“射击  益智  RPG”）")
+    @Operation(summary = "删除某个游戏（id）的部分标签")
     @RequestMapping(value = "/game/type", method = RequestMethod.DELETE)
     public Echo deleteType(String gId, String types) {
         if (!StringUtils.isNumeric(gId)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
@@ -232,4 +237,30 @@ public class GameController {
         gameService.deleteType(Long.parseLong(gId), type);
         return Echo.success();
     }
+
+    @PassToken
+    @Operation(summary = "elasticsearch游戏创建索引，只用运行一次")
+    @RequestMapping(value = "/index/create",method = RequestMethod.PUT)
+    public Echo createGame() throws IOException {
+        // 创建低级客户端
+        RestClient restClient = RestClient.builder(
+                new HttpHost("localhost", 9200)
+        ).build();
+        // 使用Jackson映射器创建传输层
+        ElasticsearchTransport transport = new RestClientTransport(
+                restClient, new JacksonJsonpMapper()
+        );
+        // 创建API客户端
+        ElasticsearchClient client = new ElasticsearchClient(transport);
+        // 创建索引
+        CreateIndexResponse createIndexResponse = client.indices().create(c -> c.index("game"));
+        // 响应状态
+        Boolean acknowledged = createIndexResponse.acknowledged();
+
+        if (acknowledged==null) return Echo.fail();
+        else return Echo.success();
+
+
+    }
+
 }
