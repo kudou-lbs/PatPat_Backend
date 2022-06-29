@@ -7,6 +7,7 @@ import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.games.tap.domain.Game;
 import com.games.tap.service.GameService;
+import com.games.tap.service.SearchService;
 import com.games.tap.util.Echo;
 import com.games.tap.util.PassToken;
 import com.games.tap.util.RetCode;
@@ -29,6 +30,8 @@ import java.util.Objects;
 public class GameController {
     @Resource
     GameService gameService;
+    @Resource
+    SearchService searchService;
 
     @PassToken
     @Operation(summary = "返回所有游戏信息", parameters = {
@@ -135,12 +138,13 @@ public class GameController {
     @PassToken
     @Operation(summary = "插入单条游戏信息")
     @RequestMapping(value = "/game", method = RequestMethod.POST)
-    public Echo insertGame(Game game) {
+    public Echo insertGame(Game game) throws IOException {
         if (gameService.isExisted(game.getGId()) != null) {
             if (gameService.selectByName(game.getName()) != null &&
                     !gameService.selectByName(game.getName()).equals(game.getGId()))
                 return Echo.fail("不同id，不能具有相同游戏名");
             gameService.updateGame(game);
+            searchService.addItem("game",game);
             if (game.getTypes() != null && !Objects.equals(game.getTypes(), "")) {
                 String[] type = game.getTypes().split(",");
                 gameService.deleteTypeById(game.getGId());
@@ -153,19 +157,21 @@ public class GameController {
         Long gId = game.getGId();
         String[] types = game.getTypes().split(",");
         gameService.insertType(gId, types);
+        searchService.addItem("game",game);
         return Echo.success();
     }
 
     @PassToken
     @Operation(summary = "批量插入游戏信息")
     @RequestMapping(value = "/game/list", method = RequestMethod.POST)
-    public Echo insertMGame(@RequestBody List<Game> games) {
+    public Echo insertMGame(@RequestBody List<Game> games) throws IOException {
         for (Game game : games) {
             Long gId = game.getGId();
             Integer result = gameService.isExisted(gId);
             if (result == null) {
                 if (gameService.selectByName(game.getName()) != null) return Echo.fail("不同id，不能具有相同游戏名");
                 gameService.insertGame(game);
+                searchService.addItem("game",game);
                 String[] types = game.getTypes().split(",");
                 gameService.insertType(gId, types);
             } else {
@@ -177,6 +183,7 @@ public class GameController {
                     String[] type = game.getTypes().split(",");
                     gameService.deleteTypeById(game.getGId());
                     gameService.insertType(game.getGId(), type);
+                    searchService.addItem("game",game);
                 }
             }
         }
@@ -186,8 +193,9 @@ public class GameController {
     @PassToken
     @Operation(summary = "根据id删除游戏信息")
     @RequestMapping(value = "/game", method = RequestMethod.DELETE)
-    public Echo deleteById(String gId) {
+    public Echo deleteById(String gId) throws IOException {
         if (!StringUtils.isNumeric(gId)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+        searchService.deleteItem("game",gId);
         if (gameService.deleteGameById(Long.parseLong(gId)) != 0) return Echo.success();
         return Echo.fail();
     }
@@ -195,11 +203,12 @@ public class GameController {
     @PassToken
     @Operation(summary = "根据id修改游戏信息")
     @RequestMapping(value = "/game", method = RequestMethod.PUT)
-    public Echo updateGame(Game game) {
+    public Echo updateGame(Game game) throws IOException {
         if (gameService.isExisted(game.getGId()) == null) return Echo.fail("该游戏不存在");
         if (!gameService.selectByName(game.getName()).equals(game.getGId()))
             return Echo.fail("不同id，不能具有相同游戏名");
         gameService.updateGame(game);
+        searchService.addItem("game",game);
         if (game.getTypes() != null && !Objects.equals(game.getTypes(), "")) {
             String[] type = game.getTypes().split(",");
             gameService.deleteTypeById(game.getGId());
@@ -236,31 +245,6 @@ public class GameController {
         }
         gameService.deleteType(Long.parseLong(gId), type);
         return Echo.success();
-    }
-
-    @PassToken
-    @Operation(summary = "elasticsearch游戏创建索引，只用运行一次")
-    @RequestMapping(value = "/index/create",method = RequestMethod.PUT)
-    public Echo createGame() throws IOException {
-        // 创建低级客户端
-        RestClient restClient = RestClient.builder(
-                new HttpHost("localhost", 9200)
-        ).build();
-        // 使用Jackson映射器创建传输层
-        ElasticsearchTransport transport = new RestClientTransport(
-                restClient, new JacksonJsonpMapper()
-        );
-        // 创建API客户端
-        ElasticsearchClient client = new ElasticsearchClient(transport);
-        // 创建索引
-        CreateIndexResponse createIndexResponse = client.indices().create(c -> c.index("game"));
-        // 响应状态
-        Boolean acknowledged = createIndexResponse.acknowledged();
-
-        if (acknowledged==null) return Echo.fail();
-        else return Echo.success();
-
-
     }
 
 }

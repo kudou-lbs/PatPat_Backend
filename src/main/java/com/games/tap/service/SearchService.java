@@ -55,8 +55,6 @@ public class SearchService {
     public List<Hit<Game>> searchGame(String term, int page, int size) throws IOException {
         SearchResponse<Game> searchResponse = client.search(s -> s
                         .index("game")
-                        .source(r -> r.filter(f -> f.includes("gid", "name","score","hot","url","intro","picture","icon","types")
-                                .excludes("createTime","updateTime","@version","@timestamp")))
                         .query(q -> q.bool(b -> b
                                 .should(h -> h.matchPhrase(m -> m.field("name").query(term).slop(1)))
                                 .should(h -> h.match(m -> m.field("intro").query(term)))
@@ -243,6 +241,41 @@ public class SearchService {
         ));
         CreateIndexResponse createIndexResponse = client.indices().create(c -> c
                 .index("post").mappings(m -> m
+                        .properties(map)
+                ).aliases("pat", a -> a.isWriteIndex(true))
+        );
+        log.info(String.valueOf(createIndexResponse.acknowledged()));
+    }
+
+
+    public void createGameIndex() throws IOException {
+        Map<String, Property> map = new HashMap<>();
+        map.put("name", Property.of(p -> p
+                .text(TextProperty.of(t -> t
+                        .index(true).analyzer("ik_smart"))
+                )));
+        map.put("intro", Property.of(p -> p
+                .text(TextProperty.of(t -> t
+                        .index(true).analyzer("ik_max_word").searchAnalyzer("ik_smart")
+                ))
+        ));
+        map.put("types", Property.of(p -> p
+                .text(TextProperty.of(t -> t
+                        .index(true).analyzer("ik_max_word").searchAnalyzer("ik_smart")
+                ))
+        ));
+        map.put("hot", Property.of(p -> p
+                .text(TextProperty.of(t -> t
+                        .index(true).analyzer("ik_smart")
+                ))
+        ));
+        map.put("score", Property.of(p -> p
+                .text(TextProperty.of(t -> t
+                        .index(true).analyzer("ik_smart")
+                ))
+        ));
+        CreateIndexResponse createIndexResponse = client.indices().create(c -> c
+                .index("game").mappings(m -> m
                         .properties(map)
                 ).aliases("pat", a -> a.isWriteIndex(true))
         );
