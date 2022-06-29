@@ -17,7 +17,8 @@ import java.util.List;
 @Table(name = "reply",indexes = {
         @Index(name = "rpf_idx",columnList = "pid"),
         @Index(name="rpf_idx",columnList = "floor_num"),
-        @Index(name = "rpf_idx",columnList = "post_time")
+        @Index(name = "rpf_idx",columnList = "post_time"),
+        @Index(name = "ru_idx",columnList = "uId")
 })
 public class Reply {
     @Id

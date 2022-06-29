@@ -2,7 +2,9 @@ package com.games.tap.mapper;
 
 import com.games.tap.domain.User;
 import com.games.tap.vo.UserInfo;
+import com.games.tap.vo.UserMessage;
 import com.games.tap.vo.UserPostInfo;
+import com.games.tap.vo.UserReply;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -15,6 +17,15 @@ public interface UserMapper {
 
     List<UserPostInfo> getUserPostList(@Param("uid")Long uid, @Param("offset")Long offset,
                                        @Param("pageSize")Long pageSize, @Param("rank")Integer rank);
+
+    List<UserReply>getUserReplyList(@Param("uid")Long uid, @Param("wid")Long wid, @Param("offset") Long offset,
+                                    @Param("pageSize") Long pageSize, @Param("rank") int rank);
+
+    List<UserMessage>getUserLikeMessage(@Param("uid")Long uid, @Param("offset")Long offset,
+                                    @Param("pageSize")Long pageSize);
+
+    List<UserMessage>getUserReplyMessage(@Param("uid")Long uid, @Param("offset")Long offset,
+                                        @Param("pageSize")Long pageSize);
 
     User getUserById(Long id);
 

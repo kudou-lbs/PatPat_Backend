@@ -10,6 +10,14 @@
         SELECT * FROM reply WHERE rid=#{rid} LIMIT 1
     </select>
 
+    <select id="getReplyByFloor" resultType="com.games.tap.domain.Reply">
+        SELECT * FROM reply
+        WHERE pid = #{pid}
+          AND floor_num = #{floor}
+          AND is_floor = true
+        LIMIT 1
+    </select>
+
     <select id="getMaxFloor" resultType="java.lang.Integer">
         SELECT MAX(floor_num) FROM (SELECT floor_num FROM reply WHERE pid=#{pid}) as rfn
     </select>

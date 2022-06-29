@@ -31,15 +31,15 @@ public class SearchController {
     @PassToken
     @Operation(summary = "搜索服务", description = "type有‘user’、‘forum’、‘post’、‘game’四种，key为搜索词，page为第几页，size为数量")
     @RequestMapping(value = "/search", method = RequestMethod.GET)
-    public Echo search(String type, String key, Integer page, Integer size) throws IOException {
-        if (page == null ^ size == null) return Echo.fail("page和size不能一个空一个不空");
-        else if (page == null) {
-            page = 0;
-            size = 10;
+    public Echo search(String type, String key, Integer offset, Integer pageSize) throws IOException {
+        if (offset == null ^ pageSize == null) return Echo.fail("page和size不能一个空一个不空");
+        else if (offset == null) {
+            offset = 0;
+            pageSize = 10;
         }
         switch (type) {
             case "user": {
-                List<Hit<User>> list = service.searchUser(key, page, size);
+                List<Hit<User>> list = service.searchUser(key, offset, pageSize);
                 if (list == null || list.isEmpty()) return Echo.fail("结果为空");
                 List<User> resList = new ArrayList<>();
                 list.forEach(i -> {
@@ -53,7 +53,7 @@ public class SearchController {
                 return Echo.success(resList);
             }
             case "forum": {
-                List<Hit<Forum>> list = service.searchForum(key, page, size);
+                List<Hit<Forum>> list = service.searchForum(key, offset, pageSize);
                 if (list == null || list.isEmpty()) return Echo.fail("结果为空");
                 List<Forum> resList = new ArrayList<>();
                 list.forEach(i -> {
@@ -65,8 +65,8 @@ public class SearchController {
                 });
                 return Echo.success(resList);
             }
-            case "post": {
-                List<Hit<SearchedPost>> list = service.searchPost(key, page, size, SearchedPost.class);
+            case "post":
+                List<Hit<SearchedPost>> list = service.searchPost(key, offset, pageSize, SearchedPost.class);
                 if (list == null || list.isEmpty()) return Echo.fail("结果为空");
                 List<SearchedPost> resList = new ArrayList<>();
                 list.forEach(i -> {
@@ -74,7 +74,7 @@ public class SearchController {
                     if (p != null) {
                         if (i.highlight().get("title") != null)
                             p.setTitle(i.highlight().get("title").get(0));
-                        if (i.highlight().get("forumName") != null)
+                        if(i.highlight().get("forumName")!=null)
                             p.setForumName(i.highlight().get("forumName").get(0));
                     }
                     resList.add(p);

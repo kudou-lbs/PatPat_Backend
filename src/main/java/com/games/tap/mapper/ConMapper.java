@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ConMapper {
 
-    List<UserInfo> getFanList(Long id,@Param("offset")Long offset, @Param("pageSize")Long pageSize);
+    List<UserInfo> getFanList(@Param("id")Long id,@Param("offset")Long offset, @Param("pageSize")Long pageSize);
 
     List<UserInfo> getFollowList(@Param("id")Long id,@Param("offset")Long offset, @Param("pageSize")Long pageSize);
 
