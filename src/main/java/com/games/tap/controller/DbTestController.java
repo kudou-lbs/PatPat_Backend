@@ -22,7 +22,7 @@ public class DbTestController {
     @Operation(summary = "主页",description = "null")
     @RequestMapping(value = "/",method = RequestMethod.GET)
     public String hello(){
-        return "6dd.jpg";
+        return "acg.gy_22.jpg";
     }
 
     @PassToken

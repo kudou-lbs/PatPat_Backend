@@ -2,7 +2,7 @@
 <Configuration>
     <!--<Configuration status="WARN" monitorInterval="30"> -->
     <properties>
-        <property name="LOG_HOME">E:/IdeaProjects/tap/logs</property>
+        <property name="LOG_HOME">/root/patpat-backend/logs</property>
     </properties>
     <Appenders>
         <!--*********************控制台日志***********************-->
