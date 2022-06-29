@@ -78,8 +78,10 @@
     </update>
 
     <insert id="insertReply" parameterType="com.games.tap.domain.Reply" useGeneratedKeys="true" keyProperty="rId">
-         INSERT INTO reply (content, fid, floor_num, is_floor, pid, post_time, reply_to_uid, uid)
-         VALUES (#{content},#{fId},#{floorNum},#{isFloor},#{pId},#{postTime},#{replyToUid},#{uId})
+         INSERT INTO reply (content, fid, floor_num, is_floor, pid,
+                            post_time, reply_to_uid, reply_to_rid, uid)
+         VALUES (#{content},#{fId},#{floorNum},#{isFloor},#{pId},
+                 #{postTime},#{replyToUid},#{replyToRid},#{uId})
     </insert>
 
     <delete id="deleteById">

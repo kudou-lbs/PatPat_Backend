@@ -30,6 +30,14 @@
         </if>
     </select>
 
+    <select id="getLikeList" resultType="java.lang.Boolean">
+        SELECT IF(id=null,false,true) FROM concern
+        WHERE following_uid=#{uid} AND followed_uid IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
     <select id="isFollow" resultType="com.games.tap.domain.Concern">
         SELECT * FROM concern WHERE following_uid=#{following} and followed_uid=#{followed} LIMIT 1
     </select>

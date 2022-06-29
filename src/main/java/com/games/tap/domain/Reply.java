@@ -18,7 +18,8 @@ import java.util.List;
         @Index(name = "rpf_idx",columnList = "pid"),
         @Index(name="rpf_idx",columnList = "floor_num"),
         @Index(name = "rpf_idx",columnList = "post_time"),
-        @Index(name = "ru_idx",columnList = "uId")
+        @Index(name = "ru_idx",columnList = "uId"),
+        @Index(name = "rr2u_idx",columnList = "reply_to_uid")
 })
 public class Reply {
     @Id
@@ -62,6 +63,10 @@ public class Reply {
     @Column(name = "reply_to_uid",columnDefinition = "bigint(20)")
     @Schema(description = "被回复者的用户Id")
     private Long replyToUid;
+
+    @Column(name = "reply_to_rid",columnDefinition = "bigint(20)")
+    @Schema(description = "被回复者的帖子Id")
+    private Long replyToRid;
 
     @Column(name = "is_floor",columnDefinition = "tinyint(1)")
     @Schema(description = "是否是子贴（否则为楼中楼回复）")

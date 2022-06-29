@@ -15,7 +15,7 @@
     </select>
 
     <select id="getPostInfo" resultType="com.games.tap.vo.PostInfo">
-        SELECT fpost.*,f.name AS forum_name,avatar,IFNULL(level,1)AS level,
+        SELECT fpost.*,fu.forum_name,avatar,IFNULL(level,1)AS level,
                IFNULL(nickname,'用户已注销') AS nickname,
         (CASE
             WHEN #{uid} IS null THEN false
@@ -41,7 +41,6 @@
         FROM (SELECT * FROM post WHERE pid=#{pid}) fpost
             LEFT JOIN user u ON fpost.uid = u.uid
             LEFT JOIN forum_user fu ON fpost.fid = fu.fid AND fpost.uid = fu.uid
-            LEFT JOIN forum f ON fpost.fid = f.fid
         <if test="uid!=null ">
             LEFT JOIN post_like pl ON fpost.pid = pl.pid AND pl.uid = #{uid}
             LEFT JOIN collection c ON fpost.pid = c.pid AND c.uid= #{uid}
@@ -51,22 +50,20 @@
     </select>
 
     <select id="getRelatedPost" resultType="com.games.tap.vo.UserPostInfo">
-        SELECT post.*,f.name AS forum_name,avatar,IFNULL(nickname,'用户已注销') AS nickname,
+        SELECT post.*,fu1.forum_name,avatar,IFNULL(nickname,'用户已注销') AS nickname,
         (IF(pl.id IS null, false, true)) AS is_like,IFNULL(fu2.level,1)AS level
-        FROM (SELECT fid FROM forum_user WHERE uid=#{uid} AND is_like=true)
+        FROM (SELECT fid,forum_name FROM forum_user WHERE uid=#{uid} AND is_like=true)
             AS fu1 INNER JOIN post ON fu1.fid=post.fid
             LEFT JOIN user u ON post.uid = u.uid
             LEFT JOIN forum_user fu2 ON post.fid = fu2.fid AND post.uid = fu2.uid
-            LEFT JOIN forum f ON post.fid = f.fid
             LEFT JOIN post_like pl ON post.pid = pl.pid AND pl.uid = #{uid}
         UNION
-        SELECT post.*,f.name AS forum_name,avatar,IFNULL(nickname,'用户已注销') AS nickname,
+        SELECT post.*,fu2.forum_name,avatar,IFNULL(nickname,'用户已注销') AS nickname,
         (IF(pl.id IS null, false, true)) AS is_like,IFNULL(fu2.level,1)AS level
         FROM (SELECT followed_uid FROM concern WHERE following_uid=#{uid})
             AS cc INNER JOIN post ON cc.followed_uid=post.uid
             LEFT JOIN user u ON post.uid = u.uid
             LEFT JOIN forum_user fu2 ON post.fid = fu2.fid AND post.uid = fu2.uid
-            LEFT JOIN forum f ON post.fid = f.fid
             LEFT JOIN post_like pl ON post.pid = pl.pid AND pl.uid = #{uid}
         ORDER BY post_time DESC
         <if test="pageSize!=null ">
