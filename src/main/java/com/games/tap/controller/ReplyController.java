@@ -14,6 +14,7 @@ import com.games.tap.util.Echo;
 import com.games.tap.util.PassToken;
 import com.games.tap.util.RetCode;
 import com.games.tap.vo.SubReply;
+import com.games.tap.vo.UserReply;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,7 +104,8 @@ public class ReplyController {
         if (echo != null) return echo;
         Reply reply = replyMapper.getReplyById(Long.parseLong(rid));
         if (reply == null) return Echo.fail("主回复不存在");
-        if (!reply.getIsFloor()) return Echo.fail("不是主回复");
+        if (!reply.getIsFloor())
+            reply= replyMapper.getReplyByFloor(reply.getFloorNum(),reply.getPId());
         int rank = 0;
         if (order != null) {
             if (!StringUtils.isNumeric(order)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
@@ -124,6 +127,7 @@ public class ReplyController {
             map.put("reply_list",subReplyList);
             map.put("reply_num",reply.getReplyNum());
             map.put("fid",reply.getFId());
+            map.put("pid",reply.getPId());
             return Echo.success(map);
         }
         return Echo.success(subReplyList);

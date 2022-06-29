@@ -9,7 +9,7 @@
     <select id="getFanList" resultType="com.games.tap.vo.UserInfo">
         SELECT uid,avatar,intro,fans_num,IFNULL(nickname,'用户已注销') AS nickname
         FROM concern LEFT JOIN user
-        ON user.uid=concern.following_uid WHERE followed_uid=#{uId}
+        ON user.uid=concern.following_uid WHERE followed_uid=#{id}
         <if test="pageSize!=null ">
             LIMIT #{pageSize}
         </if>
@@ -21,7 +21,7 @@
     <select id="getFollowList" resultType="com.games.tap.vo.UserInfo">
         SELECT uid,avatar,intro,fans_num,IFNULL(nickname,'用户已注销') AS nickname
         FROM concern LEFT JOIN user
-        ON user.uid=concern.followed_uid WHERE following_uid=#{uId}
+        ON user.uid=concern.followed_uid WHERE following_uid=#{id}
         <if test="pageSize!=null ">
             LIMIT #{pageSize}
         </if>

@@ -11,7 +11,9 @@ import javax.persistence.*;
 @Setter
 @ToString
 @Entity
-@Table(name = "reply_like",uniqueConstraints = @UniqueConstraint(name = "rl_idx",columnNames = {"uid","rid"}))
+@Table(name = "reply_like",uniqueConstraints = @UniqueConstraint(name = "rl_idx",columnNames = {"uid","rid"}),indexes = {
+        @Index(name = "rlr_idx",columnList = "rid")
+})
 public class ReplyLike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

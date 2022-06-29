@@ -60,6 +60,81 @@
         </if>
     </select>
 
+    <select id="getUserReplyList" resultType="com.games.tap.vo.UserReply">
+        SELECT r.rid, r.content, r.like_num, r.floor_num, r.reply_num, r.post_time, r.fid,
+        f.name, p.title AS r2title, p.content AS r2content, u1.avatar,
+        IFNULL(level,1)AS level, IFNULL(u1.nickname,'用户已注销') AS nickname,
+        IFNULL(u2.nickname,'用户已注销') AS r2name, r.reply_to_uid AS r2uid,
+        (CASE
+        WHEN #{wid} IS null THEN false
+        <if test="wid!=null ">
+            WHEN rl.id IS null THEN false
+        </if>
+        ELSE true
+        END) AS is_like
+        FROM (SELECT * FROM reply WHERE uid=#{uid})
+        AS r LEFT JOIN (SELECT pid,title,content FROM post) p ON p.pid=r.pid
+        LEFT JOIN (SELECT uid,nickname,avatar FROM user) u1 ON u1.uid=#{uid}
+        LEFT JOIN (SELECT uid, nickname FROM user) u2 ON r.reply_to_uid = u2.uid
+        LEFT JOIN forum_user fu ON fu.uid = #{uid} AND fu.fid=r.fid
+        LEFT JOIN (SELECT fid,name FROM forum) f on fu.fid = f.fid
+        <if test="wid!=null ">
+            LEFT JOIN reply_like rl ON r.rid = rl.rid AND rl.uid = #{wid}
+        </if>
+        ORDER BY post_time
+        <if test="rank==0 ">DESC</if>
+        <if test="pageSize!=null ">
+            LIMIT #{pageSize}
+        </if>
+        <if test="offset!=null ">
+            OFFSET #{offset}
+        </if>
+    </select>
+
+    <select id="getUserLikeMessage" resultType="com.games.tap.vo.UserMessage">
+        SELECT IFNULL(u.nickname,'用户已注销') AS nickname, u.avatar, u.uid,
+        'post_like' AS type, pl.id AS lid, pl.pid AS jid,
+        p.content AS u_content, p.title AS u_title
+        FROM (SELECT pid,title,content FROM post WHERE uid=#{uid}) AS p
+        LEFT JOIN post_like pl ON pl.pid=p.pid
+        LEFT JOIN (SELECT uid,nickname,avatar FROM user)AS u ON u.uid=pl.uid
+        UNION
+        SELECT IFNULL(u.nickname,'用户已注销') AS nickname, u.avatar, u.uid,
+        'reply_like' AS type, rl.id AS lid, rl.rid AS jid,
+        r.content AS u_content, null AS u_title
+        FROM (SELECT rid,content FROM reply WHERE uid=#{uid}) AS r
+        LEFT JOIN reply_like rl ON rl.rid=r.rid
+        LEFT JOIN (SELECT uid,nickname,avatar FROM user)AS u ON u.uid=rl.uid
+        <if test="pageSize!=null ">
+            LIMIT #{pageSize}
+        </if>
+        <if test="offset!=null ">
+            OFFSET #{offset}
+        </if>
+    </select>
+
+    <select id="getUserReplyMessage" resultType="com.games.tap.vo.UserMessage">
+        SELECT IFNULL(u.nickname,'用户已注销') AS nickname, u.avatar, u.uid,
+        'post_reply' AS type, p.pid AS jid, r.content AS content,
+        p.content AS u_content, p.title AS u_title
+        FROM (SELECT pid,title,content FROM post WHERE uid=#{uid}) AS p
+        LEFT JOIN (SELECT uid,pid,content FROM reply WHERE is_floor=true) r ON r.pid=p.pid
+        LEFT JOIN (SELECT uid,nickname,avatar FROM user)AS u ON u.uid=r.uid
+        UNION
+        SELECT IFNULL(u.nickname,'用户已注销') AS nickname, u.avatar, r1.uid,
+        'reply_reply' AS type, r1.rid AS jid, r1.content AS content,
+        r2.content AS u_content, null AS u_title
+        FROM (SELECT rid,uid,floor_num,content FROM reply WHERE reply_to_uid=#{uid}) AS r1
+        LEFT JOIN (SELECT floor_num,content FROM reply WHERE is_floor=true) r2 ON r2.floor_num=r1.floor_num
+        LEFT JOIN (SELECT uid,nickname,avatar FROM user)AS u ON u.uid=r1.uid
+        <if test="pageSize!=null ">
+            LIMIT #{pageSize}
+        </if>
+        <if test="offset!=null ">
+            OFFSET #{offset}
+        </if>
+    </select>
+
     <select id="getUserAvatarById" resultType="java.lang.String">
         select avatar from user where uid=#{uId} LIMIT 1
     </select>

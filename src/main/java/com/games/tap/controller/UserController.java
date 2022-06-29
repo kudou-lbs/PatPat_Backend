@@ -7,7 +7,9 @@ import com.games.tap.service.ImageService;
 import com.games.tap.util.ToolUtil;
 import com.games.tap.util.*;
 import com.games.tap.vo.UserInfo;
+import com.games.tap.vo.UserMessage;
 import com.games.tap.vo.UserPostInfo;
+import com.games.tap.vo.UserReply;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -227,7 +229,7 @@ public class UserController {
 
     @PassToken
     @Operation(summary = "获取用户发布的帖子列表或随机帖子", description = "通过uid查找用户的帖子,order定义排序，0 最近发布时间，1 最早发布时间，2 回复数量排序，3 随机，默认0,随机时不能获取用户发帖")
-    @RequestMapping(value = "user/post", method = RequestMethod.GET)
+    @RequestMapping(value = "/user/post", method = RequestMethod.GET)
     public Echo getUserPostList(String uid, String offset, String pageSize, String order) {
         Echo echo = ToolUtil.checkList(uid, offset, pageSize);
         if (echo != null) return echo;
@@ -248,6 +250,55 @@ public class UserController {
         if (list == null || list.isEmpty()) return Echo.fail("数据为空");
         return Echo.success(list);
     }
+
+    @PassToken
+    @Operation(summary = "获取用户发表的回复列表",description = "通过uid查找回复，order定义排序，0最近发布，1最早发布")
+    @RequestMapping(value = "/user/reply",method = RequestMethod.GET)
+    public Echo getUserReplyList(String uid, String offset, String pageSize, String order, HttpServletRequest request){
+        if(uid==null||uid.equals(""))return Echo.fail("uid不能为空");
+        Echo echo = ToolUtil.checkList(uid, offset, pageSize);
+        if (echo != null) return echo;
+        Long start = null, size = null, id = Long.parseLong(uid),wid=null;
+        if (userMapper.getUserById(id) == null) return Echo.define(RetCode.USER_NOT_EXIST);
+        int rank = 0;
+        if (order != null) {
+            if (!StringUtils.isNumeric(order)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+            rank = Integer.parseInt(order);
+            if (rank < 0 || rank > 1) return Echo.define(RetCode.PARAM_IS_INVALID);
+        }
+        String token=request.getHeader("token");
+        if(token!=null&&!token.equals(""))wid=ToolUtil.getIdByToken(token);
+        if (offset != null) start = Long.parseLong(offset);
+        if (pageSize != null) size = Long.parseLong(pageSize);
+        List<UserReply>list= userMapper.getUserReplyList(id,wid,start,size,rank);
+        if(list==null||list.isEmpty())return Echo.fail();
+        return Echo.success(list);
+    }
+
+    @Operation(summary = "消息列表",description = "获取用户被点赞、评论的消息列表，type=‘like’为点赞,type=‘reply’为回复")
+    @RequestMapping(value = "/user/message",method = RequestMethod.GET)
+    public Echo getUserMessage(String uid, String type,String offset, String pageSize, HttpServletRequest request){
+        if(uid==null||uid.equals(""))return Echo.fail("uid不能为空");
+        if(type==null||type.equals(""))return Echo.fail("type不能为空");
+        Echo echo = ToolUtil.checkList(uid, offset, pageSize);
+        if (echo != null) return echo;
+        Long start = null, size = null, id = Long.parseLong(uid),wid=null;
+        if (!Objects.equals(id, ToolUtil.getIdByToken(request.getHeader("token"))))
+            return Echo.define(RetCode.PERMISSION_NO_ACCESS);
+        if (userMapper.getUserById(id) == null) return Echo.define(RetCode.USER_NOT_EXIST);
+        if (offset != null) start = Long.parseLong(offset);
+        if (pageSize != null) size = Long.parseLong(pageSize);
+        List<UserMessage> list;
+        if(type.equals("like")){
+            list = userMapper.getUserLikeMessage(id,start,size);
+        }else if(type.equals("reply")){
+            list=userMapper.getUserReplyMessage(id,start,size);
+        }else
+            return Echo.fail("type错误");
+        if(list==null||list.isEmpty())return Echo.fail();
+        return Echo.success(list);
+    }
+
 
     @Operation(summary = "粉丝列表", description = "获取关注该用户的粉丝列表")
     @RequestMapping(value = "/user/{id}/fan", method = RequestMethod.GET)
