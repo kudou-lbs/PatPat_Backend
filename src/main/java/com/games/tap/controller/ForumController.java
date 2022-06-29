@@ -220,10 +220,11 @@ public class ForumController {//TODO 加入权限校验
             return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
         long fId = Long.parseLong(fid), uId = Long.parseLong(uid);
         if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
-        if (forumMapper.getForumById(fId) == null) return Echo.fail("论坛不存在");
+        Forum forum= forumMapper.getForumById(fId);
+        if (forum == null) return Echo.fail("论坛不存在");
         ForumUser forumUser = forumUserMapper.getForumUser(uId, fId);
         if (forumUser == null) {
-            forumUser = new ForumUser(uId, fId, true,0);
+            forumUser = new ForumUser(uId, fId, true,0,forum.getName());
             if (forumUserMapper.insertForumUser(forumUser) != 0) return Echo.success();
         } else {
             if (forumUser.getIsLike()) return Echo.fail("已经关注过了");
@@ -241,11 +242,12 @@ public class ForumController {//TODO 加入权限校验
         long fId = Long.parseLong(fid), uId = Long.parseLong(uid);
         int identity = Integer.parseInt(role);
         if (userMapper.getUserById(uId) == null) return Echo.define(RetCode.USER_NOT_EXIST);
-        if (forumMapper.getForumById(fId) == null) return Echo.fail("论坛不存在");
+        Forum forum= forumMapper.getForumById(fId);
+        if (forum == null) return Echo.fail("论坛不存在");
         if (identity < 0 || identity > 2) return Echo.define(RetCode.PARAM_IS_INVALID);
         ForumUser forumUser = forumUserMapper.getForumUser(uId, fId);
         if (forumUser == null) {
-            forumUser = new ForumUser(uId, fId, false,identity);
+            forumUser = new ForumUser(uId, fId, false,identity,forum.getName());
             if (forumUserMapper.insertForumUser(forumUser) != 0) return Echo.success();
         } else {
             if (forumUser.getIdentity() == identity) return Echo.fail("权限相同，无法更改");

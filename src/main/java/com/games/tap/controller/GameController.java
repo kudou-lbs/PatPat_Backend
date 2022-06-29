@@ -204,7 +204,7 @@ public class GameController {
     }
 
     @PassToken
-    @Operation(summary = "添加某个游戏（id）的部分标签（String types,以两个空格分开,例如“射击  益智  RPG”）")
+    @Operation(summary = "添加某个游戏（id）的部分标签")
     @RequestMapping(value = "/game/type", method = RequestMethod.POST)
     public Echo insertType(String gId, String types) {
         if (!StringUtils.isNumeric(gId)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
@@ -219,7 +219,7 @@ public class GameController {
     }
 
     @PassToken
-    @Operation(summary = "删除某个游戏（id）的部分标签（String types,以两个空格分开,例如“射击  益智  RPG”）")
+    @Operation(summary = "删除某个游戏（id）的部分标签")
     @RequestMapping(value = "/game/type", method = RequestMethod.DELETE)
     public Echo deleteType(String gId, String types) {
         if (!StringUtils.isNumeric(gId)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
