@@ -46,9 +46,9 @@ public class ReplyController {
     @Resource
     LACService lacService;
 
-    @Operation(summary = "新增回复", description = "前四个参数必带，后两个全为空或全不空，全空为新增主回复，不空为新增楼中楼")
+    @Operation(summary = "新增回复", description = "前四个参数必带，后三个全为空或全不空，全空为新增主回复，不空为新增楼中楼")
     @RequestMapping(value = "/reply", method = RequestMethod.POST)
-    public Echo addReply(String uid, String fid, String pid, String content, String replyToUid, String floorNum) {
+    public Echo addReply(String uid, String fid, String pid, String content, String replyToUid, String floorNum,String replyToRid) {
         if (uid == null || uid.equals("") || fid == null || fid.equals("") || pid == null || pid.equals("")
                 || content == null || content.equals("")) return Echo.define(RetCode.PARAM_IS_EMPTY);
         if ((replyToUid == null || replyToUid.equals("")) ^ (floorNum == null || floorNum.equals("")))
@@ -61,14 +61,16 @@ public class ReplyController {
         String ctime = DateUtil.getCurrentTime();
         Reply reply = new Reply(uId, fId, pId, content, ctime);
         if (replyToUid != null && !replyToUid.equals("")) {//新增楼中楼
-            if (!StringUtils.isNumeric(replyToUid) || !StringUtils.isNumeric(floorNum))
-                return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-            long r2id = Long.parseLong(replyToUid);
-            if (userMapper.getUsernameById(r2id) == null) return Echo.fail("回复的用户不存在");
+            if(replyToRid==null||replyToRid.equals(""))return Echo.fail("r2rid不能为空");
+            if (!StringUtils.isNumeric(replyToUid) || !StringUtils.isNumeric(floorNum)
+            || !StringUtils.isNumeric(replyToRid)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
+            long r2uid = Long.parseLong(replyToUid),r2rid=Long.parseLong(replyToRid);
+            if (userMapper.getUsernameById(r2uid) == null) return Echo.fail("回复的用户不存在");
             int floor = Integer.parseInt(floorNum);
             Long floorId = replyMapper.getRIdByFloor(floor, pId);
             if (floorId == null) return Echo.fail("回复楼层不存在");
-            reply.setReplyToUid(r2id);
+            reply.setReplyToUid(r2uid);
+            reply.setReplyToRid(r2rid);
             reply.setIsFloor(false);
             reply.setFloorNum(floor);
             if (replyMapper.addFloorReplyNum(floorId) == 0) return Echo.fail("更新楼层回复数失败");
@@ -126,6 +128,7 @@ public class ReplyController {
             Map<String, Object>map=new HashMap<>();
             map.put("reply_list",subReplyList);
             map.put("reply_num",reply.getReplyNum());
+            map.put("floor_num",reply.getFloorNum());
             map.put("fid",reply.getFId());
             map.put("pid",reply.getPId());
             return Echo.success(map);

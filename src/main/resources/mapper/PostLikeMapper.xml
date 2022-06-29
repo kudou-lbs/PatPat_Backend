@@ -27,13 +27,12 @@
     </select>
 
     <select id="getUserLikePostList" resultType="com.games.tap.vo.UserPostInfo">
-        SELECT post.*,f.name AS forum_name,avatar,IFNULL(level,1)AS level,
+        SELECT post.*,fu.forum_name,avatar,IFNULL(level,1)AS level,
                IFNULL(nickname,'用户已注销') AS nickname, true AS is_like
         FROM (SELECT * FROM post_like WHERE uid=#{uid}) pl
             LEFT JOIN post ON post.pid = pl.pid
             LEFT JOIN user u ON post.uid = u.uid
             LEFT JOIN forum_user fu ON post.fid = fu.fid AND post.uid = fu.uid
-            LEFT JOIN forum f ON post.fid = f.fid
         ORDER BY last_date DESC
         <if test="pageSize!=null ">
             LIMIT #{pageSize}
