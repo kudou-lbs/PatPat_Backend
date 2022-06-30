@@ -1,82 +1,71 @@
 package com.games.tap;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-
-import com.games.tap.domain.User;
-import com.games.tap.mapper.UserMapper;
+import com.games.tap.domain.Forum;
 import com.games.tap.service.SearchService;
+import com.games.tap.vo.SearchedPost;
 import com.games.tap.vo.SearchedUser;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.core.async.AsyncLoggerContextSelector;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.io.IOException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Slf4j
 class TapApplicationTests {
 	@Resource
 	SearchService service;
-	@Resource
-	ElasticsearchClient client;
+
+	private final SearchedUser user=new SearchedUser(1L,"admin","null","hello",0);
+	private final SearchedPost post= new SearchedPost(1L,0,0,"test","echo","gn","null");
+	private final Forum forum=new Forum(1L,"gn","gck","gnk48",0,0);
+
+	@Order(1)
 	@Test
-	void test() {
-//		User u1=new User(4L,"塞尔达玩家","111");
-//		User u2=new User(1L,"原皮魅力时刻","999");
-//		User u3=new User(3L,"正常玩家","woc,原");
+	void createIndex() {
 		try {
-//			service.addItem("user",u1);
-//			service.updateItem("user",u2,User.class);
-//			service.addUser(u2);
-//			service.addUser(u3);
-//			service.searchUser("魅力",0,10, SearchedUser.class);
-			service.createUserIndex();
-			service.createPostIndex();
-			service.createForumIndex();
-			service.createGameIndex();
+			if(service.isIndexNonexistence("user")) service.createUserIndex();
+			if(service.isIndexNonexistence("post"))service.createPostIndex();
+			if(service.isIndexNonexistence("forum"))service.createForumIndex();
+			if(service.isIndexNonexistence("game"))service.createGameIndex();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-//	@Test
-//	void test1(){
-//		try {
-//			service.searchAll("user",0,10,User.class);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//	}
-//	@Test
-//	void test2(){
-//		try {
-////			service.deleteUser("1");
-//			service.deleteIndex("user");
-//			service.createUserIndex();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//	}
-//	@Test
-//	void test3(){
-//		try {
-//			log.info(service.getItem("user","1",User.class).toString());
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//	}
-//	@Test
-//	void test4(){
-//		try {
-//			service.createUserIndex();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//	}
+	@Order(2)
+	@Test
+	void addItem(){
+		try {
+			service.addItem("user",user);
+			service.addItem("post",post);
+			service.addItem("forum",forum);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
+	@Order(3)
+	@Test
+	void deleteItem(){
+		try {
+			service.deleteItem("user", user.getId());
+			service.deleteItem("post", post.getId());
+			service.deleteItem("forum", forum.getId());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	@Test
+	void test(){
+		Long i=1L;
+		System.out.println(i);
+	}
 }

@@ -55,7 +55,7 @@ public class SearchController {
                 List<Boolean> tmp=new ArrayList<>();
                 if (id != null) {
                     List<Long> tmp1 = new ArrayList<>();
-                    list.forEach(i -> tmp1.add(Objects.requireNonNull(i.source()).getUId()));
+                    list.forEach(i -> tmp1.add(Objects.requireNonNull(i.source()).getUid()));
                     tmp = conMapper.getLikeList(id, tmp1);
                 }
                 int num = 0;
