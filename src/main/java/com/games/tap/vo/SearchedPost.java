@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class SearchedPost implements Item {
-    private Long pId;
+    private Long pid;
     private Integer likeNum;
     private Integer replyNum;
     private String title;
@@ -15,6 +15,19 @@ public class SearchedPost implements Item {
 
     @Override
     public String getId() {
-        return pId.toString();
+        return pid.toString();
     }
+
+    public SearchedPost(Long pid, int likeNum, int replyNum, String title,
+                        String content, String forumName, String picture) {
+        this.pid = pid;
+        this.likeNum = likeNum;
+        this.replyNum = replyNum;
+        this.title = title;
+        this.forumName = forumName;
+        this.picture = picture;
+        this.content = content;
+    }
+
+    public SearchedPost(){}
 }

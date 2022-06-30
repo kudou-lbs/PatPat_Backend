@@ -49,4 +49,15 @@ public class Forum implements Item{
         return fId.toString();
     }
 
+    public Forum(){};
+
+    public Forum(long fId,String name,String intro,String icon,int followNum,int postNum){
+        this.fId=fId;
+        this.name=name;
+        this.intro=intro;
+        this.icon=icon;
+        this.followNum=followNum;
+        this.postNum=postNum;
+    }
+
 }
