@@ -35,9 +35,11 @@ public class SearchService {
     public <T> List<Hit<T>> searchUser(String term, int page, int size,Class<T> tClass) throws IOException {
         SearchResponse<T> searchResponse = client.search(s -> s
                         .index("user")
-                        .query(q -> q.bool(b -> b
+                        .query(q -> q
+//                                        .match(m->m.field("intro").query(term)
+                                .bool(b -> b
                                         .should(h -> h.match(m -> m.field("intro").query(term)))
-                                        .should(h -> h.matchPhrase(m -> m.field("nickname").query(term).slop(1)))
+                                        .should(h -> h.matchPhrase(m -> m.field("nickname").query(term).slop(3)))
 //                        .term(t -> t
 //                                .field("nickname")
 //                                .value(v -> v.stringValue(term)))
@@ -158,6 +160,19 @@ public class SearchService {
                 .doc(item), tClass);
     }
 
+    public <T extends Item> void updateItemList(String idx, List<T> tList) throws IOException {
+        List<BulkOperation> bulkOperations = new ArrayList<>();
+        tList.forEach(t ->
+                bulkOperations.add(BulkOperation.of(b -> b
+                        .update(u->u.id(t.getId()).action(a->a.doc(t))
+                        )
+                ))
+        );
+        BulkResponse bulkResponse = client.bulk(b -> b.index(idx).operations(bulkOperations));
+        bulkResponse.items().forEach(i -> System.out.println("i = " + i.result()));
+        System.out.println("bulkResponse.errors() = " + bulkResponse.errors());
+    }
+
     public <T> T getItem(String idx, String id, Class<T> tClass) throws IOException {
         GetResponse<T> getResponse = client.get(g -> g
                 .index(idx)
@@ -173,11 +188,11 @@ public class SearchService {
         log.info("删除Id:" + deleteResponse.id());
     }
 
-    public void deleteItemList(String idx, List<String> list) throws IOException {
+    public void deleteItemList(String idx, List<Long> list) throws IOException {
         List<BulkOperation> bulkOperations = new ArrayList<>();
         list.forEach(i ->
                 bulkOperations.add(BulkOperation.of(b ->
-                        b.delete(c -> c.id(i))
+                        b.delete(c -> c.id(i.toString()))
                 ))
         );
         BulkResponse bulkResponse = client.bulk(a -> a.index(idx).operations(bulkOperations));

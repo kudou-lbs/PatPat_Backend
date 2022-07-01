@@ -9,16 +9,16 @@ public class SearchedUser implements Item {
     private String avatar;
     private String nickname;
     private Integer fansNum;
-    private Long uid;
+    private Long uId;
     private Boolean isFollow;
 
     @Override
     public String getId() {
-        return uid.toString();
+        return uId.toString();
     }
 
-    public SearchedUser(Long uid,String nickname,String avatar,String intro,int fansNum){
-        this.uid=uid;
+    public SearchedUser(Long uId, String nickname, String avatar, String intro, int fansNum){
+        this.uId = uId;
         this.nickname=nickname;
         this.avatar=avatar;
         this.intro=intro;

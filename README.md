@@ -57,4 +57,23 @@ mvn spring-boot:run
 - Completed the upgrade function
 
 2022-06-26
-- The index for the database is established and some SQL statements are optimized
+- The index for the database is established
+- Optimized some SQL statements 
+
+2022-06-27
+- Configure and write ElasticSearch
+
+2022-06-28
+- Integrated the Elasticsearch 
+- Test the query function
+
+2022-06-29
+- The back-end code is deployed on the CVM
+- Deploy mysql and elasticSearch on docker
+
+2022-06-30
+- Try to integrate alibaba canal's database synchronization scheme
+- Fixed some bugs
+
+2022-07-01
+- Released the beta version with code synchronization scheme.

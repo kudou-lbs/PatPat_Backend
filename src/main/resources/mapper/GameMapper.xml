@@ -110,12 +110,11 @@
 
     <select id="getById" resultType="com.games.tap.domain.Game">
         SELECT game.gid,hot,name,picture,score,url,intro,icon,table_type.type as types
-        FROM game left join
+        FROM (select * from game where game.gid=#{gId})game left join
              (SELECT game_type.gid,GROUP_CONCAT(game_type.type SEPARATOR ',') type
               FROM game_type
               GROUP BY game_type.gid)as table_type
              on game.gid=table_type.gid
-            where game.gid=#{gId}
     </select>
 
     <select id="isExisted" resultType="java.lang.Integer">

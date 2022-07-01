@@ -22,10 +22,8 @@ public class ElasticsearchConfig {
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("elastic","123456"));
         RestClient restClient= RestClient.builder(new HttpHost(
-                "localhost",9200,"http"))
-                .setHttpClientConfigCallback(builder ->{
-                   return builder.setDefaultCredentialsProvider(credentialsProvider);
-                }).build();
+                "123.207.30.101",9200,"http"))
+                .setHttpClientConfigCallback(builder -> builder.setDefaultCredentialsProvider(credentialsProvider)).build();
         ElasticsearchTransport transport=new RestClientTransport(restClient, new JacksonJsonpMapper());
 
         return new ElasticsearchClient(transport);

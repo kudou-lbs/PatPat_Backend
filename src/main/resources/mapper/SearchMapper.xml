@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.games.tap.mapper.SearchMapper">
+
+    <select id="getSearchUser" resultType="com.games.tap.vo.SearchedUser">
+        select uid, nickname, avatar, intro, fans_num from user
+    </select>
+
+    <select id="getForums" resultType="com.games.tap.domain.Forum">
+        select * from forum where follow_num>=0
+    </select>
+
+    <select id="getSearchPost" resultType="com.games.tap.vo.SearchedPost">
+        select fpost.*,forum.name as forum_name from (select pid,fid, like_num, reply_num, title,content, picture from post
+        where reading_num>=0) fpost left join forum on fpost.fid=forum.fid
+    </select>
+
+    <select id="getGames" resultType="com.games.tap.domain.Game">
+        SELECT game.gid as gid,game.hot,game.name,
+               game.picture,game.score,game.url,game.intro,game.icon,table_type.type as types
+        FROM game left join
+             (SELECT game_type.gid,GROUP_CONCAT(game_type.type SEPARATOR ',') type
+              FROM game_type
+              GROUP BY game_type.gid)as table_type
+             on game.gid=table_type.gid
+    </select>
+
+</mapper>

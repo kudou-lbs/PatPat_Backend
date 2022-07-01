@@ -73,6 +73,19 @@
         select picture from post where fid=#{fid}
     </select>
 
+    <select id="getForumNameById" resultType="java.lang.String">
+        select name from forum where fid=#{id}
+    </select>
+
+    <select id="getPIdListByFId" resultType="java.lang.Long">
+        select pid from post where fid=#{fid}
+    </select>
+
+    <select id="getSearchPostListById" resultType="com.games.tap.vo.SearchedPost">
+        select fpost.*,forum.name as forum_name from (select pid, like_num, reply_num, title,content, picture from post
+        where fid=#{fid}) fpost left join forum on fid=#{fid}
+    </select>
+
     <select id="getForumInfo" resultType="com.games.tap.vo.UserForumInfo">
         SELECT f.*,exp,level,is_like FROM (SELECT * FROM forum WHERE fid=#{fid} LIMIT 1)
             AS f LEFT JOIN forum_user fu ON f.fid= fu.fid AND fu.uid=#{uid}

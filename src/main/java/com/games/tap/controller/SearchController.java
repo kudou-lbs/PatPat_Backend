@@ -3,7 +3,6 @@ package com.games.tap.controller;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.games.tap.domain.Forum;
 import com.games.tap.domain.Game;
-import com.games.tap.domain.User;
 import com.games.tap.mapper.ConMapper;
 import com.games.tap.service.SearchService;
 import com.games.tap.util.Echo;
@@ -48,14 +47,16 @@ public class SearchController {
             case "user": {
                 List<Hit<SearchedUser>> list = service.searchUser(key, offset, pageSize, SearchedUser.class);
                 if (list == null || list.isEmpty()) return Echo.fail("结果为空");
-                String token = request.getHeader("token");
                 Long id = null;
-                if (token != null && !token.equals("")) id = ToolUtil.getIdByToken(token);
+                if(request!=null){
+                    String token = request.getHeader("token");
+                    if (token != null && !token.equals("")) id = ToolUtil.getIdByToken(token);
+                }
                 List<SearchedUser> resList = new ArrayList<>();
                 List<Boolean> tmp=new ArrayList<>();
                 if (id != null) {
                     List<Long> tmp1 = new ArrayList<>();
-                    list.forEach(i -> tmp1.add(Objects.requireNonNull(i.source()).getUid()));
+                    list.forEach(i -> tmp1.add(Objects.requireNonNull(i.source()).getUId()));
                     tmp = conMapper.getLikeList(id, tmp1);
                 }
                 int num = 0;
