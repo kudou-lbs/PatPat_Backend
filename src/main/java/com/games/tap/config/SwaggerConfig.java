@@ -20,7 +20,7 @@ public class SwaggerConfig {
                         .name("token").description("用户登录认证").schema(new StringSchema()).required(false)))
                 .info(new Info()
                         .title("Patpat接口测试")
-                        .version("beta v1.0")
+                        .version("dev v1.0")
                         .description("测试接口文档    —— 致高贵的客户端和前端爷")
                         .contact(new Contact().name("admin").url("https://gitee.com/lin_po_sheng/patpat-backend")));
     }

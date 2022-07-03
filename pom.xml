@@ -129,11 +129,6 @@
 			<artifactId>spring-security-crypto</artifactId>
 			<version>5.7.1</version>
 		</dependency>
-		<dependency>
-			<groupId>cn.hutool</groupId>
-			<artifactId>hutool-core</artifactId>
-			<version>4.1.8</version>
-		</dependency>
 
 	</dependencies>
 

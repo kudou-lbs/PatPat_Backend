@@ -77,3 +77,8 @@ mvn spring-boot:run
 
 2022-07-01
 - Released the beta version with code synchronization scheme.
+
+2022-07-03
+- Set up the mysql-canal-es8 environment 
+- Fix the bug of the main version
+- Migrate master-slave copy version to dev branch
