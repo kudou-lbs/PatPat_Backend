@@ -77,9 +77,9 @@ public class SearchService {
         SearchResponse<T> searchResponse = client.search(s -> s
                         .index("post")
                         .query(q -> q.bool(b -> b
-                                .should(h -> h.match(m -> m.field("content").query(term)))
+                                .should(h -> h.match(m -> m.field("title").query(term)))
                                 .should(h -> h.matchPhrase(m -> m.field("forumName").query(term).slop(2)))
-                                .should(h -> h.fuzzy(f -> f.field("title").value(term).fuzziness("3")))
+                                .should(h -> h.fuzzy(f -> f.field("content").value(term).fuzziness("1")))
                         ))
                         .highlight(h -> h
                                 .fields("forumName", f -> f.preTags(PRE_TAG).postTags(POST_TAG))

@@ -66,7 +66,7 @@ public class SearchController {
                         assert u != null;
                         u.setNickname(i.highlight().get("nickname").get(0));
                     }
-                    if(id!=null) Objects.requireNonNull(u).setIsFollow(tmp.get(num++));
+                    if(id!=null&&tmp.size()>num) Objects.requireNonNull(u).setIsFollow(tmp.get(num++));
                     resList.add(u);
                 }
                 return Echo.success(resList);
