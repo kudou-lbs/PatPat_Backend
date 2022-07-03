@@ -6,7 +6,6 @@ import com.games.tap.mapper.ForumMapper;
 import com.games.tap.mapper.ForumUserMapper;
 import com.games.tap.mapper.UserMapper;
 import com.games.tap.service.ImageService;
-import com.games.tap.service.SearchService;
 import com.games.tap.util.ToolUtil;
 import com.games.tap.util.Echo;
 import com.games.tap.util.PassToken;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -34,8 +32,6 @@ public class ForumController {//TODO 加入权限校验
     ForumMapper forumMapper;
     @Resource
     ImageService imageService;
-    @Resource
-    SearchService searchService;
     @Resource
     UserMapper userMapper;
     @Resource
@@ -59,14 +55,8 @@ public class ForumController {//TODO 加入权限校验
             if (map.containsKey("path")) forum.setIcon(map.get("path"));
             else return Echo.fail(map.get("result"));
         }
-        if (forumMapper.insertForum(forum) == 0) return Echo.fail("数据库操作失败");
-        try {
-            searchService.addItem("forum", forum);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Echo.fail("es操作失败");
-        }
-        return Echo.success(forum.getFId());
+        if (forumMapper.insertForum(forum) != 0) return Echo.success(forum.getFId());
+        return Echo.fail("数据库操作失败");
     }
 
     @Operation(summary = "更新论坛", description = "id必填，其他修改项任选，但不能同时为空", parameters = {
@@ -81,32 +71,22 @@ public class ForumController {//TODO 加入权限校验
         if (saveForum == null) return Echo.fail("论坛不存在");
         if ((name == null || name.equals("")) && (intro == null || intro.equals("")) && icon == null)
             return Echo.define(RetCode.PARAM_IS_EMPTY);
-        boolean flag=false;
-        if (name != null && !name.equals("") && !name.equals(saveForum.getName())) {
-            if (forumMapper.getForumByName(name) != null) return Echo.fail("论坛名重复");
-            saveForum.setName(name);
-            flag=true;
-        }
-        if (intro != null && !intro.equals("") && !intro.equals(saveForum.getIntro())) {
-            saveForum.setIntro(intro);
-        }
-        if (icon != null && !icon.isEmpty()) {
-            Map<String, String> map = imageService.uploadImage(icon);
-            if (map.containsKey("path")) saveForum.setIcon(map.get("path"));
-            else return Echo.fail(map.get("result"));
-        }
-        if (forumMapper.updateForum(saveForum) == 0) return Echo.fail("数据库操作失败");
-        try {
-            if(flag){
-                List<SearchedPost>list=forumMapper.getSearchPostListById(saveForum.getFId());
-                searchService.updateItemList("post",list);
+        else {
+            if (name != null && !name.equals("") && !name.equals(saveForum.getName())) {
+                if (forumMapper.getForumByName(name) != null) return Echo.fail("论坛名重复");
+                saveForum.setName(name);
             }
-            searchService.updateItem("forum", saveForum, Forum.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Echo.fail("es操作失败");
+            if (intro != null && !intro.equals("") && !intro.equals(saveForum.getIntro())) {
+                saveForum.setIntro(intro);
+            }
+            if (icon != null && !icon.isEmpty()) {
+                Map<String, String> map = imageService.uploadImage(icon);
+                if (map.containsKey("path")) saveForum.setIcon(map.get("path"));
+                else return Echo.fail(map.get("result"));
+            }
+            if (forumMapper.updateForum(saveForum) != 0) return Echo.success();
+            return Echo.fail("数据库操作失败");
         }
-        return Echo.success();
     }
 
     @Operation(summary = "删除论坛", description = "通过id删除论坛")
@@ -123,16 +103,8 @@ public class ForumController {//TODO 加入权限校验
             flag &= imageService.deleteFiles(path);
         }
         if (!flag) return Echo.fail("删除图片失败");
-        if (forumMapper.deleteForumById(fid) == 0) return Echo.fail();
-        List<Long> list1=forumMapper.getPIdListByFId(fid);
-        try {
-            searchService.deleteItem("forum",id);
-            searchService.deleteItemList("post",list1);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Echo.fail("es操作失败");
-        }
-        return Echo.success();
+        if (forumMapper.deleteForumById(fid) != 0) return Echo.success();
+        return Echo.fail();
     }
 
     @PassToken

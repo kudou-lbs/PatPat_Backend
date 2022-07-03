@@ -1,17 +1,14 @@
 package com.games.tap.controller;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.games.tap.domain.ForumUser;
 import com.games.tap.domain.TypeEnum;
 import com.games.tap.mapper.ForumUserMapper;
 import com.games.tap.service.LACService;
-import com.games.tap.service.SearchService;
 import com.games.tap.util.ToolUtil;
 import com.games.tap.util.Echo;
 import com.games.tap.util.PassToken;
 import com.games.tap.util.RetCode;
 import com.games.tap.vo.ReplyInfo;
-import com.games.tap.vo.SearchedPost;
 import com.games.tap.vo.UserPostInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import com.games.tap.domain.Post;
@@ -29,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -41,8 +37,6 @@ public class PostController {
     LACService lacService;
     @Resource
     ImageService imageService;
-    @Resource
-    SearchService searchService;
     @Resource
     PostMapper postMapper;
     @Resource
@@ -83,15 +77,6 @@ public class PostController {
             ToolUtil.checkExp(forumUser);
             if (forumUserMapper.updateLevelAndExp(uId, fId, forumUser.getExp(), forumUser.getLevel()) == 0)
                 return Echo.fail("更新用户经验值失败");
-        }
-        SearchedPost post1=new SearchedPost();
-        BeanUtil.copyProperties(post,post1);
-        post1.setForumName(forumMapper.getForumNameById(fId));
-        try {
-            searchService.addItem("post",post1);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Echo.fail("es操作失败");
         }
         return Echo.success();
     }
@@ -181,12 +166,6 @@ public class PostController {
         if (!imageService.deleteFiles(path)) return Echo.fail("图片删除失败");
         if (postMapper.deleteByPId(id) == 0) return Echo.fail("帖子删除失败");
         if (forumMapper.subPostNum(fid) == 0) return Echo.fail("论坛更新失败");
-        try {
-            searchService.deleteItem("post",pid);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Echo.fail("es操作失败");
-        }
         return Echo.success();
     }
 

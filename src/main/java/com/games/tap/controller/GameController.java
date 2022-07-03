@@ -1,7 +1,6 @@
 package com.games.tap.controller;
 
 import com.games.tap.domain.Game;
-import com.games.tap.mapper.GameMapper;
 import com.games.tap.service.GameService;
 import com.games.tap.service.SearchService;
 import com.games.tap.util.Echo;
@@ -24,10 +23,6 @@ import java.util.Objects;
 public class GameController {
     @Resource
     GameService gameService;
-    @Resource
-    GameMapper gameMapper;
-    @Resource
-    SearchService searchService;
 
     @PassToken
     @Operation(summary = "返回所有游戏信息", parameters = {
@@ -152,12 +147,6 @@ public class GameController {
         Long gId = game.getGId();
         String[] types = game.getTypes().split(",");
         gameService.insertType(gId, types);
-        try {
-            searchService.addItem("game",game);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Echo.fail("es操作失败");
-        }
         return Echo.success();
     }
 
@@ -185,12 +174,6 @@ public class GameController {
                 }
             }
         }
-        try {
-            searchService.addItemList("game",games);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Echo.fail("es操作失败");
-        }
         return Echo.success();
     }
 
@@ -199,14 +182,8 @@ public class GameController {
     @RequestMapping(value = "/game", method = RequestMethod.DELETE)
     public Echo deleteById(String gId) {
         if (!StringUtils.isNumeric(gId)) return Echo.define(RetCode.PARAM_TYPE_BIND_ERROR);
-        if (gameService.deleteGameById(Long.parseLong(gId)) == 0) return Echo.fail();
-        try {
-            searchService.deleteItem("game",gId);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Echo.fail("es操作失败");
-        }
-        return Echo.success();
+        if (gameService.deleteGameById(Long.parseLong(gId)) != 0) return Echo.success();
+        return Echo.fail();
     }
 
     @PassToken
@@ -221,12 +198,6 @@ public class GameController {
             String[] type = game.getTypes().split(",");
             gameService.deleteTypeById(game.getGId());
             gameService.insertType(game.getGId(), type);
-        }
-        try {
-            searchService.updateItem("game",game,Game.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Echo.fail("es操作失败");
         }
         return Echo.success();
     }
@@ -243,12 +214,6 @@ public class GameController {
                 return Echo.fail("游戏已经有该标签");
         }
         gameService.insertType(Long.parseLong(gId), type);
-        try {
-            searchService.updateItem("game",gameMapper.getById(Long.parseLong(gId)),Game.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Echo.fail("es操作失败");
-        }
         return Echo.success();
     }
 
@@ -264,13 +229,6 @@ public class GameController {
                 return Echo.fail("游戏没有该标签");
         }
         gameService.deleteType(Long.parseLong(gId), type);
-        gameService.insertType(Long.parseLong(gId), type);
-        try {
-            searchService.updateItem("game",gameMapper.getById(Long.parseLong(gId)),Game.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Echo.fail("es操作失败");
-        }
         return Echo.success();
     }
 }

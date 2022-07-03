@@ -1,11 +1,9 @@
 package com.games.tap.controller;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.games.tap.domain.User;
 import com.games.tap.mapper.ConMapper;
 import com.games.tap.mapper.UserMapper;
 import com.games.tap.service.ImageService;
-import com.games.tap.service.SearchService;
 import com.games.tap.util.ToolUtil;
 import com.games.tap.util.*;
 import com.games.tap.vo.*;
@@ -20,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.*;
 
 @Slf4j
@@ -34,8 +31,6 @@ public class UserController {
     PasswordEncoder encoder;
     @Resource
     ImageService imageService;
-    @Resource
-    SearchService searchService;
     @Resource
     ConMapper conMapper;
 
@@ -87,14 +82,6 @@ public class UserController {
         user.setRegisterTime(DateUtil.getCurrentTime());
         if (userMapper.insertUser(user) > 0) {
             log.info(user.getUsername() + "注册成功");
-            SearchedUser user1=new SearchedUser();
-            BeanUtil.copyProperties(user,user1);
-            try {
-                searchService.addItem("user",user1);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return Echo.fail("es操作失败");
-            }
             return Echo.success();
         } else return Echo.fail("注册失败");
     }
@@ -154,16 +141,8 @@ public class UserController {
             }else
                 return Echo.fail("密码格式错误");
         }
-        if (userMapper.updateUser(saveUser) == 0) return Echo.fail();
-        SearchedUser searchedUser=new SearchedUser();
-        BeanUtil.copyProperties(saveUser, searchedUser);
-        try {
-            searchService.updateItem("user",searchedUser,SearchedUser.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Echo.fail("es操作失败");
-        }
-        return Echo.success();
+        if (userMapper.updateUser(saveUser) != 0) return Echo.success();
+        else return Echo.fail();
     }
 
     @Operation(summary = "删除用户", description = "通过id删除，该方法应加入权限验证")//TODO 用户删除相应表也应该删除
@@ -174,14 +153,8 @@ public class UserController {
         boolean flag= imageService.deleteFiles(userMapper.getUserAvatarById(uid));
         if(flag) flag = imageService.deleteFiles(userMapper.getBackgroundById(uid));
         if(!flag)return Echo.fail("删除图片失败");
-        if (userMapper.deleteUserById(uid) == 0) return Echo.fail();
-        try {
-            searchService.deleteItem("user",id);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Echo.fail("es操作失败");
-        }
-        return Echo.success();
+        if (userMapper.deleteUserById(uid) != 0) return Echo.success();
+        else return Echo.fail();
     }
 
     @PassToken
