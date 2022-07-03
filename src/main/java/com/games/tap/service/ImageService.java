@@ -86,7 +86,7 @@ public class ImageService {
      * 删除图片
      */
     public boolean deleteFiles(String pathName){
-
+        if(pathName==null||pathName.equals(""))return true;
         boolean flag = false;
         //根据路径创建文件对象
         File file = new File(uploadPath+pathName);

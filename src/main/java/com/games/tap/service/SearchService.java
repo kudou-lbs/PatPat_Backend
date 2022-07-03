@@ -99,7 +99,6 @@ public class SearchService {
                         .index("game")
                         .query(q -> q.bool(b -> b
                                 .should(h -> h.matchPhrase(m -> m.field("name").query(term).slop(1)))
-                                .should(h -> h.match(m -> m.field("intro").query(term)))
                                 .should(h -> h.match(m -> m.field("types").query(term)))
                         ))
                         .highlight(h -> h.fields("name", f -> f.preTags(PRE_TAG).postTags(POST_TAG)))
@@ -204,7 +203,7 @@ public class SearchService {
         Map<String, Property> map = new HashMap<>();
         map.put("nickname", Property.of(p -> p
                 .text(TextProperty.of(t -> t
-                        .index(true).analyzer("ik_smart"))
+                        .index(true).analyzer("ik_max_word"))
                 )));
         map.put("intro", Property.of(p -> p
                 .text(TextProperty.of(t -> t
@@ -223,7 +222,7 @@ public class SearchService {
         Map<String, Property> map = new HashMap<>();
         map.put("name", Property.of(p -> p
                 .text(TextProperty.of(t -> t
-                        .index(true).analyzer("ik_smart")
+                        .index(true).analyzer("ik_max_word")
                 ))
         ));
         map.put("intro", Property.of(p -> p
@@ -253,7 +252,7 @@ public class SearchService {
         ));
         map.put("forumName", Property.of(p -> p
                 .text(TextProperty.of(t -> t
-                        .index(true).analyzer("ik_smart")
+                        .index(true).analyzer("ik_max_word")
                 ))
         ));
         CreateIndexResponse createIndexResponse = client.indices().create(c -> c
@@ -268,26 +267,11 @@ public class SearchService {
  Map<String, Property> map = new HashMap<>();
         map.put("name", Property.of(p -> p
                 .text(TextProperty.of(t -> t
-                        .index(true).analyzer("ik_smart"))
+                        .index(true).analyzer("ik_max_word"))
                 )));
-        map.put("intro", Property.of(p -> p
-                .text(TextProperty.of(t -> t
-                        .index(true).analyzer("ik_max_word").searchAnalyzer("ik_smart")
-                ))
-        ));
         map.put("types", Property.of(p -> p
                 .text(TextProperty.of(t -> t
                         .index(true).analyzer("ik_max_word").searchAnalyzer("ik_smart")
-                ))
-        ));
-        map.put("hot", Property.of(p -> p
-                .text(TextProperty.of(t -> t
-                        .index(true).analyzer("ik_smart")
-                ))
-        ));
-        map.put("score", Property.of(p -> p
-                .text(TextProperty.of(t -> t
-                        .index(true).analyzer("ik_smart")
                 ))
         ));
         CreateIndexResponse createIndexResponse = client.indices().create(c -> c

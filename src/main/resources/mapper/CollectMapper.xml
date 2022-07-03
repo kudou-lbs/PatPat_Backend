@@ -27,13 +27,14 @@
     </update>
 
     <select id="getUserCollectList" resultType="com.games.tap.vo.UserPostInfo">
-        SELECT post.*,fu.forum_name,avatar,IFNULL(level,1)AS level,
+        SELECT post.*,f.name AS forum_name,avatar,IFNULL(level,1)AS level,
                IFNULL(nickname,'用户已注销') AS nickname,
                (IF(c.id IS null, false, true)) AS is_like
         FROM (SELECT * FROM collection WHERE uid=#{uid}) c
             LEFT JOIN post ON post.pid = c.pid
             LEFT JOIN user u ON post.uid = u.uid
             LEFT JOIN forum_user fu ON post.fid = fu.fid AND post.uid = fu.uid
+            LEFT JOIN forum f ON post.fid = f.fid
         ORDER BY last_date DESC
         <if test="pageSize!=null ">
             LIMIT #{pageSize}

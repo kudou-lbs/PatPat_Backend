@@ -11,16 +11,23 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.client.RestClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 
 @Configuration
 public class ElasticsearchConfig {
+
+    @Value("${spring.elasticsearch.username}")
+    private String userName;
+    @Value("${spring.elasticsearch.password}")
+    private String password;
+
     @Bean
     public ElasticsearchClient elasticsearchClient(){
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("elastic","123456"));
+        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userName,password));
         RestClient restClient= RestClient.builder(new HttpHost(
                 "123.207.30.101",9200,"http"))
                 .setHttpClientConfigCallback(builder -> builder.setDefaultCredentialsProvider(credentialsProvider)).build();

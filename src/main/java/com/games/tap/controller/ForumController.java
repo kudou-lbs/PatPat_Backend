@@ -252,7 +252,7 @@ public class ForumController {//TODO 加入权限校验
         if (forum == null) return Echo.fail("论坛不存在");
         ForumUser forumUser = forumUserMapper.getForumUser(uId, fId);
         if (forumUser == null) {
-            forumUser = new ForumUser(uId, fId, true, 0, forum.getName());
+            forumUser = new ForumUser(uId, fId, true, 0);
             if (forumUserMapper.insertForumUser(forumUser) == 0) return Echo.fail();
             if (forumUserMapper.likeForum(uId, fId) != 0) return Echo.success();
         } else {
@@ -276,7 +276,7 @@ public class ForumController {//TODO 加入权限校验
         if (identity < 0 || identity > 2) return Echo.define(RetCode.PARAM_IS_INVALID);
         ForumUser forumUser = forumUserMapper.getForumUser(uId, fId);
         if (forumUser == null) {
-            forumUser = new ForumUser(uId, fId, false, identity, forum.getName());
+            forumUser = new ForumUser(uId, fId, false, identity);
             if (forumUserMapper.insertForumUser(forumUser) != 0) return Echo.success();
         } else {
             if (forumUser.getIdentity() == identity) return Echo.fail("权限相同，无法更改");

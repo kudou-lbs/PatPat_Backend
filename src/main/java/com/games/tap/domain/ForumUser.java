@@ -37,10 +37,6 @@ public class ForumUser {
     @Schema(description = "是否关注论坛")
     private Boolean isLike;
 
-    @Column(name = "forum_name", columnDefinition = "int(11) default 0")
-    @Schema(description = "论坛名称")
-    private String forumName;
-
     @Column(name = "uid", columnDefinition = "bigint(20)",nullable = false)
     @Schema(description = "用户Id",required = true)
     private Long uId;
@@ -51,12 +47,11 @@ public class ForumUser {
 
     public ForumUser(){}
 
-    public ForumUser(Long uid,Long fid,Boolean isLike,Integer identity,String name){
+    public ForumUser(Long uid,Long fid,Boolean isLike,Integer identity){
         this.uId=uid;
         this.fId=fid;
         this.isLike=isLike;
         this.identity=identity;
-        this.forumName=name;
     }
 
 }

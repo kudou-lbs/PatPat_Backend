@@ -15,13 +15,13 @@
     </select>
 
     <select id="getSearchPost" resultType="com.games.tap.vo.SearchedPost">
-        select fpost.*,forum.name as forum_name from (select pid,fid, like_num, reply_num, title,content, picture from post
+        select fpost.*,forum.name as forum_name from (select pid, fid, like_num, reply_num, title,content, picture from post
         where reading_num>=0) fpost left join forum on fpost.fid=forum.fid
     </select>
 
     <select id="getGames" resultType="com.games.tap.domain.Game">
         SELECT game.gid as gid,game.hot,game.name,
-               game.picture,game.score,game.url,game.intro,game.icon,table_type.type as types
+               game.score,game.url,game.icon,table_type.type as types
         FROM game left join
              (SELECT game_type.gid,GROUP_CONCAT(game_type.type SEPARATOR ',') type
               FROM game_type

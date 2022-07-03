@@ -22,7 +22,7 @@
     </select>
 
     <select id="getUserPostList" resultType="com.games.tap.vo.UserPostInfo">
-        SELECT fpost.*,fu.forum_name,avatar,IFNULL(nickname,'用户已注销') AS nickname,
+        SELECT fpost.*,f.name AS forum_name,avatar,IFNULL(nickname,'用户已注销') AS nickname,
         (CASE
         WHEN #{uid} IS null THEN false
         <if test="uid!=null ">
@@ -41,6 +41,7 @@
         </where>) fpost
             LEFT JOIN user u ON fpost.uid = u.uid
             LEFT JOIN forum_user fu ON fpost.fid = fu.fid AND fpost.uid = fu.uid
+            LEFT JOIN forum f ON fpost.fid = f.fid
         <if test="uid!=null ">
             LEFT JOIN post_like pl ON fpost.pid = pl.pid AND pl.uid = #{uid}
         </if>
@@ -61,7 +62,7 @@
 
     <select id="getUserReplyList" resultType="com.games.tap.vo.UserReply">
         SELECT r.rid, r.content, r.like_num, r.floor_num, r.reply_num, r.post_time, r.fid,
-        fu.forum_name, p.title AS r2title, p.content AS r2content, u1.avatar,
+        f.name, p.title AS r2title, p.content AS r2content, u1.avatar,
         IFNULL(level,1)AS level, IFNULL(u1.nickname,'用户已注销') AS nickname,
         IFNULL(u2.nickname,'用户已注销') AS r2name, r.reply_to_uid AS r2uid,
         (CASE
@@ -76,6 +77,7 @@
         LEFT JOIN (SELECT uid,nickname,avatar FROM user) u1 ON u1.uid=#{uid}
         LEFT JOIN (SELECT uid, nickname FROM user) u2 ON r.reply_to_uid = u2.uid
         LEFT JOIN forum_user fu ON fu.uid = #{uid} AND fu.fid=r.fid
+        LEFT JOIN (SELECT fid,name FROM forum) f on fu.fid = f.fid
         <if test="wid!=null ">
             LEFT JOIN reply_like rl ON r.rid = rl.rid AND rl.uid = #{wid}
         </if>
@@ -122,7 +124,7 @@
         SELECT IFNULL(u.nickname,'用户已注销') AS nickname, u.avatar, r1.uid,
         'reply_reply' AS type, r1.rid AS jid, r1.content AS content, r1.post_time,
         r2.content AS u_content, null AS u_title
-        FROM (SELECT rid,uid,pid,post_time,reply_to_rid,floor_num,content FROM reply WHERE reply_to_uid=#{uid}) AS r1
+        FROM (SELECT rid,uid,post_time,reply_to_rid,floor_num,content FROM reply WHERE reply_to_uid=#{uid}) AS r1
         LEFT JOIN (SELECT rid,content FROM reply) r2 ON r1.reply_to_rid=r2.rid
         LEFT JOIN (SELECT uid,nickname,avatar FROM user)AS u ON u.uid=r1.uid
         <if test="pageSize!=null ">
